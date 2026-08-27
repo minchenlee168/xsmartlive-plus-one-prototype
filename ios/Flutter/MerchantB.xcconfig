@@ -1,5 +1,0 @@
-#include "Generated.xcconfig"
-BUNDLE_IDENTIFIER=com.xsmartlive.plus.one.merchantB
-DISPLAY_NAME=Brand B Shop
-MERCHANT_ID=merchant_b
-BASE_URL=https://api.merchant-b.com

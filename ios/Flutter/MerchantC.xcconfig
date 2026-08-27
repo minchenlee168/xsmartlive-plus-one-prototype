@@ -1,5 +1,0 @@
-#include "Generated.xcconfig"
-BUNDLE_IDENTIFIER=com.xsmartlive.plus.one.merchantC
-DISPLAY_NAME=Brand C Live
-MERCHANT_ID=merchant_c
-BASE_URL=https://api.merchant-c.com

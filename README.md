@@ -1,5 +1,9 @@
 # xSmartLive Plus One
 
+> ⚠️ **這是「觀眾版 APP」的 prototype（web 預覽版）**，用於快速預覽 / 試做畫面與流程，非正式版。
+> 由 `xsmartlive-plus-one` 複製而來，額外加了 web 支援與預覽用改動（登入略過、購物車以純前端模擬等，均以 `kIsWeb` 保護）。
+> 正式手機/上架版請回原始 repo [`ariesweng/xsmartlive-plus-one`](https://github.com/ariesweng/xsmartlive-plus-one)。
+
 Flutter 直播購物 White-Label App，支援多商家品牌（Multi-Flavor）與執行期遠端主題（Remote Theme）。
 
 - **版本**：1.1.2+10

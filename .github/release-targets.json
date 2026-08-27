@@ -1,0 +1,43 @@
+{
+  "$schema-note": "Single source of truth for multi-merchant publishing. Add a merchant = add an entry here. Keys = flavor name. 'publishAndroid' controls automatic tag-push (v*) releases only; manual workflow_dispatch can publish any flavor via its checkbox regardless of this flag. 'playServiceAccountSecret'/'iosBundleId' are reserved for Phase 2/3 — Phase 1 wires the shared PLAY_SERVICE_ACCOUNT_JSON explicitly in release.yml (no dynamic secret indexing).",
+  "default": {
+    "flavor": "default",
+    "entrypoint": "lib/main.dart",
+    "androidPackageName": "com.xsmartlive.plus.one",
+    "playServiceAccountSecret": "PLAY_SERVICE_ACCOUNT_JSON",
+    "mappingFlavorDir": "defaultRelease",
+    "iosBundleId": "com.xsmartlive.plus.one",
+    "publishAndroid": true,
+    "publishIos": false
+  },
+  "merchantA": {
+    "flavor": "merchantA",
+    "entrypoint": "lib/main_merchant_a.dart",
+    "androidPackageName": "com.xsmartlive.plus.one.merchant_a",
+    "playServiceAccountSecret": "PLAY_SERVICE_ACCOUNT_JSON",
+    "mappingFlavorDir": "merchantARelease",
+    "iosBundleId": "com.xsmartlive.plus.one.merchantA",
+    "publishAndroid": false,
+    "publishIos": false
+  },
+  "merchantB": {
+    "flavor": "merchantB",
+    "entrypoint": "lib/main_merchant_b.dart",
+    "androidPackageName": "com.xsmartlive.plus.one.merchant_b",
+    "playServiceAccountSecret": "PLAY_SERVICE_ACCOUNT_JSON",
+    "mappingFlavorDir": "merchantBRelease",
+    "iosBundleId": "com.xsmartlive.plus.one.merchantB",
+    "publishAndroid": false,
+    "publishIos": false
+  },
+  "merchantC": {
+    "flavor": "merchantC",
+    "entrypoint": "lib/main_merchant_c.dart",
+    "androidPackageName": "com.xsmartlive.plus.one.merchant_c",
+    "playServiceAccountSecret": "PLAY_SERVICE_ACCOUNT_JSON",
+    "mappingFlavorDir": "merchantCRelease",
+    "iosBundleId": "com.xsmartlive.plus.one.merchantC",
+    "publishAndroid": false,
+    "publishIos": false
+  }
+}

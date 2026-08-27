@@ -1,0 +1,5 @@
+#include "Generated.xcconfig"
+BUNDLE_IDENTIFIER=com.xsmartlive.plus.one
+DISPLAY_NAME=XSmartLive
+MERCHANT_ID=1
+BASE_URL=https://api-uat-1.xsmartlive.com

@@ -1,0 +1,124 @@
+name: Release · Multi-merchant publish
+
+# Dispatcher. Pick which merchants to publish (checkboxes) + track + status, then fans
+# out one reusable _android-publish.yml job per selected flavor. fail-fast:false so one
+# merchant's rejection never aborts the others.
+#
+# Flavor -> packageName / serviceAccount / mapping mapping lives in .github/release-targets.json.
+# Add a merchant = add an entry there (no workflow change).
+
+on:
+  workflow_dispatch:
+    inputs:
+      merchant_default:
+        description: "Publish default (com.xsmartlive.plus.one — UAT, internal only)"
+        type: boolean
+        default: true
+      merchant_a:
+        description: "Publish merchantA (com.xsmartlive.plus.one.merchant_a)"
+        type: boolean
+        default: false
+      merchant_b:
+        description: "Publish merchantB (com.xsmartlive.plus.one.merchant_b)"
+        type: boolean
+        default: false
+      merchant_c:
+        description: "Publish merchantC (com.xsmartlive.plus.one.merchant_c)"
+        type: boolean
+        default: false
+      track:
+        description: "Play track (applies to all selected merchants)"
+        type: choice
+        default: internal
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      status:
+        description: "Release status (use draft while the app is draft in Play Console)"
+        type: choice
+        default: draft
+        options:
+          - draft
+          - completed
+          - inProgress
+          - halted
+      release_notes:
+        description: "Release notes for testers (zh-TW & en-US)"
+        type: string
+        default: "CI build"
+  push:
+    tags:
+      # Tag push publishes every target with publishAndroid:true (internal/draft).
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Resolve target matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+      count: ${{ steps.set.outputs.count }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build matrix from release-targets.json
+        id: set
+        shell: bash
+        run: |
+          set -euo pipefail
+          cfg=.github/release-targets.json
+
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # Tag push: every target flagged for automatic Android release.
+            sel=$(jq -c '[to_entries[] | select(.value | type == "object" and .publishAndroid == true) | .value]' "$cfg")
+          else
+            keys=()
+            if [[ "${{ inputs.merchant_default }}" == "true" ]]; then keys+=("default"); fi
+            if [[ "${{ inputs.merchant_a }}" == "true" ]]; then keys+=("merchantA"); fi
+            if [[ "${{ inputs.merchant_b }}" == "true" ]]; then keys+=("merchantB"); fi
+            if [[ "${{ inputs.merchant_c }}" == "true" ]]; then keys+=("merchantC"); fi
+            if [[ ${#keys[@]} -eq 0 ]]; then
+              echo "::error::No merchant selected — tick at least one merchant_* box."
+              exit 1
+            fi
+            keys_json=$(printf '%s\n' "${keys[@]}" | jq -R . | jq -cs .)
+            sel=$(jq -c --argjson keys "$keys_json" \
+              '[to_entries[] | select(.key as $k | $keys | index($k)) | .value]' "$cfg")
+          fi
+
+          count=$(echo "$sel" | jq 'length')
+          echo "Selected $count target(s):"
+          echo "$sel" | jq -r '.[] | "  - \(.flavor) -> \(.androidPackageName)"'
+          echo "matrix={\"target\":$sel}" >> "$GITHUB_OUTPUT"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
+  android:
+    name: Publish
+    needs: prepare
+    if: ${{ needs.prepare.outputs.count != '0' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    uses: ./.github/workflows/_android-publish.yml
+    with:
+      flavor: ${{ matrix.target.flavor }}
+      entrypoint: ${{ matrix.target.entrypoint }}
+      package_name: ${{ matrix.target.androidPackageName }}
+      mapping_dir: ${{ matrix.target.mappingFlavorDir }}
+      track: ${{ inputs.track || 'internal' }}
+      status: ${{ inputs.status || 'draft' }}
+      release_notes: ${{ inputs.release_notes || format('Tag build {0}', github.ref_name) }}
+    # Explicit, least-privilege (no `secrets: inherit`). All flavors share one Play SA today;
+    # for per-merchant SAs, add the new secret names here and to _android-publish.yml.
+    secrets:
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}

@@ -1,0 +1,5 @@
+// Single plain Pods xcconfig only (see Release.xcconfig for rationale): the
+// 5-include version multiplied every pod's build settings and overflowed
+// /bin/sh ARG_MAX during build.
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+#include "Generated.xcconfig"

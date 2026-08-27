@@ -1,0 +1,6 @@
+// Single plain Pods xcconfig only. CocoaPods uses $(CONFIGURATION) variables
+// inside it, so this works for every Release-<flavor> config. Including all
+// five flavor xcconfigs duplicated every pod's build settings ~5x and blew
+// past /bin/sh ARG_MAX ("Argument list too long") during archive.
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "Generated.xcconfig"

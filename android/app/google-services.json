@@ -1,0 +1,86 @@
+{
+  "project_info": {
+    "project_number": "209890010125",
+    "project_id": "xsmartlive-plus-one",
+    "storage_bucket": "xsmartlive-plus-one.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209890010125:android:6033a50b66084debe76144",
+        "android_client_info": {
+          "package_name": "com.xsmartlive.plus.one"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-G8m_uTiwFDBa11xYal5QTKHv3PjiZB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209890010125:android:6033a50b66084debe76144",
+        "android_client_info": {
+          "package_name": "com.xsmartlive.plus.one.merchant_a"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-G8m_uTiwFDBa11xYal5QTKHv3PjiZB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209890010125:android:6033a50b66084debe76144",
+        "android_client_info": {
+          "package_name": "com.xsmartlive.plus.one.merchant_b"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-G8m_uTiwFDBa11xYal5QTKHv3PjiZB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209890010125:android:6033a50b66084debe76144",
+        "android_client_info": {
+          "package_name": "com.xsmartlive.plus.one.merchant_c"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-G8m_uTiwFDBa11xYal5QTKHv3PjiZB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

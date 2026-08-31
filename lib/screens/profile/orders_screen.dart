@@ -11,6 +11,9 @@ import '../../theme/app_theme_extension.dart';
 /// 5 timeline stages shown per fulfillment.
 enum _OrderStage { pending, toShip, shipped, delivered, completed }
 
+/// 訂單卡「配送進度／明細」下拉選單的動作。
+enum _OrderAction { detail, inquiry, changeAddress, payInfo }
+
 class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});
 
@@ -316,6 +319,34 @@ class _OrderCard extends ConsumerStatefulWidget {
 class _OrderCardState extends ConsumerState<_OrderCard> {
   bool _expanded = true;
 
+  void _handleAction(_OrderAction action) {
+    switch (action) {
+      case _OrderAction.detail:
+        setState(() => _expanded = !_expanded);
+      case _OrderAction.inquiry:
+        _openSheet(const _OrderInquirySheet());
+      case _OrderAction.changeAddress:
+        _openSheet(const _ChangeAddressSheet());
+      case _OrderAction.payInfo:
+        _openSheet(_PayInfoSheet(order: widget.order));
+    }
+  }
+
+  void _openSheet(Widget sheet) {
+    final appTheme = context.appTheme;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: appTheme.bgElev,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(appTheme.sheetRadius),
+        ),
+      ),
+      builder: (_) => sheet,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
@@ -335,7 +366,10 @@ class _OrderCardState extends ConsumerState<_OrderCard> {
           const SizedBox(height: 7),
           _DetailToggleRow(
             expanded: _expanded,
-            onToggle: () => setState(() => _expanded = !_expanded),
+            // 待付款 / 待出貨可更換地址；備貨中及出貨後停用。
+            canChangeAddress:
+                order.status == 'pending' || order.status == 'paid',
+            onSelected: _handleAction,
           ),
           AnimatedSize(
             duration: const Duration(milliseconds: 220),
@@ -490,20 +524,62 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _DetailToggleRow extends StatelessWidget {
-  const _DetailToggleRow({required this.expanded, required this.onToggle});
+  const _DetailToggleRow({
+    required this.expanded,
+    required this.canChangeAddress,
+    required this.onSelected,
+  });
 
   final bool expanded;
-  final VoidCallback onToggle;
+
+  /// 待出貨前（待付款 / 待出貨）才可更換地址；備貨中 / 出貨後停用。
+  final bool canChangeAddress;
+  final ValueChanged<_OrderAction> onSelected;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final appTheme = context.appTheme;
+
+    PopupMenuItem<_OrderAction> item(
+        _OrderAction value, IconData icon, String label,
+        {bool enabled = true}) {
+      final labelColor = enabled ? appTheme.fg : appTheme.muted;
+      final iconColor = enabled ? appTheme.fgMuted : appTheme.muted;
+      return PopupMenuItem<_OrderAction>(
+        value: value,
+        height: 44,
+        enabled: enabled,
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: iconColor),
+            const SizedBox(width: 10),
+            Text(label, style: TextStyle(fontSize: 14, color: labelColor)),
+          ],
+        ),
+      );
+    }
+
     return Row(
       children: [
         Expanded(
-          child: GestureDetector(
-            onTap: onToggle,
+          child: PopupMenuButton<_OrderAction>(
+            onSelected: onSelected,
+            position: PopupMenuPosition.under,
+            color: appTheme.bgElev,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
+              side: BorderSide(color: appTheme.divider),
+            ),
+            itemBuilder: (_) => [
+              item(_OrderAction.detail, Icons.local_shipping_outlined,
+                  l10n.ordersDetailToggle),
+              item(_OrderAction.inquiry, Icons.help_outline, '訂單提問'),
+              item(_OrderAction.changeAddress, Icons.place_outlined, '更換地址',
+                  enabled: canChangeAddress),
+              item(_OrderAction.payInfo, Icons.receipt_long_outlined,
+                  '訂購／付款資訊'),
+            ],
             child: Container(
               height: 33,
               decoration: BoxDecoration(
@@ -536,7 +612,7 @@ class _DetailToggleRow extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         InkWell(
-          onTap: onToggle,
+          onTap: () => onSelected(_OrderAction.detail),
           borderRadius: BorderRadius.circular(28),
           child: Container(
             width: 25,
@@ -1598,6 +1674,469 @@ class _PaginationBar extends StatelessWidget {
                 : null,
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 訂單卡下拉動作的 bottom sheets（訂單提問 / 更換地址 / 訂購·付款資訊）
+// 皆為 prototype：送出 / 選擇後以 SnackBar 回饋，尚未串接後端。
+// ─────────────────────────────────────────────────────────────────────────
+class _SheetScaffold extends StatelessWidget {
+  const _SheetScaffold({required this.title, required this.child});
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: appTheme.fg,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close, size: 22, color: appTheme.fgMuted),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(child: child),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 訂單提問 —— AI 智能客服（待開發）佔位。
+class _OrderInquirySheet extends StatelessWidget {
+  const _OrderInquirySheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return _SheetScaffold(
+      title: '訂單提問',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: appTheme.bgSubtle,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Icon(Icons.support_agent,
+                  size: 56, color: appTheme.muted),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'AI 智能客服',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: appTheme.fg,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '(待開發)',
+              style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 更換配送地址 —— 顯示原收件資料，並填入新收件人 / 電話 / 城市區 / 詳細地址。
+class _ChangeAddressSheet extends StatefulWidget {
+  const _ChangeAddressSheet();
+
+  @override
+  State<_ChangeAddressSheet> createState() => _ChangeAddressSheetState();
+}
+
+class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
+  final _nameCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  final _addrCtrl = TextEditingController();
+  static const _codes = ['+886', '+852', '+86', '+81', '+82', '+65', '+1'];
+  String _phoneCode = '+886';
+  String? _city;
+  String? _district;
+  String? _error;
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _phoneCtrl.dispose();
+    _addrCtrl.dispose();
+    super.dispose();
+  }
+
+  BoxDecoration _boxDeco(AppThemeExtension t) => BoxDecoration(
+        color: t.bg,
+        borderRadius: BorderRadius.circular(t.radiusSm),
+        border: Border.all(color: t.divider),
+      );
+
+  Widget _lbl(String s, {bool req = false}) {
+    final t = context.appTheme;
+    final style =
+        TextStyle(fontSize: 12, color: t.fgMuted, fontWeight: FontWeight.w600);
+    if (!req) return Text(s, style: style);
+    return Text.rich(TextSpan(style: style, children: [
+      TextSpan(text: s),
+      TextSpan(text: ' *', style: TextStyle(color: t.danger)),
+    ]));
+  }
+
+  Widget _field(TextEditingController c, String hint) {
+    final t = context.appTheme;
+    return Container(
+      decoration: _boxDeco(t),
+      child: TextField(
+        controller: c,
+        style: TextStyle(fontSize: 14, color: t.fg),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(fontSize: 13, color: t.fgMuted),
+          border: InputBorder.none,
+          isDense: true,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+        ),
+      ),
+    );
+  }
+
+  Widget _dd({
+    required String? value,
+    required String hint,
+    required List<String> items,
+    required ValueChanged<String?>? onChanged,
+  }) {
+    final t = context.appTheme;
+    return Container(
+      decoration: _boxDeco(t),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: value,
+          hint: Text(hint,
+              style: TextStyle(fontSize: 14, color: t.fgMuted)),
+          onChanged: onChanged,
+          style: TextStyle(fontSize: 14, color: t.fg),
+          dropdownColor: t.bgElev,
+          icon: Icon(Icons.keyboard_arrow_down, color: t.fgMuted),
+          items: [
+            for (final i in items) DropdownMenuItem(value: i, child: Text(i)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _readonly(String label, String value) {
+    final t = context.appTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _lbl(label),
+        const SizedBox(height: 4),
+        Text(value, style: TextStyle(fontSize: 14, color: t.fg)),
+      ],
+    );
+  }
+
+  void _confirm() {
+    if (_addrCtrl.text.trim().isEmpty) {
+      setState(() => _error = '請輸入詳細收件地址');
+      return;
+    }
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(content: Text('已更換配送地址')));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final districts = _addrCityDistricts[_city] ?? const <String>[];
+
+    return _SheetScaffold(
+      title: '更換配送地址',
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 原收件資料（唯讀）
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _readonly('原收件人', '陳曉娟')),
+                Expanded(
+                    child: _readonly('原聯絡電話', '(+886) 912 345 678')),
+              ],
+            ),
+            const SizedBox(height: 14),
+            _readonly('原配送地址', '桃園市桃園區南平路 303 號'),
+            const SizedBox(height: 16),
+            _lbl('新收件人'),
+            const SizedBox(height: 6),
+            _field(_nameCtrl, ''),
+            const SizedBox(height: 14),
+            _lbl('新聯絡電話'),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Container(
+                  decoration: _boxDeco(appTheme),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _phoneCode,
+                      style: TextStyle(fontSize: 14, color: appTheme.fg),
+                      dropdownColor: appTheme.bgElev,
+                      onChanged: (v) =>
+                          setState(() => _phoneCode = v ?? _phoneCode),
+                      items: [
+                        for (final c in _codes)
+                          DropdownMenuItem(value: c, child: Text(c)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(child: _field(_phoneCtrl, '例如：0912345678')),
+              ],
+            ),
+            const SizedBox(height: 14),
+            _lbl('城市 / 區'),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: _dd(
+                    value: _city,
+                    hint: '請選擇城市',
+                    items: _addrCityDistricts.keys.toList(),
+                    onChanged: (v) => setState(() {
+                      _city = v;
+                      _district = null;
+                    }),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _dd(
+                    value: districts.contains(_district) ? _district : null,
+                    hint: _city == null ? '請先選城市' : '請選擇區',
+                    items: districts,
+                    onChanged: districts.isEmpty
+                        ? null
+                        : (v) => setState(() => _district = v),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            _lbl('詳細收件地址', req: true),
+            const SizedBox(height: 6),
+            _field(_addrCtrl, '街道、門牌、樓層'),
+            if (_error != null) ...[
+              const SizedBox(height: 8),
+              Text(_error!,
+                  style: TextStyle(color: appTheme.danger, fontSize: 12)),
+            ],
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: TextButton.styleFrom(
+                      foregroundColor: appTheme.fgMuted),
+                  child: const Text('取消'),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _confirm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(appTheme.buttonRadius),
+                    ),
+                  ),
+                  child: const Text('確認更換',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 更換地址用的城市 / 區資料（prototype 涵蓋主要縣市）。
+const Map<String, List<String>> _addrCityDistricts = {
+  '台北市': ['中正區', '大同區', '中山區', '松山區', '大安區', '萬華區', '信義區', '士林區', '北投區', '內湖區', '南港區', '文山區'],
+  '新北市': ['板橋區', '三重區', '中和區', '永和區', '新莊區', '新店區', '土城區', '蘆洲區', '淡水區', '林口區'],
+  '桃園市': ['桃園區', '中壢區', '平鎮區', '八德區', '楊梅區', '蘆竹區', '龜山區', '大溪區'],
+  '台中市': ['中區', '東區', '南區', '西區', '北區', '北屯區', '西屯區', '南屯區', '大里區', '豐原區'],
+  '台南市': ['中西區', '東區', '南區', '北區', '安平區', '安南區', '永康區', '歸仁區'],
+  '高雄市': ['楠梓區', '左營區', '鼓山區', '三民區', '苓雅區', '新興區', '前金區', '前鎮區', '鳳山區', '仁武區'],
+};
+
+class _PayInfoSheet extends StatefulWidget {
+  const _PayInfoSheet({required this.order});
+  final Purchase order;
+
+  @override
+  State<_PayInfoSheet> createState() => _PayInfoSheetState();
+}
+
+class _PayInfoSheetState extends State<_PayInfoSheet> {
+  // 發票狀態：已完成訂單預設「已開立」，其餘「尚未開立」（可線上開立）。
+  late bool _invoiceIssued = widget.order.status == 'completed';
+
+  // 姓名遮罩：保留中間、遮首尾（陳曉娟 → *曉*）。
+  String _maskName(String name) {
+    if (name.length <= 1) return name;
+    final chars = name.split('');
+    chars[0] = '*';
+    chars[chars.length - 1] = '*';
+    return chars.join();
+  }
+
+  // 手機遮罩：保留前 4 碼與末 3 碼（0912345678 → 0912***678）。
+  String _maskPhone(String phone) {
+    if (phone.length < 7) return phone;
+    return '${phone.substring(0, 4)}***${phone.substring(phone.length - 3)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final order = widget.order;
+
+    Widget row(String label, Widget value) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 7),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 80,
+                child: Text(label,
+                    style: TextStyle(fontSize: 13, color: appTheme.fgMuted)),
+              ),
+              Expanded(child: value),
+            ],
+          ),
+        );
+
+    Widget txt(String v, {bool strong = false, Color? color}) => Text(
+          v,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: strong ? FontWeight.w800 : FontWeight.w500,
+            color: color ?? appTheme.fg,
+          ),
+        );
+
+    return _SheetScaffold(
+      title: '訂購／付款資訊',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            row('收件人姓名', txt(_maskName('陳曉娟'))),
+            row('手機號碼', txt(_maskPhone('0912345678'))),
+            row('收件地址', txt('高雄市三民區北平一街 103 號')),
+            row('發票類型', txt('自然人憑證')),
+            // 發票開立狀態：已開立 / 尚未開立（+ 線上開立按鈕）
+            row(
+              '發票',
+              _invoiceIssued
+                  ? Row(
+                      children: [
+                        Icon(Icons.check_circle,
+                            size: 16, color: appTheme.success),
+                        const SizedBox(width: 4),
+                        txt('已開立', color: appTheme.success),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        txt('尚未開立', color: appTheme.fgMuted),
+                        const Spacer(),
+                        Material(
+                          color: accent,
+                          borderRadius:
+                              BorderRadius.circular(appTheme.buttonRadius),
+                          child: InkWell(
+                            borderRadius:
+                                BorderRadius.circular(appTheme.buttonRadius),
+                            onTap: () {
+                              setState(() => _invoiceIssued = true);
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(const SnackBar(
+                                    content: Text('發票已線上開立')));
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              child: Text('線上開立',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+            row('付款方式', txt(order.paymentMethod ?? 'ATM 繳費帳號')),
+          ],
+        ),
       ),
     );
   }

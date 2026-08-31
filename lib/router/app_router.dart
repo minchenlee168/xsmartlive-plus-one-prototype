@@ -23,6 +23,8 @@ import '../screens/profile/profile_screen.dart';
 import '../screens/profile/settings_screen.dart';
 import '../screens/profile/address_book_screen.dart';
 import '../screens/profile/bind_mobile_screen.dart';
+import '../screens/profile/bonus_screen.dart';
+import '../screens/profile/following_screen.dart';
 import '../screens/profile/change_mobile_screen.dart';
 import '../screens/profile/change_password_screen.dart';
 import '../screens/profile/language_picker_screen.dart';
@@ -145,6 +147,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/coupons',
         builder: (context, state) => const CouponScreen(),
+      ),
+      GoRoute(
+        path: '/bonus',
+        builder: (context, state) => const BonusScreen(),
+      ),
+      GoRoute(
+        path: '/following',
+        builder: (context, state) => const FollowingScreen(),
       ),
       GoRoute(
         path: '/orders',

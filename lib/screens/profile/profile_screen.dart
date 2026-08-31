@@ -8,6 +8,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/purchase.dart';
 import '../../providers/app_info_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/bonus_provider.dart';
 import '../../providers/coupon_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../providers/purchase_provider.dart';
@@ -61,12 +62,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final counts = ref.watch(purchaseCountsProvider).valueOrNull;
     final unusedCoupons =
         ref.watch(memberCouponsProvider(const MemberCouponFilter(used: false, expired: false))).valueOrNull?.length ?? 0;
+    // 紅利點數以「紅利點數頁」的可用點數為準（bonusOverviewProvider），
+    // 讓頭部統計與點進去的頁面數字一致；未取得時退回 /me 的 bonus 欄位。
+    final bonusPoints =
+        ref.watch(bonusOverviewProvider).valueOrNull?.availablePoints;
 
     final displayName = profile?.name ?? authUser?.name ?? '—';
     final avatarInitial = displayName.isNotEmpty ? displayName[0] : '?';
     final email = authUser?.email ?? '';
     final bonus = profile?.bonus ?? 0;
-    final couponCount = profile?.couponCount ?? 0;
+    final bonusValue =
+        bonusPoints != null ? bonusPoints.toStringAsFixed(0) : '$bonus';
     final brandName = FlavorConfig.instance.appName;
     final appVersion = ref.watch(appVersionProvider).valueOrNull;
 
@@ -83,10 +89,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 profile != null && !profile.hasBoundMobile,
             unboundLabel: l10n.profileUnboundMobile,
             stats: [
-              (label: '紅利', value: '$bonus'),
-              (label: '優惠券', value: '$couponCount'),
-              (label: '收藏', value: '0'),
-              (label: '追蹤', value: '0'),
+              (
+                label: '紅利',
+                value: bonusValue,
+                onTap: () => context.push('/bonus'),
+              ),
+              (
+                label: '優惠券',
+                value: '$unusedCoupons',
+                onTap: () => _pushAndRefresh('/coupons'),
+              ),
+              (
+                label: '收藏',
+                value: '0',
+                onTap: () => _pushAndRefresh('/favorites'),
+              ),
+              (
+                label: '追蹤',
+                value: '0',
+                onTap: () => context.push('/following'),
+              ),
             ],
             onLogoutTap: () =>
                 ref.read(authNotifierProvider.notifier).logout(),
@@ -151,7 +173,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: Icons.podcasts,
                 value: null,
                 badge: 0,
-                route: '/favorites',
+                route: '/following',
               ),
               (
                 label: '語言 / Language',
@@ -258,7 +280,7 @@ class _GradientHeader extends StatelessWidget {
   final String email;
   final bool unboundMobile;
   final String unboundLabel;
-  final List<({String label, String value})> stats;
+  final List<({String label, String value, VoidCallback? onTap})> stats;
   final VoidCallback onLogoutTap;
   final VoidCallback onChangeMobileTap;
 
@@ -379,25 +401,29 @@ class _GradientHeader extends StatelessWidget {
           Row(
             children: stats
                 .map((s) => Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            s.value,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                      child: GestureDetector(
+                        onTap: s.onTap,
+                        behavior: HitTestBehavior.opaque,
+                        child: Column(
+                          children: [
+                            Text(
+                              s.value,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            s.label,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.white.withValues(alpha: 0.8),
+                            const SizedBox(height: 2),
+                            Text(
+                              s.label,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ))
                 .toList(),

@@ -235,8 +235,80 @@ final selectedCategoryProvider = StateProvider<int?>((ref) => null);
 
 final favoritesProvider =
     FutureProvider<List<FavoriteProduct>>((ref) async {
-  return ref.read(productRepositoryProvider).fetchFavorites();
+  try {
+    return await ref.read(productRepositoryProvider).fetchFavorites();
+  } catch (_) {
+    // Web 預覽（未登入 / 無法打真實 API）→ 回退範例收藏，讓「收藏 / 追蹤」
+    // 頁有內容可預覽；真機登入後走真實 API。
+    return _sampleFavorites;
+  }
 });
+
+const List<FavoriteProduct> _sampleFavorites = [
+  FavoriteProduct(
+    streamer: '美妝達人小芸',
+    product: Product(
+      id: 'fav1',
+      name: '玫瑰保濕精華液 30ml',
+      price: 1280,
+      originalPrice: 1580,
+      image: '',
+      category: '保養',
+    ),
+  ),
+  FavoriteProduct(
+    streamer: 'Kelly 美妝快閃',
+    product: Product(
+      id: 'fav2',
+      name: '絲絨霧面唇釉 #05 楓糖',
+      price: 590,
+      originalPrice: 720,
+      image: '',
+      category: '彩妝',
+    ),
+  ),
+  FavoriteProduct(
+    streamer: 'Mia 保養專場',
+    product: Product(
+      id: 'fav3',
+      name: '玻尿酸保濕面膜 10 入組',
+      price: 399,
+      image: '',
+      category: '保養',
+    ),
+  ),
+  FavoriteProduct(
+    streamer: '鮮選市集直播',
+    product: Product(
+      id: 'fav4',
+      name: '挪威生鮮鮭魚切片 300g',
+      price: 380,
+      image: '',
+      category: '生鮮',
+      inStock: false,
+    ),
+  ),
+  FavoriteProduct(
+    streamer: '廚娘小桂的直播廚房',
+    product: Product(
+      id: 'fav5',
+      name: '古早味手工冷凍水餃 60 顆',
+      price: 199,
+      image: '',
+      category: '冷凍',
+    ),
+  ),
+  FavoriteProduct(
+    streamer: '媽咪好物推薦',
+    product: Product(
+      id: 'fav6',
+      name: '寶寶學步防滑襪 3 雙組',
+      price: 129,
+      image: '',
+      category: '嬰幼兒',
+    ),
+  ),
+];
 
 // Cart — client-side state only.
 class CartNotifier extends Notifier<List<CartItem>> {

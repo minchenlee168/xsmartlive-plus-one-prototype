@@ -79,6 +79,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/icons/orders/
+    - assets/icons/stores/
     - assets/prototype/
     - assets/prototype/categories/
     - assets/prototype/products/

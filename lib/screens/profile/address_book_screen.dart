@@ -33,6 +33,8 @@ class AddressBookScreen extends StatelessWidget {
             labelColor: accent,
             unselectedLabelColor: appTheme.fgMuted,
             indicatorColor: accent,
+            // 移除 M3 TabBar 預設底部分隔線（黑/灰線）。
+            dividerColor: Colors.transparent,
             labelStyle: const TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w700),
             tabs: const [
@@ -412,7 +414,7 @@ class _AddressCardShell extends StatelessWidget {
               ),
             ),
           ],
-          const Divider(height: 20),
+          Divider(height: 20, color: appTheme.divider),
           // 動作列：設為預設 / 刪除
           Row(
             children: [

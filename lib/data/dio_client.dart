@@ -1,6 +1,7 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../config/api_constants.dart';
 import '../core/errors/app_exception.dart';
@@ -16,7 +17,11 @@ class DioClient {
     ));
 
     _dio.interceptors.addAll([
-      CookieManager(cookieJar),
+      // dio_cookie_manager 的 CookieManager 在 web 會 assert
+      // （"Don't use the manager in Web environments."）——瀏覽器本身管
+      // cookie，不需要也不能用它。因此僅在非 web 掛載；web 預覽改由各頁
+      // 的範例資料 fallback 呈現內容。
+      if (!kIsWeb) CookieManager(cookieJar),
       _SessionInterceptor(sessionService),
       LogInterceptor(requestBody: true, responseBody: true),
     ]);

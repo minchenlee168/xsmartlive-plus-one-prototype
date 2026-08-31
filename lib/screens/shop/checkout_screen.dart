@@ -4,9 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../models/address.dart' show CartDeliveryType;
-import '../../models/cart_api.dart';
 import '../../providers/checkout_provider.dart';
+import '../../providers/preview_cart.dart';
 import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../utils/responsive.dart';
@@ -49,26 +48,98 @@ extension on _InvoiceType {
 }
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
-  final _couponCtrl = TextEditingController();
   final _emailCtrl = TextEditingController(text: 'abc@gmail.com');
-  final _bonusCtrl = TextEditingController();
-  final _shopMoneyCtrl = TextEditingController();
   _InvoiceType _invoiceType = _InvoiceType.member;
+
+  /// 每張購物車各自選到的配送方式 code，key = 購物車分組 id
+  /// （[previewCartProvider] 的 group id）；缺 key = 尚未選擇。
+  /// prototype 以純前端狀態模擬「多台購物車分別選配送」的情境。
+  final Map<String, String?> _cartDelivery = {};
+
+  /// 每張購物車在彈窗展開後所選的地址 / 門市顯示文字（缺 key = 未選）。
+  final Map<String, String?> _cartLocation = {};
+
+  /// 每張購物車套用的優惠券（缺 key = 未使用）。
+  final Map<String, _CheckoutCoupon> _cartCoupon = {};
 
   @override
   void dispose() {
-    _couponCtrl.dispose();
     _emailCtrl.dispose();
-    _bonusCtrl.dispose();
-    _shopMoneyCtrl.dispose();
     super.dispose();
+  }
+
+  /// 全部購物車小計加總（各台商品金額 − 該台優惠券折抵）。
+  int _grandTotal(List<PreviewCartGroup> groups) => groups.fold(
+        0,
+        (s, g) => s + _groupSubtotal(g) - (_cartCoupon[g.id]?.discount ?? 0),
+      );
+
+  Future<void> _openCouponPicker(String groupId) async {
+    final result = await showModalBottomSheet<_CouponResult>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => _CouponPickerSheet(selectedId: _cartCoupon[groupId]?.id),
+    );
+    if (result == null || !mounted) return;
+    setState(() {
+      if (result.coupon == null) {
+        _cartCoupon.remove(groupId);
+      } else {
+        _cartCoupon[groupId] = result.coupon!;
+      }
+    });
+  }
+
+  Future<void> _openApplyAllSheet(List<String> groupIds) async {
+    final choice = await _showDeliveryMethodSheet(
+      applyAll: true,
+      currentCode: null,
+      currentLocation: null,
+    );
+    if (choice == null || !mounted) return;
+    setState(() {
+      for (final id in groupIds) {
+        _cartDelivery[id] = choice.code;
+        _cartLocation[id] = choice.locationLabel;
+      }
+    });
+  }
+
+  Future<void> _openCartSheet(String groupId) async {
+    final choice = await _showDeliveryMethodSheet(
+      applyAll: false,
+      currentCode: _cartDelivery[groupId],
+      currentLocation: _cartLocation[groupId],
+    );
+    if (choice == null || !mounted) return;
+    setState(() {
+      _cartDelivery[groupId] = choice.code;
+      _cartLocation[groupId] = choice.locationLabel;
+    });
+  }
+
+  Future<_DeliveryChoice?> _showDeliveryMethodSheet({
+    required bool applyAll,
+    required String? currentCode,
+    required String? currentLocation,
+  }) {
+    return showModalBottomSheet<_DeliveryChoice>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => _DeliveryMethodSheet(
+        applyAll: applyAll,
+        selectedCode: currentCode,
+        selectedLocation: currentLocation,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final cartAsync = ref.watch(cartApiProvider);
     final checkout = ref.watch(checkoutProvider);
-    final previewAsync = ref.watch(checkoutPreviewProvider);
     final appTheme = context.appTheme;
     final l10n = AppLocalizations.of(context)!;
 
@@ -103,7 +174,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new,
               size: 18, color: appTheme.fg),
-          onPressed: () => context.pop(),
+          // 有返回堆疊就 pop 回上一頁（通常是購物車）；若是深連結 / 重新整理
+          // 直接落在 /checkout（無上一頁），context.pop() 會無事可退而卡住，
+          // 因此 fallback 導回購物車。
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/cart'),
         ),
         title: Text(
           '結帳',
@@ -168,60 +243,59 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                 ),
               Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                  children: [
-                    _CouponSection(controller: _couponCtrl),
-                    const SizedBox(height: 14),
-                    _ItemsCard(items: cart.items),
-                    const SizedBox(height: 14),
-                    _SectionTitle(text: '配送方式'),
-                    const SizedBox(height: 8),
-                    _ShippingCard(
-                      selectedDeliveryType: checkout.deliveryType,
-                      selectedBrand: checkout.pickupBrand,
-                      onChangeDeliveryType: (code) => ref
-                          .read(checkoutProvider.notifier)
-                          .changeDeliveryType(code),
-                      onChangeBrand: (brand) => ref
-                          .read(checkoutProvider.notifier)
-                          .changePickupBrand(brand),
-                    ),
-                    const SizedBox(height: 14),
-                    const _SectionTitle(text: '發票資訊'),
-                    const SizedBox(height: 8),
-                    _InvoiceCard(
-                      type: _invoiceType,
-                      emailCtrl: _emailCtrl,
-                      onTypeChanged: (t) =>
-                          setState(() => _invoiceType = t),
-                    ),
-                    const SizedBox(height: 14),
-                    const _SectionTitle(text: '金額折抵'),
-                    const SizedBox(height: 8),
-                    _DeductionCard(
-                      bonusCtrl: _bonusCtrl,
-                      shopMoneyCtrl: _shopMoneyCtrl,
-                    ),
-                    const SizedBox(height: 14),
-                    const _SectionTitle(text: '付款方式'),
-                    const SizedBox(height: 8),
-                    _PaymentCard(
-                      selectedId: checkout.paymentMethodId,
-                      onChanged: (id) => ref
-                          .read(checkoutProvider.notifier)
-                          .changePayment(id),
-                    ),
-                    const SizedBox(height: 14),
-                    _PriceSummaryCard(
-                        cart: cart, previewAsync: previewAsync),
-                    const SizedBox(height: 24),
-                  ],
-                ),
+                child: Builder(builder: (context) {
+                  final groups = ref.watch(previewCartProvider);
+                  return ListView(
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                    children: [
+                      // 配送資訊 —— 移到最上方，標題比照「優惠券」放在區塊外面。
+                      const _SectionTitle(text: '配送資訊'),
+                      const SizedBox(height: 8),
+                      _DeliveryInfoCard(
+                        selected: _cartDelivery,
+                        selectedLocation: _cartLocation,
+                        onApplyAll: _openApplyAllSheet,
+                        onSelectCart: _openCartSheet,
+                      ),
+                      const SizedBox(height: 14),
+                      // 每張購物車一張「訂單明細」卡：商品列 + 收件人 / 運費 /
+                      // 運費折抵 / 優惠券 / 紅利點數 / 小計。
+                      for (final g in groups) ...[
+                        _CartOrderCard(
+                          group: g,
+                          method: _cartDelivery[g.id],
+                          location: _cartLocation[g.id],
+                          coupon: _cartCoupon[g.id],
+                          onChangeDelivery: () => _openCartSheet(g.id),
+                          onSelectCoupon: () => _openCouponPicker(g.id),
+                        ),
+                        const SizedBox(height: 14),
+                      ],
+                      const _SectionTitle(text: '發票資訊'),
+                      const SizedBox(height: 8),
+                      _InvoiceCard(
+                        type: _invoiceType,
+                        emailCtrl: _emailCtrl,
+                        onTypeChanged: (t) =>
+                            setState(() => _invoiceType = t),
+                      ),
+                      const SizedBox(height: 14),
+                      const _SectionTitle(text: '付款方式'),
+                      const SizedBox(height: 8),
+                      _PaymentCard(
+                        selectedId: checkout.paymentMethodId,
+                        onChanged: (id) => ref
+                            .read(checkoutProvider.notifier)
+                            .changePayment(id),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  );
+                }),
               ),
               _ConfirmBar(
-                cart: cart,
-                previewAsync: previewAsync,
+                total:
+                    _grandTotal(ref.watch(previewCartProvider)).toDouble(),
                 isSubmitting: checkout.isSubmitting,
                 onConfirm: () =>
                     ref.read(checkoutProvider.notifier).confirmOrder(cart),
@@ -279,295 +353,6 @@ class _Card extends StatelessWidget {
         border: Border.all(color: appTheme.divider),
       ),
       child: child,
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// 優惠券 section — search button + code input row.
-// `// TODO(API): wire to /coupons (search) + /coupons/redeem (apply code)`
-// ─────────────────────────────────────────────────────────────────────────
-class _CouponSection extends StatelessWidget {
-  const _CouponSection({required this.controller});
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    final accent = appTheme.brandPalette.tone500;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _SectionTitle(text: '優惠券'),
-        const SizedBox(height: 8),
-        _Card(
-          child: Column(
-            children: [
-              // Search-coupons button
-              Material(
-                color: appTheme.bgSubtle,
-                borderRadius: BorderRadius.circular(appTheme.radiusSm),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(appTheme.radiusSm),
-                  onTap: () {
-                    // TODO(API): open coupon picker (member coupons + claimable).
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 11),
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.circular(appTheme.radiusSm),
-                      border: Border.all(color: appTheme.divider),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search,
-                            size: 14, color: appTheme.fgMuted),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '搜尋可使用優惠券',
-                            style: TextStyle(
-                                fontSize: 12, color: appTheme.fg),
-                          ),
-                        ),
-                        Icon(Icons.chevron_right,
-                            size: 16, color: appTheme.fgMuted),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              // Code input + 使用 button
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: appTheme.bgSubtle,
-                        borderRadius:
-                            BorderRadius.circular(appTheme.radiusSm),
-                        border: Border.all(color: appTheme.divider),
-                      ),
-                      child: TextField(
-                        controller: controller,
-                        style: TextStyle(
-                            fontSize: 12, color: appTheme.fg),
-                        decoration: InputDecoration(
-                          hintText: '輸入優惠券或優惠代碼',
-                          hintStyle: TextStyle(
-                              fontSize: 12, color: appTheme.fgMuted),
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 11),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Material(
-                    color: accent,
-                    borderRadius:
-                        BorderRadius.circular(appTheme.radiusSm),
-                    child: InkWell(
-                      borderRadius:
-                          BorderRadius.circular(appTheme.radiusSm),
-                      onTap: () {
-                        // TODO(API): submit coupon code; show toast on result.
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 18, vertical: 11),
-                        child: Text(
-                          '使用',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// Order items card — list with thumbnail / name / 數量 N / NTD $X,
-// and a small subtotal footer ("訂單金額小計（X 個商品）$Y").
-// ─────────────────────────────────────────────────────────────────────────
-class _ItemsCard extends StatelessWidget {
-  const _ItemsCard({required this.items});
-
-  final List<CartApiItem> items;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    final accent = appTheme.brandPalette.tone500;
-    final itemCount = items.fold<int>(0, (s, e) => s + e.quantity);
-    final subtotal =
-        items.fold<double>(0, (s, e) => s + e.unitPrice * e.quantity);
-
-    return _Card(
-      padding: EdgeInsets.zero,
-      child: Column(
-        children: [
-          for (var i = 0; i < items.length; i++) ...[
-            _ItemRow(item: items[i]),
-            if (i < items.length - 1)
-              Divider(height: 1, color: appTheme.divider),
-          ],
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              border:
-                  Border(top: BorderSide(color: appTheme.divider)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  '訂單金額小計（$itemCount 個商品）',
-                  style: TextStyle(
-                      fontSize: 12, color: appTheme.fgMuted),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '\$${_fmt(subtotal)}',
-                  style: GoogleFonts.getFont(
-                    appTheme.fontDisplay,
-                    textStyle: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: accent,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ItemRow extends StatelessWidget {
-  const _ItemRow({required this.item});
-
-  final CartApiItem item;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    final accent = appTheme.brandPalette.tone500;
-    final l10n = AppLocalizations.of(context)!;
-    final name = item.product.name ?? l10n.cartProductFallback;
-    final lineTotal = item.unitPrice * item.quantity;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Thumbnail
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: appTheme.bgSubtle,
-              borderRadius: BorderRadius.circular(appTheme.radiusSm),
-              border: Border.all(color: appTheme.divider),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Image.network(
-              item.image ?? '',
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Icon(
-                Icons.image_outlined,
-                color: appTheme.muted,
-                size: 22,
-              ),
-              loadingBuilder: (_, child, progress) => progress == null
-                  ? child
-                  : const Center(
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child:
-                            CircularProgressIndicator(strokeWidth: 1.5),
-                      ),
-                    ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Name + (直播卡) suffix + 數量 N
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: name,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          height: 1.4,
-                          color: appTheme.fg,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' （直播卡）',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: appTheme.fgMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '數量 ${item.quantity}',
-                  style: TextStyle(
-                      fontSize: 10, color: appTheme.fgMuted),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Line total (right-aligned)
-          Text(
-            'NTD \$${_fmt(lineTotal)}',
-            style: GoogleFonts.getFont(
-              appTheme.fontDisplay,
-              textStyle: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: accent,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -659,252 +444,633 @@ class _InvoiceCard extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// 金額折抵 — bonus + shop money inputs. Mirrors prototype lines 135-158.
-// `// TODO(API): wire to /member/bonus + /member/shop-money balance`
+// 配送資訊 — 多台購物車情境：每張購物車各自選擇配送方式。
+//
+// 版面（對照設計稿）：
+//   • 卡片內建標題「配送資訊 ⓘ」
+//   • 「配送方式  {摘要}」列，右側「套用全部 ›」→ 開啟套用全部彈窗
+//   • 每張購物車一列：購物車名稱 + 已選 / 尚未選擇配送方式（可點選單獨設定）
+//
+// 多台購物車與名稱為 prototype 前端模擬（真實資料模型目前為單一購物車）。
 // ─────────────────────────────────────────────────────────────────────────
-class _DeductionCard extends StatelessWidget {
-  const _DeductionCard({
-    required this.bonusCtrl,
-    required this.shopMoneyCtrl,
+class _DeliveryInfoCard extends ConsumerWidget {
+  const _DeliveryInfoCard({
+    required this.selected,
+    required this.selectedLocation,
+    required this.onApplyAll,
+    required this.onSelectCart,
   });
 
-  final TextEditingController bonusCtrl;
-  final TextEditingController shopMoneyCtrl;
+  /// 各購物車已選配送方式，key = 購物車分組 id（缺 key = 尚未選擇）。
+  final Map<String, String?> selected;
+
+  /// 各購物車已選的地址 / 門市顯示文字，key = 購物車分組 id。
+  final Map<String, String?> selectedLocation;
+
+  /// 開啟「套用全部」彈窗，回呼帶入目前所有分組 id。
+  final void Function(List<String> groupIds) onApplyAll;
+
+  /// 開啟單張購物車的配送方式選擇彈窗。
+  final void Function(String groupId) onSelectCart;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+
+    // 沿用購物車頁的多台分組（每台一個 sellerName），讓結帳頁的
+    // 配送資訊與購物車顯示同一批「購物車名稱」。
+    final groups = ref.watch(previewCartProvider);
+    final ids = groups.map((g) => g.id).toList(growable: false);
+
+    // 上排摘要：全部分組選到相同方式才顯示該名稱，否則「各訂單各自選擇」。
+    final codes = ids.map((id) => selected[id]).toSet();
+    final summary = (codes.length == 1 && codes.first != null)
+        ? (_deliveryMethodLabel(codes.first) ?? '各訂單各自選擇')
+        : '各訂單各自選擇';
+
     return _Card(
+      padding: EdgeInsets.zero,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _DeductionRow(
-            label: '紅利金',
-            controller: bonusCtrl,
-            balanceNote: '元 · 有紅利金 0 元可使用',
-            appTheme: appTheme,
+          // 配送方式 摘要 + 套用全部（標題已移到卡片外，比照「優惠券」）
+          InkWell(
+            onTap: () => onApplyAll(ids),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+              child: Row(
+                children: [
+                  Text(
+                    '配送方式',
+                    style: TextStyle(fontSize: 13, color: appTheme.fg),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      summary,
+                      style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+                    ),
+                  ),
+                  Text(
+                    '套用全部',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: accent,
+                    ),
+                  ),
+                  Icon(Icons.chevron_right, size: 18, color: accent),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 12),
-          _DeductionRow(
-            label: '購物金',
-            controller: shopMoneyCtrl,
-            balanceNote: '元 · 有購物金 0 元可使用',
-            appTheme: appTheme,
-          ),
+          Divider(height: 1, color: appTheme.divider),
+          // 每張購物車一列（已選配送方式時，第二行顯示地址 / 門市）
+          for (var i = 0; i < groups.length; i++) ...[
+            InkWell(
+              onTap: () => onSelectCart(groups[i].id),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            groups[i].sellerName,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: appTheme.fg,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (selectedLocation[groups[i].id] != null) ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(Icons.place_outlined,
+                                    size: 12, color: appTheme.fgMuted),
+                                const SizedBox(width: 3),
+                                Expanded(
+                                  child: Text(
+                                    selectedLocation[groups[i].id]!,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: appTheme.fgMuted,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      _deliveryMethodLabel(selected[groups[i].id]) ??
+                          '尚未選擇配送方式',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: selected[groups[i].id] == null
+                            ? appTheme.fgMuted
+                            : appTheme.fg,
+                      ),
+                    ),
+                    Icon(Icons.chevron_right,
+                        size: 16, color: appTheme.fgMuted),
+                  ],
+                ),
+              ),
+            ),
+            if (i < groups.length - 1)
+              Divider(height: 1, color: appTheme.divider, indent: 14),
+          ],
         ],
       ),
     );
   }
 }
 
-class _DeductionRow extends StatelessWidget {
-  const _DeductionRow({
-    required this.label,
-    required this.controller,
-    required this.balanceNote,
-    required this.appTheme,
+// ─────────────────────────────────────────────────────────────────────────
+// 單張購物車「訂單明細」卡：商品列（含組合內容）+ 該台的收件人 / 運費 /
+// 運費折抵 / 優惠券 / 紅利點數 / 訂單金額小計。
+// 資料取自 previewCartProvider 的分組；運費 / 收件人 / 折抵為 prototype 值。
+// ─────────────────────────────────────────────────────────────────────────
+class _CartOrderCard extends StatefulWidget {
+  const _CartOrderCard({
+    required this.group,
+    required this.method,
+    required this.location,
+    required this.coupon,
+    required this.onChangeDelivery,
+    required this.onSelectCoupon,
   });
 
-  final String label;
-  final TextEditingController controller;
-  final String balanceNote;
-  final AppThemeExtension appTheme;
+  final PreviewCartGroup group;
+  final String? method;
+  final String? location;
+  final _CheckoutCoupon? coupon;
+  final VoidCallback onChangeDelivery;
+  final VoidCallback onSelectCoupon;
+
+  @override
+  State<_CartOrderCard> createState() => _CartOrderCardState();
+}
+
+class _CartOrderCardState extends State<_CartOrderCard> {
+  final _bonusCtrl = TextEditingController(text: '0');
+
+  @override
+  void dispose() {
+    _bonusCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 36,
-          child: Text(
-            label,
-            style: TextStyle(fontSize: 12, color: appTheme.fg),
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final g = widget.group;
+    final subtotal = _groupSubtotal(g);
+    final hasMethod = widget.method != null;
+    final fee = _feeFor(widget.method);
+    // 免運門檻：有選配送方式即視為達標，運費折抵抵銷運費，小計＝商品金額。
+    final feeDiscount = hasMethod ? fee : 0;
+    final couponDiscount = widget.coupon?.discount ?? 0;
+    final total = subtotal + fee - feeDiscount - couponDiscount;
+
+    return _Card(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 標題：「{購物車名稱} 訂單明細  [溫層]」
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${g.sellerName} 訂單明細',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: appTheme.fg,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (g.tempTag != null) ...[
+                  const SizedBox(width: 8),
+                  _TempBadge(label: g.tempTag!),
+                ],
+              ],
+            ),
+          ),
+          Divider(height: 1, color: appTheme.divider),
+          // 商品列
+          for (var i = 0; i < g.items.length; i++) ...[
+            _CartItemRow(item: g.items[i]),
+            if (i < g.items.length - 1)
+              Divider(height: 1, color: appTheme.divider, indent: 14),
+          ],
+          Divider(height: 1, color: appTheme.divider),
+          // 金額 / 配送 / 折抵 / 優惠券 / 紅利 摘要
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+            child: Column(
+              children: [
+                _kv(
+                  context,
+                  label: '商品金額',
+                  right: _rightValue(context, 'NT\$${_fmt(subtotal)}'),
+                ),
+                _kv(
+                  context,
+                  label: '運送方式/運費',
+                  middle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        hasMethod
+                            ? _shippingLine(g.tempTag, widget.method,
+                                widget.location)
+                            : '尚未選擇配送方式',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: hasMethod ? appTheme.fg : appTheme.fgMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _OutlineButton(
+                        label: '變更',
+                        onTap: widget.onChangeDelivery,
+                      ),
+                    ],
+                  ),
+                  right: _rightValue(
+                      context, hasMethod ? 'NT\$${_fmt(fee)}' : '—'),
+                ),
+                _kv(
+                  context,
+                  label: '收件人',
+                  middle: Text(
+                    hasMethod ? '王小明  +886 912****56' : '—',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: hasMethod ? appTheme.fg : appTheme.fgMuted,
+                    ),
+                  ),
+                ),
+                _kv(
+                  context,
+                  label: '運費折抵',
+                  middle: hasMethod
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: accent.withValues(alpha: 0.12),
+                              borderRadius:
+                                  BorderRadius.circular(appTheme.radiusSm),
+                            ),
+                            child: Text(
+                              '達免運門檻',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: accent,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                  right: _rightValue(
+                    context,
+                    hasMethod ? '- NT\$${_fmt(feeDiscount)}' : '—',
+                    color: hasMethod ? appTheme.danger : null,
+                  ),
+                ),
+                _kv(
+                  context,
+                  label: '優惠券',
+                  middle: Align(
+                    alignment: Alignment.centerLeft,
+                    child: widget.coupon == null
+                        ? _OutlineButton(
+                            label: '選擇優惠券',
+                            onTap: widget.onSelectCoupon,
+                          )
+                        : InkWell(
+                            onTap: widget.onSelectCoupon,
+                            borderRadius:
+                                BorderRadius.circular(appTheme.radiusSm),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.local_offer,
+                                    size: 13, color: accent),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    widget.coupon!.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: accent,
+                                    ),
+                                  ),
+                                ),
+                                Icon(Icons.expand_more,
+                                    size: 14, color: appTheme.fgMuted),
+                              ],
+                            ),
+                          ),
+                  ),
+                  right: _rightValue(
+                    context,
+                    widget.coupon == null
+                        ? '—'
+                        : '- NT\$${_fmt(couponDiscount)}',
+                    color: widget.coupon == null ? null : appTheme.danger,
+                  ),
+                ),
+                _kv(
+                  context,
+                  label: '紅利點數',
+                  middle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 72,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: appTheme.bgSubtle,
+                            borderRadius:
+                                BorderRadius.circular(appTheme.radiusSm),
+                            border: Border.all(color: appTheme.divider),
+                          ),
+                          child: TextField(
+                            controller: _bonusCtrl,
+                            style: TextStyle(fontSize: 12, color: appTheme.fg),
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.center,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '尚有 500 點',
+                        style:
+                            TextStyle(fontSize: 11, color: appTheme.fgMuted),
+                      ),
+                    ],
+                  ),
+                  right: _rightValue(context, '—'),
+                ),
+                const SizedBox(height: 6),
+                Divider(height: 1, color: appTheme.divider),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '訂單金額小計',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: appTheme.fg,
+                      ),
+                    ),
+                    Text(
+                      'NT\$${_fmt(total)}',
+                      style: GoogleFonts.getFont(
+                        appTheme.fontDisplay,
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: accent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 摘要列：左固定寬標籤 + 中間內容 + 右對齊數值。
+  Widget _kv(
+    BuildContext context, {
+    required String label,
+    Widget? middle,
+    Widget? right,
+  }) {
+    final appTheme = context.appTheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 84,
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
+            ),
+          ),
+          Expanded(child: middle ?? const SizedBox()),
+          if (right != null)
+            Padding(padding: const EdgeInsets.only(left: 8), child: right),
+        ],
+      ),
+    );
+  }
+
+  Widget _rightValue(BuildContext context, String text, {Color? color}) {
+    final appTheme = context.appTheme;
+    return Text(
+      text,
+      style: TextStyle(fontSize: 12, color: color ?? appTheme.fg),
+    );
+  }
+}
+
+/// 溫層徽章（常溫 / 冷藏 / 冷凍）。
+class _TempBadge extends StatelessWidget {
+  const _TempBadge({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: appTheme.info.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: appTheme.info,
+        ),
+      ),
+    );
+  }
+}
+
+/// 小型外框按鈕（變更 / 選擇優惠券）。
+class _OutlineButton extends StatelessWidget {
+  const _OutlineButton({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(appTheme.radiusSm),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(appTheme.radiusSm),
+          border: Border.all(color: appTheme.divider),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: appTheme.fg,
           ),
         ),
-        const SizedBox(width: 10),
-        Text('使用',
-            style: TextStyle(fontSize: 11, color: appTheme.fgMuted)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Container(
+      ),
+    );
+  }
+}
+
+/// 購物車商品列（含組合商品內容、數量、金額）。
+class _CartItemRow extends StatelessWidget {
+  const _CartItemRow({required this.item});
+  final PreviewCartItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               color: appTheme.bgSubtle,
               borderRadius: BorderRadius.circular(appTheme.radiusSm),
               border: Border.all(color: appTheme.divider),
             ),
-            child: TextField(
-              controller: controller,
-              style: TextStyle(fontSize: 12, color: appTheme.fg),
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: 'NT\$',
-                hintStyle:
-                    TextStyle(fontSize: 12, color: appTheme.fgMuted),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 8),
-              ),
+            clipBehavior: Clip.antiAlias,
+            child: item.imageUrl != null
+                ? Image.network(
+                    item.imageUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => Icon(Icons.image_outlined,
+                        color: appTheme.muted, size: 22),
+                  )
+                : Icon(Icons.image_outlined, color: appTheme.muted, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(children: [
+                    TextSpan(
+                      text: item.name,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        height: 1.4,
+                        color: appTheme.fg,
+                      ),
+                    ),
+                    if (item.cardTypeLabel != null)
+                      TextSpan(
+                        text: ' ${item.cardTypeLabel}',
+                        style: TextStyle(
+                            fontSize: 10, color: appTheme.fgMuted),
+                      ),
+                  ]),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (item.spec.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    item.spec,
+                    style: TextStyle(fontSize: 11, color: appTheme.fgMuted),
+                  ),
+                ],
+                if (item.isBundle &&
+                    item.bundleItems != null &&
+                    item.bundleItems!.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    '組合商品內容：${_bundleText(item.bundleItems!)}',
+                    style: TextStyle(
+                        fontSize: 11, height: 1.4, color: appTheme.fgMuted),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                Text(
+                  '數量 ${item.qty}',
+                  style: TextStyle(fontSize: 11, color: appTheme.fgMuted),
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(width: 6),
-        Text(balanceNote,
-            style:
-                TextStyle(fontSize: 10, color: appTheme.fgMuted)),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// Shipping card — driven by GET /cart/checkout/shippingOptions (B10, 2026-05).
-//
-// Top section: pick a delivery type (home / pickup) — backend tells us
-// which are `available` for this store.
-// Bottom section (pickup only): pick a brand (7-11 / 全家 …) from the
-// merchant-activated list.
-//
-// When the API returns nothing (or is loading), a static fallback row pair
-// is rendered so dev devices and unauthenticated states stay clickable.
-// ─────────────────────────────────────────────────────────────────────────
-class _ShippingCard extends ConsumerWidget {
-  const _ShippingCard({
-    required this.selectedDeliveryType,
-    required this.selectedBrand,
-    required this.onChangeDeliveryType,
-    required this.onChangeBrand,
-  });
-
-  final String selectedDeliveryType;
-  final String? selectedBrand;
-  final ValueChanged<String> onChangeDeliveryType;
-  final ValueChanged<String?> onChangeBrand;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final optionsAsync = ref.watch(checkoutShippingOptionsProvider);
-
-    // Once the API answers, default the brand to the first activated one
-    // when the customer chose pickup but hasn't picked a brand yet.
-    ref.listen<AsyncValue<List<CartDeliveryType>>>(
-      checkoutShippingOptionsProvider,
-      (prev, next) {
-        next.whenData((types) {
-          if (selectedDeliveryType != 'pickup' || selectedBrand != null) return;
-          final pickup = types.firstWhere(
-            (t) => t.code == 'pickup',
-            orElse: () => const CartDeliveryType(
-                code: '', label: '', available: false, brands: []),
-          );
-          if (pickup.brands.isNotEmpty) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              onChangeBrand(pickup.brands.first);
-            });
-          }
-        });
-      },
-    );
-
-    final apiTypes = optionsAsync.valueOrNull ?? const <CartDeliveryType>[];
-    final l10n = AppLocalizations.of(context)!;
-    final appTheme = context.appTheme;
-
-    // Use API list when available; otherwise show a sensible static pair so
-    // the picker is never empty.
-    final List<CartDeliveryType> types = apiTypes.isNotEmpty
-        ? apiTypes
-        : <CartDeliveryType>[
-            CartDeliveryType(
-              code: 'home',
-              label: l10n.checkoutShippingNormal,
-              available: true,
-              brands: const [],
-            ),
-            const CartDeliveryType(
-              code: 'pickup',
-              label: '超商取貨',
-              available: true,
-              brands: ['7-11', '全家'],
-            ),
-          ];
-
-    final pickupType = types.firstWhere(
-      (t) => t.code == 'pickup',
-      orElse: () => const CartDeliveryType(
-          code: '', label: '', available: false, brands: []),
-    );
-
-    return _Card(
-      padding: EdgeInsets.zero,
-      child: Column(
-        children: [
-          for (final t in types) ...[
-            Opacity(
-              opacity: t.available ? 1 : 0.4,
-              child: _RadioTile(
-                value: t.code,
-                groupValue: selectedDeliveryType,
-                title: t.label,
-                subtitle: t.code == 'home'
-                    ? l10n.checkoutShippingNormalDesc
-                    : (t.brands.isNotEmpty
-                        ? t.brands.join(' / ')
-                        : null),
-                icon: _deliveryIconFor(t.code),
-                onChanged: t.available ? onChangeDeliveryType : (_) {},
-              ),
-            ),
-            // Brand chips appear directly under the pickup row when selected.
-            if (t.code == 'pickup' &&
-                selectedDeliveryType == 'pickup' &&
-                pickupType.brands.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(54, 0, 14, 12),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 6,
-                  children: [
-                    for (final brand in pickupType.brands)
-                      _BrandChip(
-                        label: brand,
-                        selected: brand == selectedBrand,
-                        onTap: () => onChangeBrand(brand),
-                      ),
-                  ],
-                ),
-              ),
-          ],
-          // 新增收件地址 — 跳出與地址簿相同的新增表單 bottom sheet。
-          // 依目前選的配送類型開對應表單（宅配 / 超商取貨）。
-          Divider(height: 1, color: appTheme.divider),
-          InkWell(
-            onTap: () => showAddressFormSheet(
-              context,
-              type: selectedDeliveryType == 'pickup'
-                  ? AddressFormType.pickup
-                  : AddressFormType.home,
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-              child: Row(
-                children: [
-                  Icon(Icons.add_location_alt_outlined,
-                      size: 20, color: appTheme.brandPalette.tone500),
-                  const SizedBox(width: 8),
-                  Text(
-                    selectedDeliveryType == 'pickup' ? '新增超商取貨門市' : '新增宅配地址',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: appTheme.brandPalette.tone500,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(Icons.chevron_right,
-                      size: 18, color: appTheme.fgMuted),
-                ],
+          const SizedBox(width: 8),
+          Text(
+            'NT\$${_fmt(item.lineTotal)}',
+            style: GoogleFonts.getFont(
+              appTheme.fontDisplay,
+              textStyle: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: accent,
               ),
             ),
           ),
@@ -914,20 +1080,504 @@ class _ShippingCard extends ConsumerWidget {
   }
 }
 
-IconData _deliveryIconFor(String code) => switch (code) {
-      'home' => Icons.home_outlined,
-      'pickup' => Icons.storefront_outlined,
-      _ => Icons.local_shipping_outlined,
+/// 每張購物車商品金額小計（各品項 lineTotal 加總）。
+int _groupSubtotal(PreviewCartGroup g) =>
+    g.items.fold(0, (s, it) => s + it.lineTotal);
+
+/// 依配送方式對應的 prototype 起始運費。
+int _feeFor(String? method) => switch (method) {
+      'home' => 150,
+      'post' => 100,
+      'cvs' => 120,
+      'self' => 0,
+      _ => 0,
     };
 
-class _BrandChip extends StatelessWidget {
-  const _BrandChip({
-    required this.label,
+/// 「運送方式/運費」中段顯示文字，例如「冷凍超商取貨 · 鑫工門市」。
+String _shippingLine(String? tempTag, String? method, String? location) {
+  final base = '${tempTag ?? ''}${_deliveryMethodLabel(method) ?? ''}';
+  return location == null ? base : '$base · $location';
+}
+
+/// 組合商品內容文字：「A - 規格 ×1、B ×2」。
+String _bundleText(List<BundleSubItem> items) => items
+    .map((b) => b.spec != null ? '${b.name} - ${b.spec} ×${b.qty}'
+        : '${b.name} ×${b.qty}')
+    .join('、');
+
+/// 彈窗回傳值：選到的配送方式 code + 展開後選到的地址 / 門市顯示文字。
+class _DeliveryChoice {
+  const _DeliveryChoice({required this.code, required this.locationLabel});
+  final String code;
+  final String? locationLabel;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 選擇運送方式 bottom sheet。點選方式後，該方式下方就地「展開」對應的
+// 收件地址（宅配 / 郵局宅配）或取貨門市（超商取貨）選擇區。
+// applyAll=true 時標題帶「（套用全部）」並顯示「部分運送方式不共同支援」提示。
+// 回傳 [_DeliveryChoice]（取消則回傳 null）。
+// ─────────────────────────────────────────────────────────────────────────
+class _DeliveryMethodSheet extends StatefulWidget {
+  const _DeliveryMethodSheet({
+    required this.applyAll,
+    required this.selectedCode,
+    required this.selectedLocation,
+  });
+
+  final bool applyAll;
+  final String? selectedCode;
+  final String? selectedLocation;
+
+  @override
+  State<_DeliveryMethodSheet> createState() => _DeliveryMethodSheetState();
+}
+
+class _DeliveryMethodSheetState extends State<_DeliveryMethodSheet> {
+  String? _selected;
+  int _homeIndex = 0; // 收件地址（宅配 / 郵局宅配）
+  int _storeIndex = 0; // 取貨門市（超商取貨）
+
+  static bool _needsHome(String? code) => code == 'home' || code == 'post';
+  static bool _needsStore(String? code) => code == 'cvs';
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.selectedCode;
+    // 收件地址預設落在第一筆「可配送」地址。
+    _homeIndex = _sampleHomeAddresses.indexWhere((a) => a.supported);
+    if (_homeIndex < 0) _homeIndex = 0;
+  }
+
+  /// 依目前選到的方式，組出要回寫到購物車列的地址 / 門市文字。
+  String? _locationLabel() {
+    final code = _selected;
+    if (_needsHome(code)) return _sampleHomeAddresses[_homeIndex].address;
+    if (_needsStore(code)) {
+      final s = _sampleStores[_storeIndex];
+      return '${s.brand} ${s.name}';
+    }
+    if (code == 'self') return '到店自取';
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final maxHeight = MediaQuery.of(context).size.height * 0.85;
+
+    return Container(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      decoration: BoxDecoration(
+        color: appTheme.bgElev,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(appTheme.sheetRadius),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 標題列 + 關閉
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 8, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.applyAll ? '選擇運送方式（套用全部）' : '選擇運送方式',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: appTheme.fg,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close, size: 22, color: appTheme.fgMuted),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            // 套用全部限定提示
+            if (widget.applyAll)
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: appTheme.bgSubtle,
+                  borderRadius: BorderRadius.circular(appTheme.radiusSm),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.info_outline,
+                        size: 15, color: appTheme.fgMuted),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '部分運送方式因您勾選的購物車不共同支援，套用全部時已自動隱藏。',
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.4,
+                          color: appTheme.fgMuted,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 4),
+            // 方式列表（選中者下方就地展開地址 / 門市選擇）
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var i = 0;
+                        i < _deliveryMethodOptions.length;
+                        i++) ...[
+                      _DeliveryMethodRow(
+                        option: _deliveryMethodOptions[i],
+                        selected:
+                            _deliveryMethodOptions[i].code == _selected,
+                        onTap: () => setState(() =>
+                            _selected = _deliveryMethodOptions[i].code),
+                      ),
+                      if (_deliveryMethodOptions[i].code == _selected)
+                        _expansionFor(_deliveryMethodOptions[i].code),
+                      if (i < _deliveryMethodOptions.length - 1)
+                        Divider(height: 1, color: appTheme.divider, indent: 20),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            // 完成
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: Material(
+                  color: _selected == null ? appTheme.muted : accent,
+                  borderRadius: BorderRadius.circular(appTheme.cardRadius),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(appTheme.cardRadius),
+                    onTap: _selected == null
+                        ? null
+                        : () => Navigator.of(context).pop(
+                              _DeliveryChoice(
+                                code: _selected!,
+                                locationLabel: _locationLabel(),
+                              ),
+                            ),
+                    child: const Center(
+                      child: Text(
+                        '完成',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _expansionFor(String code) {
+    if (_needsHome(code)) {
+      return _HomeAddressExpansion(
+        selectedIndex: _homeIndex,
+        onSelect: (i) => setState(() => _homeIndex = i),
+      );
+    }
+    if (_needsStore(code)) {
+      return _StorePickupExpansion(
+        selectedIndex: _storeIndex,
+        onSelect: (i) => setState(() => _storeIndex = i),
+      );
+    }
+    // 自取：無需地址。
+    final appTheme = context.appTheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+      child: Text(
+        '到店自取，無需填寫地址；請留意賣家通知的自取時間與地點。',
+        style: TextStyle(fontSize: 12, height: 1.4, color: appTheme.fgMuted),
+      ),
+    );
+  }
+}
+
+// ── 宅配 / 郵局宅配：收件地址列表（就地展開）───────────────────────────────
+class _HomeAddressExpansion extends StatelessWidget {
+  const _HomeAddressExpansion({
+    required this.selectedIndex,
+    required this.onSelect,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: Column(
+        children: [
+          for (var i = 0; i < _sampleHomeAddresses.length; i++) ...[
+            _HomeAddressCard(
+              addr: _sampleHomeAddresses[i],
+              selected: i == selectedIndex,
+              onTap: _sampleHomeAddresses[i].supported
+                  ? () => onSelect(i)
+                  : null,
+            ),
+            const SizedBox(height: 8),
+          ],
+          _AddNewRow(
+            label: '新增宅配地址',
+            onTap: () =>
+                showAddressFormSheet(context, type: AddressFormType.home),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeAddressCard extends StatelessWidget {
+  const _HomeAddressCard({
+    required this.addr,
     required this.selected,
     required this.onTap,
   });
 
-  final String label;
+  final _AddrOption addr;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final enabled = onTap != null;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(appTheme.radiusSm),
+      child: Opacity(
+        opacity: enabled ? 1 : 0.6,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(appTheme.radiusSm),
+            border: Border.all(
+              color: selected ? accent : appTheme.divider,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${addr.name}  ${addr.phone}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: appTheme.fg,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (addr.isDefault) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: accent.withValues(alpha: 0.12),
+                              borderRadius:
+                                  BorderRadius.circular(appTheme.radiusSm),
+                            ),
+                            child: Text(
+                              '預設',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: accent,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.place_outlined,
+                            size: 13, color: appTheme.fgMuted),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            addr.address,
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 1.4,
+                              color: appTheme.fg,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (addr.note != null) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        addr.note!,
+                        style: TextStyle(fontSize: 11, color: appTheme.danger),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                children: [
+                  Icon(
+                    addr.isDefault ? Icons.star : Icons.star_border,
+                    size: 18,
+                    color: addr.isDefault ? accent : appTheme.fgMuted,
+                  ),
+                  const SizedBox(height: 10),
+                  Icon(Icons.delete_outline,
+                      size: 18, color: appTheme.fgMuted),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── 超商取貨：取貨門市選擇（就地展開）─────────────────────────────────────
+class _StorePickupExpansion extends StatelessWidget {
+  const _StorePickupExpansion({
+    required this.selectedIndex,
+    required this.onSelect,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final store = _sampleStores[selectedIndex];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '選擇取貨門市（門市取自會員設定，運費依溫層）：',
+            style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
+              border: Border.all(color: appTheme.divider),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (var i = 0; i < _sampleStores.length; i++)
+                      _StoreChip(
+                        store: _sampleStores[i],
+                        selected: i == selectedIndex,
+                        onTap: () => onSelect(i),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Icon(Icons.place_outlined,
+                        size: 13, color: appTheme.fgMuted),
+                    const SizedBox(width: 4),
+                    Text(
+                      '門市：${store.name}',
+                      style: TextStyle(fontSize: 12, color: appTheme.fg),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(Icons.person_outline,
+                        size: 13, color: appTheme.fgMuted),
+                    const SizedBox(width: 4),
+                    Text(
+                      '收件人：王小明 +886 912****56',
+                      style: TextStyle(fontSize: 12, color: appTheme.fg),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          _AddNewRow(
+            label: '新增超商門市',
+            onTap: () =>
+                showAddressFormSheet(context, type: AddressFormType.pickup),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StoreChip extends StatelessWidget {
+  const _StoreChip({
+    required this.store,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _StoreOption store;
   final bool selected;
   final VoidCallback onTap;
 
@@ -935,24 +1585,489 @@ class _BrandChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
-    return Material(
-      color: selected
-          ? accent.withValues(alpha: 0.12)
-          : appTheme.bgSubtle,
+    return InkWell(
+      onTap: onTap,
       borderRadius: BorderRadius.circular(appTheme.chipRadius),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(appTheme.chipRadius),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              color: selected ? accent : appTheme.fg,
-            ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(appTheme.chipRadius),
+          border: Border.all(
+            color: selected ? accent : appTheme.divider,
+            width: selected ? 1.5 : 1,
           ),
+          color: selected ? accent.withValues(alpha: 0.06) : appTheme.bgElev,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: appTheme.bgSubtle,
+                borderRadius: BorderRadius.circular(appTheme.radiusSm),
+              ),
+              child: Text(
+                store.brand,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: appTheme.fgMuted,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              store.name,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected ? accent : appTheme.fg,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              store.price,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: selected ? accent : appTheme.fgMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── 共用：虛線框「＋ 新增…」列 ─────────────────────────────────────────────
+class _AddNewRow extends StatelessWidget {
+  const _AddNewRow({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(appTheme.radiusSm),
+      child: CustomPaint(
+        painter: _DashedRectPainter(
+          color: appTheme.divider,
+          radius: appTheme.radiusSm,
+        ),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add, size: 16, color: accent),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: accent,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 虛線圓角矩形外框（用於「＋ 新增…」列）。
+class _DashedRectPainter extends CustomPainter {
+  const _DashedRectPainter({required this.color, required this.radius});
+  final Color color;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final rrect = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      Radius.circular(radius),
+    );
+    final path = Path()..addRRect(rrect);
+    const dash = 4.0;
+    const gap = 4.0;
+    for (final metric in path.computeMetrics()) {
+      var dist = 0.0;
+      while (dist < metric.length) {
+        final next = (dist + dash).clamp(0.0, metric.length);
+        canvas.drawPath(metric.extractPath(dist, next), paint);
+        dist = next + gap;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedRectPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.radius != radius;
+}
+
+class _DeliveryMethodRow extends StatelessWidget {
+  const _DeliveryMethodRow({
+    required this.option,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _DeliveryMethodOption option;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                option.label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: selected ? accent : appTheme.fg,
+                ),
+              ),
+            ),
+            Text(
+              option.priceLabel,
+              style: TextStyle(
+                fontSize: 14,
+                color: selected ? accent : appTheme.fgMuted,
+              ),
+            ),
+            if (selected) ...[
+              const SizedBox(width: 8),
+              Icon(Icons.check, size: 18, color: accent),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 配送資訊 prototype 資料 —— 可選運送方式（含起始價）。
+// 購物車名稱沿用 `previewCartProvider` 的多台分組，不在此另立。
+// ─────────────────────────────────────────────────────────────────────────
+class _DeliveryMethodOption {
+  const _DeliveryMethodOption({
+    required this.code,
+    required this.label,
+    required this.priceLabel,
+  });
+  final String code;
+  final String label;
+  final String priceLabel;
+}
+
+const List<_DeliveryMethodOption> _deliveryMethodOptions = [
+  _DeliveryMethodOption(code: 'home', label: '宅配', priceLabel: '\$150 起'),
+  _DeliveryMethodOption(code: 'self', label: '自取', priceLabel: '\$0'),
+  _DeliveryMethodOption(code: 'cvs', label: '超商取貨', priceLabel: '\$110 起'),
+  _DeliveryMethodOption(code: 'post', label: '郵局宅配', priceLabel: '\$100 起'),
+];
+
+String? _deliveryMethodLabel(String? code) {
+  if (code == null) return null;
+  for (final m in _deliveryMethodOptions) {
+    if (m.code == code) return m.label;
+  }
+  return null;
+}
+
+// ── 收件地址 / 取貨門市 prototype 範例資料（彈窗展開後可選）─────────────────
+// 真機登入後應改讀 address_provider 的會員地址 / 門市；web 預覽無授權，
+// 以下範例讓展開選單有內容可預覽。
+class _AddrOption {
+  const _AddrOption({
+    required this.name,
+    required this.phone,
+    required this.address,
+    this.isDefault = false,
+    this.supported = true,
+    this.note,
+  });
+  final String name;
+  final String phone;
+  final String address;
+  final bool isDefault;
+  final bool supported;
+  final String? note;
+}
+
+class _StoreOption {
+  const _StoreOption({
+    required this.brand,
+    required this.name,
+    required this.price,
+  });
+  final String brand;
+  final String name;
+  final String price;
+}
+
+const List<_AddrOption> _sampleHomeAddresses = [
+  _AddrOption(
+    name: '王小明',
+    phone: '+886 912****56',
+    address: '台北市信義區忠孝東路五段 100 號 10 樓',
+    isDefault: true,
+  ),
+  _AddrOption(
+    name: '王小明',
+    phone: '+886 912****56',
+    address: '高雄市前鎮區中山路一段 50 號 8 樓',
+    supported: false,
+    note: '目前不提供配送至此地區',
+  ),
+];
+
+const List<_StoreOption> _sampleStores = [
+  _StoreOption(brand: '7-11', name: '鑫工門市', price: 'NT\$120'),
+  _StoreOption(brand: '7-11', name: '連興門市', price: 'NT\$120'),
+  _StoreOption(brand: '全家', name: '平鎮上海店', price: 'NT\$110'),
+];
+
+// ── 結帳頁「選擇優惠券」prototype 資料 + 彈窗 ─────────────────────────────
+class _CheckoutCoupon {
+  const _CheckoutCoupon({
+    required this.id,
+    required this.name,
+    required this.discount,
+    required this.note,
+  });
+  final int id;
+  final String name;
+
+  /// 折抵金額（NT$）。
+  final int discount;
+  final String note;
+}
+
+const List<_CheckoutCoupon> _checkoutCoupons = [
+  _CheckoutCoupon(
+      id: 1, name: '滿 \$1000 折 \$100', discount: 100, note: '單一購物車滿 \$1000 可用'),
+  _CheckoutCoupon(id: 2, name: '生鮮直播折 \$50', discount: 50, note: '生鮮 / 冷凍類專用'),
+  _CheckoutCoupon(id: 3, name: '全站現折 \$80', discount: 80, note: '不限金額'),
+  _CheckoutCoupon(id: 4, name: '指定商品折 \$150', discount: 150, note: '指定商品限定'),
+];
+
+/// 彈窗回傳值：`coupon == null` 代表「不使用優惠券」，dismiss 則回傳 null。
+class _CouponResult {
+  const _CouponResult(this.coupon);
+  final _CheckoutCoupon? coupon;
+}
+
+class _CouponPickerSheet extends StatefulWidget {
+  const _CouponPickerSheet({required this.selectedId});
+  final int? selectedId;
+
+  @override
+  State<_CouponPickerSheet> createState() => _CouponPickerSheetState();
+}
+
+class _CouponPickerSheetState extends State<_CouponPickerSheet> {
+  int? _selectedId;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedId = widget.selectedId;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final maxHeight = MediaQuery.of(context).size.height * 0.8;
+
+    return Container(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      decoration: BoxDecoration(
+        color: appTheme.bgElev,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(appTheme.sheetRadius),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '選擇優惠券',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: appTheme.fg,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close, size: 22, color: appTheme.fgMuted),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _CouponPickRow(
+                      title: '不使用優惠券',
+                      note: null,
+                      trailing: '',
+                      selected: _selectedId == null,
+                      onTap: () => setState(() => _selectedId = null),
+                    ),
+                    Divider(height: 1, color: appTheme.divider, indent: 20),
+                    for (var i = 0; i < _checkoutCoupons.length; i++) ...[
+                      _CouponPickRow(
+                        title: _checkoutCoupons[i].name,
+                        note: _checkoutCoupons[i].note,
+                        trailing: '- NT\$${_fmt(_checkoutCoupons[i].discount)}',
+                        selected: _selectedId == _checkoutCoupons[i].id,
+                        onTap: () => setState(
+                            () => _selectedId = _checkoutCoupons[i].id),
+                      ),
+                      if (i < _checkoutCoupons.length - 1)
+                        Divider(height: 1, color: appTheme.divider, indent: 20),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: Material(
+                  color: accent,
+                  borderRadius: BorderRadius.circular(appTheme.cardRadius),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(appTheme.cardRadius),
+                    onTap: () {
+                      final coupon = _selectedId == null
+                          ? null
+                          : _checkoutCoupons
+                              .firstWhere((c) => c.id == _selectedId);
+                      Navigator.of(context).pop(_CouponResult(coupon));
+                    },
+                    child: const Center(
+                      child: Text(
+                        '完成',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CouponPickRow extends StatelessWidget {
+  const _CouponPickRow({
+    required this.title,
+    required this.note,
+    required this.trailing,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String title;
+  final String? note;
+  final String trailing;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                      color: selected ? accent : appTheme.fg,
+                    ),
+                  ),
+                  if (note != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      note!,
+                      style: TextStyle(fontSize: 11, color: appTheme.fgMuted),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (trailing.isNotEmpty)
+              Text(
+                trailing,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: appTheme.danger,
+                ),
+              ),
+            if (selected) ...[
+              const SizedBox(width: 8),
+              Icon(Icons.check, size: 18, color: accent),
+            ],
+          ],
         ),
       ),
     );
@@ -1087,237 +2202,21 @@ class _RadioTile<T> extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Price summary card — breakdown rows (subtotal, shipping, discounts, total)
-// ─────────────────────────────────────────────────────────────────────────
-class _PriceSummaryCard extends StatelessWidget {
-  const _PriceSummaryCard(
-      {required this.cart, required this.previewAsync});
-
-  final CartApi cart;
-  final AsyncValue<Map<String, dynamic>?> previewAsync;
-
-  double? _toDouble(dynamic v) {
-    if (v == null) return null;
-    if (v is double) return v;
-    if (v is int) return v.toDouble();
-    if (v is String) return double.tryParse(v);
-    return null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _Card(
-      child: previewAsync.when(
-        loading: () => const Center(
-          child: Padding(
-            padding: EdgeInsets.all(12),
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-        error: (_, _) => _PriceRows(
-          subtotal: cart.subtotal,
-          discount: cart.discount,
-          total: cart.total,
-          shippingFee: null,
-          shippingFeeReason: null,
-        ),
-        data: (preview) => _PriceRows(
-          subtotal: _toDouble(preview?['subtotal']) ?? cart.subtotal,
-          discount: _toDouble(preview?['discount']) ?? cart.discount,
-          total: _toDouble(preview?['total']) ?? cart.total,
-          shippingFee: _toDouble(preview?['shipping_fee']),
-          shippingFeeReason: preview?['shipping_fee_reason'] as String?,
-        ),
-      ),
-    );
-  }
-}
-
-class _PriceRows extends StatelessWidget {
-  const _PriceRows({
-    required this.subtotal,
-    required this.discount,
-    required this.total,
-    required this.shippingFee,
-    required this.shippingFeeReason,
-  });
-
-  final double subtotal;
-  final double discount;
-  final double total;
-  final double? shippingFee;
-
-  /// 2026-05 spec: backend explains why `shipping_fee` could not be
-  /// computed yet. `null` = fee finalised. Known values:
-  ///   • `NEEDS_ADDRESS_SELECTION`        — 尚未選擇地址
-  ///   • `ADDRESS_NOT_FOUND_OR_UNAUTHORIZED` — 地址不存在或無權限
-  ///   • `NO_AVAILABLE_RATE`              — 無對應費率
-  final String? shippingFeeReason;
-
-  /// Human-readable form of [shippingFeeReason]. Returns `null` when the
-  /// fee has been finalised.
-  String? get _shippingReasonLabel => switch (shippingFeeReason) {
-        'NEEDS_ADDRESS_SELECTION' => '尚未選擇地址',
-        'ADDRESS_NOT_FOUND_OR_UNAUTHORIZED' => '地址不存在或無權限',
-        'NO_AVAILABLE_RATE' => '無可用運費方案',
-        null => null,
-        _ => shippingFeeReason,
-      };
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    final accent = appTheme.brandPalette.tone500;
-    // Prototype-level breakdown rows. Multi-item & free-shipping discounts
-    // are mock 0 placeholders until backend exposes the actual values.
-    // TODO(API): expose multi-item-discount + free-shipping-threshold
-    // values on the checkout preview response so these rows can display
-    // real numbers instead of 0/—.
-    const bulkDiscount = 0.0;
-    final freeShippingDiscount =
-        (shippingFee != null && shippingFee == 0) ? 80.0 : 0.0;
-    final reason = _shippingReasonLabel;
-    return Column(
-      children: [
-        _Row(
-          label: '商品總金額',
-          value: '\$${_fmt(subtotal)}',
-        ),
-        const SizedBox(height: 6),
-        _Row(
-          label: '運費總金額',
-          value: shippingFee == null
-              ? (reason ?? '—')
-              : (shippingFee == 0
-                  ? '免運'
-                  : '\$${_fmt(shippingFee!)}'),
-          valueColor: shippingFee == null && reason != null
-              ? appTheme.fgMuted
-              : (shippingFee != null && shippingFee == 0
-                  ? appTheme.success
-                  : null),
-        ),
-        const SizedBox(height: 6),
-        _Row(
-          label: '多件優惠折抵',
-          value: '-\$${_fmt(bulkDiscount)}',
-          labelColor: appTheme.danger,
-          valueColor: appTheme.danger,
-        ),
-        const SizedBox(height: 6),
-        _Row(
-          label: '🛒 符合「滿千免運」 運費折抵',
-          value: '-\$${_fmt(freeShippingDiscount)}',
-          labelColor: appTheme.danger,
-          valueColor: appTheme.danger,
-        ),
-        if (discount > 0) ...[
-          const SizedBox(height: 6),
-          _Row(
-            label: '優惠券折抵',
-            value: '-\$${_fmt(discount)}',
-            labelColor: appTheme.danger,
-            valueColor: appTheme.danger,
-          ),
-        ],
-        const SizedBox(height: 10),
-        Container(height: 1, color: appTheme.divider),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '總付款金額',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: appTheme.fg,
-              ),
-            ),
-            Text(
-              '\$${_fmt(total)}',
-              style: GoogleFonts.getFont(
-                appTheme.fontDisplay,
-                textStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  color: accent,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _Row extends StatelessWidget {
-  const _Row({
-    required this.label,
-    required this.value,
-    this.labelColor,
-    this.valueColor,
-  });
-
-  final String label;
-  final String value;
-  final Color? labelColor;
-  final Color? valueColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: labelColor ?? appTheme.fgMuted,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 12,
-            color: valueColor ?? appTheme.fg,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────
 // Bottom 總付款金額 + 去付款 sticky bar.
 // ─────────────────────────────────────────────────────────────────────────
 class _ConfirmBar extends StatelessWidget {
   const _ConfirmBar({
-    required this.cart,
-    required this.previewAsync,
+    required this.total,
     required this.isSubmitting,
     required this.onConfirm,
   });
 
-  final CartApi cart;
-  final AsyncValue<Map<String, dynamic>?> previewAsync;
+  /// 全部購物車小計加總（各台 [_groupSubtotal] 之和）。
+  final double total;
   final bool isSubmitting;
   final VoidCallback onConfirm;
 
-  double get _total => previewAsync.maybeWhen(
-        data: (p) {
-          final v = p?['total'];
-          if (v is num) return v.toDouble();
-          if (v is String) return double.tryParse(v) ?? cart.total;
-          return cart.total;
-        },
-        orElse: () => cart.total,
-      );
+  double get _total => total;
 
   @override
   Widget build(BuildContext context) {

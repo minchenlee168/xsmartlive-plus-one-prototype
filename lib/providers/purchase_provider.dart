@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/purchase.dart';
@@ -15,6 +16,9 @@ typedef PurchasesFilter = ({
 final purchasesProvider =
     FutureProvider.family<PurchaseCollection, PurchasesFilter>(
         (ref, filter) async {
+  // Web 預覽打不到需授權的訂單 API（無 session），改用範例訂單，並在此
+  // 依狀態 / 關鍵字（訂單編號）/ 日期區間過濾，讓下拉篩選與搜尋可實際運作。
+  if (kIsWeb) return _sampleOrderCollection(filter);
   return ref.read(purchaseRepositoryProvider).fetchPurchases(
         status: filter.status,
         page: filter.page,
@@ -27,6 +31,7 @@ final purchasesProvider =
 
 final purchaseDetailProvider =
     FutureProvider.family<PurchaseDetail, int>((ref, id) async {
+  if (kIsWeb) return _sampleOrderDetail(id);
   return ref.read(purchaseRepositoryProvider).fetchPurchaseDetail(id);
 });
 
@@ -52,6 +57,14 @@ int _countFromCollection(PurchaseCollection c) {
 }
 
 final purchaseCountsProvider = FutureProvider<PurchaseCounts>((ref) async {
+  if (kIsWeb) {
+    return PurchaseCounts(
+      pending: sampleOrderCount('pending'),
+      paid: sampleOrderCount('paid'),
+      shipped: sampleOrderCount('shipped'),
+      completed: sampleOrderCount('completed'),
+    );
+  }
   final repo = ref.read(purchaseRepositoryProvider);
   final results = await Future.wait([
     repo.fetchPurchases(status: 'pending', perPage: 10),
@@ -66,3 +79,150 @@ final purchaseCountsProvider = FutureProvider<PurchaseCounts>((ref) async {
     completed: _countFromCollection(results[3]),
   );
 });
+
+// ── 訂單狀態選項 + 範例資料（web 預覽 / 未登入 fallback）─────────────────
+/// 對照設計稿的 7 種狀態；`code == null` = 所有訂單。真機的狀態代碼以後端為準，
+/// 這裡的 `preparing`（備貨中）/ `delivered`（已送達）為 prototype 範例用途。
+const List<({String? code, String label})> kOrderStatusOptions = [
+  (code: null, label: '所有訂單'),
+  (code: 'pending', label: '待付款'),
+  (code: 'paid', label: '待出貨'),
+  (code: 'preparing', label: '備貨中'),
+  (code: 'shipped', label: '已出貨'),
+  (code: 'delivered', label: '已送達'),
+  (code: 'completed', label: '已完成'),
+];
+
+/// 範例訂單狀態的顯示文字。
+String orderStatusLabel(String? code) {
+  for (final o in kOrderStatusOptions) {
+    if (o.code == code) return o.label;
+  }
+  return code ?? '';
+}
+
+/// 12 筆範例訂單，分布於各狀態（待付款 2 / 待出貨 2 / 備貨中 2 / 已出貨 1 /
+/// 已送達 2 / 已完成 3）。日期落在近 3 個月，預設查詢區間即可看到。
+const List<Purchase> kSampleOrders = [
+  Purchase(id: 100012, createdAt: '2026-08-28T20:14:00', itemCount: 2, amount: 1690, paymentMethod: '信用卡', shippingMethod: '超商取貨', status: 'pending'),
+  Purchase(id: 100011, createdAt: '2026-08-25T13:02:00', itemCount: 1, amount: 890, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'pending'),
+  Purchase(id: 100010, createdAt: '2026-08-20T09:47:00', itemCount: 3, amount: 3280, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'paid'),
+  Purchase(id: 100009, createdAt: '2026-08-18T21:30:00', itemCount: 2, amount: 1180, paymentMethod: 'Apple Pay', shippingMethod: '超商取貨', status: 'paid'),
+  Purchase(id: 100008, createdAt: '2026-08-12T15:20:00', itemCount: 4, amount: 4560, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'preparing'),
+  Purchase(id: 100007, createdAt: '2026-08-08T11:05:00', itemCount: 1, amount: 599, paymentMethod: '貨到付款', shippingMethod: '超商取貨', status: 'preparing'),
+  Purchase(id: 100006, createdAt: '2026-07-30T18:41:00', itemCount: 2, amount: 2050, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'shipped'),
+  Purchase(id: 100005, createdAt: '2026-07-22T10:12:00', itemCount: 3, amount: 1780, paymentMethod: 'LINE Pay', shippingMethod: '超商取貨', status: 'delivered'),
+  Purchase(id: 100004, createdAt: '2026-07-15T14:33:00', itemCount: 1, amount: 990, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'delivered'),
+  Purchase(id: 100003, createdAt: '2026-07-05T20:00:00', itemCount: 5, amount: 5320, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'completed'),
+  Purchase(id: 100002, createdAt: '2026-06-28T09:15:00', itemCount: 2, amount: 1440, paymentMethod: 'Apple Pay', shippingMethod: '超商取貨', status: 'completed'),
+  Purchase(id: 100001, createdAt: '2026-06-18T16:50:00', itemCount: 1, amount: 760, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'completed'),
+];
+
+int sampleOrderCount(String? status) => status == null
+    ? kSampleOrders.length
+    : kSampleOrders.where((o) => o.status == status).length;
+
+PurchaseCollection _sampleOrderCollection(PurchasesFilter filter) {
+  final list = kSampleOrders.where((o) {
+    if (filter.status != null && o.status != filter.status) return false;
+    final kw = filter.keyword;
+    if (kw != null && kw.trim().isNotEmpty &&
+        !o.id.toString().contains(kw.trim())) {
+      return false;
+    }
+    final dt = DateTime.tryParse(o.createdAt);
+    if (dt != null) {
+      if (filter.startTime != null && dt.isBefore(filter.startTime!)) {
+        return false;
+      }
+      if (filter.endTime != null && dt.isAfter(filter.endTime!)) return false;
+    }
+    return true;
+  }).toList(growable: false);
+  return PurchaseCollection(
+    data: list,
+    meta: PurchasePagination(
+      currentPage: '1',
+      pageSize: '${list.length}',
+      totalPages: '1',
+      totalNumber: '${list.length}',
+    ),
+  );
+}
+
+/// 依 fulfillment 狀態碼（0 待出貨 / 1 已出貨 / 3 已送達）組出範例包裹，
+/// 並把各階段時間戳補到「已達成」為止。
+PurchaseFulfillment _sampleFulfillment(
+  int orderId,
+  int seq,
+  int fStatus,
+  String createdAt,
+  int qty,
+) {
+  return PurchaseFulfillment(
+    // 產生類似物流包裹單號的數字（顯示為 P{id}），各包裹唯一。
+    id: 2024300000 + (orderId % 100000) * 10 + seq,
+    status: fStatus,
+    statusLabel: switch (fStatus) {
+      1 => '已出貨',
+      2 => '配送中',
+      3 => '已送達',
+      _ => '待出貨',
+    },
+    itemQuantity: '$qty',
+    paidAt: createdAt,
+    shippedAt: fStatus >= 1 ? createdAt : null,
+    deliveredAt: fStatus >= 3 ? createdAt : null,
+    completedAt: null,
+  );
+}
+
+PurchaseDetail _sampleOrderDetail(int id) {
+  final order = kSampleOrders.firstWhere(
+    (o) => o.id == id,
+    orElse: () => kSampleOrders.first,
+  );
+
+  // 示範：訂單 100006 拆成兩個包裹 —— 包裹 1 已送達、包裹 2 已出貨。
+  if (order.id == 100006) {
+    return PurchaseDetail(
+      id: id,
+      items: [
+        PurchaseDetailItem(
+          id: id * 10 + 1,
+          productName: '範例商品 ${order.id}',
+          variantName: '標準規格',
+          unitPrice: 1025,
+          quantity: 2,
+          fulfillments: [
+            _sampleFulfillment(id, 1, 3, order.createdAt, 1), // 包裹1 已送達
+            _sampleFulfillment(id, 2, 1, order.createdAt, 1), // 包裹2 已出貨
+          ],
+        ),
+      ],
+    );
+  }
+
+  final status = order.status;
+  final fStatus = switch (status) {
+    'shipped' => 1,
+    'delivered' => 3,
+    'completed' => 3,
+    _ => 0,
+  };
+  return PurchaseDetail(
+    id: id,
+    items: [
+      PurchaseDetailItem(
+        id: id * 10 + 1,
+        productName: '範例商品 ${order.id}',
+        variantName: '標準規格',
+        unitPrice: order.amount,
+        quantity: order.itemCount,
+        fulfillments: [
+          _sampleFulfillment(id, 1, fStatus, order.createdAt, order.itemCount),
+        ],
+      ),
+    ],
+  );
+}

@@ -321,6 +321,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             children: [
                               for (final g in vmGroups)
                                 _HostGroupCard(group: g),
+                              const SizedBox(height: 8),
+                              // 購物車頁最下方的「加購區」。
+                              const _AddonSection(),
                             ],
                           ),
           ),
@@ -1694,4 +1697,277 @@ String _format(num value) {
     buf.write(intPart[i]);
   }
   return buf.toString();
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 加購區 —— 購物車頁最下方的加購商品區。
+//   • 標題「加購區 / 共 N 件」+ 搜尋框 + 直播場次 / 購物車 篩選（prototype，
+//     視覺為主，不做實際過濾）。
+//   • 商品以 2 欄格狀排列；區塊高度固定，預設露出兩排，其餘以捲軸捲動。
+// 內容為 prototype 範例資料；樣式沿用 Theme token。
+// ─────────────────────────────────────────────────────────────────────────
+class _AddonProduct {
+  const _AddonProduct({required this.name, required this.price});
+  final String name;
+  final int price;
+}
+
+const List<_AddonProduct> _kAddonProducts = [
+  _AddonProduct(name: '寶寶嬰兒紗布手帕 5 入組', price: 89),
+  _AddonProduct(name: '寶寶柔嫩濕紙巾 80 抽 / 包', price: 49),
+  _AddonProduct(name: '不鏽鋼防滑安撫奶嘴', price: 129),
+  _AddonProduct(name: '嬰兒安全電動指甲剪', price: 199),
+  _AddonProduct(name: '寶寶副食品試吃綜合包', price: 99),
+  _AddonProduct(name: '媽咪保溫水壺 500ml', price: 290),
+  _AddonProduct(name: '嬰兒防踢被 純棉睡袋', price: 359),
+  _AddonProduct(name: '寶寶學步防滑襪 3 雙組', price: 129),
+  _AddonProduct(name: '嬰兒副食品調理研磨組', price: 249),
+  _AddonProduct(name: '寶寶矽膠圍兜 防水款', price: 79),
+  _AddonProduct(name: '嬰兒安撫音樂鈴', price: 450),
+  _AddonProduct(name: '寶寶哺乳枕 多功能', price: 399),
+  _AddonProduct(name: '寶寶洗澡溫度計 小鴨造型', price: 89),
+  _AddonProduct(name: '嬰兒紗布浴巾 6 層', price: 159),
+  _AddonProduct(name: '寶寶學飲杯 防漏鴨嘴', price: 119),
+  _AddonProduct(name: '嬰兒指甲剪安全護套', price: 59),
+];
+
+class _AddonSection extends StatelessWidget {
+  const _AddonSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: appTheme.bgElev,
+        borderRadius: BorderRadius.circular(appTheme.cardRadius),
+        border: Border.all(color: appTheme.divider),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 標題 + 搜尋 + 篩選
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '加購區',
+                      style: GoogleFonts.getFont(
+                        appTheme.fontDisplay,
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: appTheme.fg,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text(
+                        '共 ${_kAddonProducts.length} 件',
+                        style: TextStyle(
+                            fontSize: 11, color: appTheme.fgMuted),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                _AddonSearchBox(),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(child: _AddonDropChip(label: '直播場次')),
+                    const SizedBox(width: 8),
+                    Expanded(child: _AddonDropChip(label: '購物車')),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // 標題底下的品牌色分隔線
+          Container(height: 2, color: accent),
+          // 商品格狀區：固定高度，露出兩排，其餘捲動。
+          SizedBox(
+            height: 452,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final cols =
+                    (constraints.maxWidth / 190).floor().clamp(2, 5);
+                return GridView.builder(
+                  padding: const EdgeInsets.all(12),
+                  gridDelegate:
+                      SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: cols,
+                    mainAxisExtent: 210,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: _kAddonProducts.length,
+                  itemBuilder: (context, i) =>
+                      _AddonCard(product: _kAddonProducts[i]),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddonSearchBox extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: appTheme.bgSubtle,
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
+        border: Border.all(color: appTheme.divider),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.search, size: 16, color: appTheme.fgMuted),
+          const SizedBox(width: 8),
+          Text(
+            '搜尋商品名稱',
+            style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddonDropChip extends StatelessWidget {
+  const _AddonDropChip({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: appTheme.bgElev,
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
+        border: Border.all(color: appTheme.divider),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 12, color: appTheme.fg),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Icon(Icons.keyboard_arrow_down,
+              size: 16, color: appTheme.fgMuted),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddonCard extends StatelessWidget {
+  const _AddonCard({required this.product});
+  final _AddonProduct product;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 商品圖（prototype 以佔位圖示呈現）
+        Container(
+          height: 96,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: appTheme.bgSubtle,
+            borderRadius: BorderRadius.circular(appTheme.radiusSm),
+            border: Border.all(color: appTheme.divider),
+          ),
+          alignment: Alignment.center,
+          child: Icon(Icons.image_outlined,
+              size: 26, color: appTheme.muted),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          product.name,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 12,
+            height: 1.3,
+            fontWeight: FontWeight.w500,
+            color: appTheme.fg,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'NT\$${product.price}',
+          style: GoogleFonts.getFont(
+            appTheme.fontDisplay,
+            textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: accent,
+            ),
+          ),
+        ),
+        const Spacer(),
+        SizedBox(
+          width: double.infinity,
+          child: Material(
+            color: accent,
+            borderRadius: BorderRadius.circular(appTheme.buttonRadius),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(appTheme.buttonRadius),
+              onTap: () {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(content: Text('已加入購物車：${product.name}')),
+                  );
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.shopping_cart_outlined,
+                        size: 14, color: Colors.white),
+                    SizedBox(width: 6),
+                    Text(
+                      '加入購物車',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

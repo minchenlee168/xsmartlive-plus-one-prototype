@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -202,14 +203,17 @@ class _StatusFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final appTheme = context.appTheme;
-    final items = <({String? status, String label})>[
-      (status: null, label: l10n.ordersFilterHintAll),
-      (status: 'pending', label: l10n.orderFilterPending),
-      (status: 'paid', label: l10n.orderFilterPaid),
-      (status: 'shipped', label: l10n.orderFilterShipped),
-      (status: 'completed', label: l10n.orderFilterCompleted),
+    // 對照設計稿的 7 種狀態（所有訂單 / 待付款 / 待出貨 / 備貨中 / 已出貨 /
+    // 已送達 / 已完成）。web 預覽附上各狀態筆數。
+    final items = [
+      for (final o in kOrderStatusOptions)
+        (
+          status: o.code,
+          label: kIsWeb
+              ? '${o.label} (${sampleOrderCount(o.code)})'
+              : o.label,
+        ),
     ];
 
     return Container(
@@ -388,8 +392,12 @@ class _OrderInfoList extends StatelessWidget {
         return l10n.ordersTimelinePending;
       case 'paid':
         return l10n.orderFilterPaid;
+      case 'preparing':
+        return '備貨中';
       case 'shipped':
         return l10n.ordersTimelineShipped;
+      case 'delivered':
+        return l10n.ordersTimelineDelivered;
       case 'completed':
         return l10n.ordersTimelineCompleted;
       default:
@@ -790,6 +798,13 @@ class _FulfillmentPackage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final active = _activeStage();
+    // 已出貨（含配送中 / 已送達 / 已完成）才有包裹編號；之前一律「待處理包裹」。
+    final hasShipped = active == _OrderStage.shipped ||
+        active == _OrderStage.delivered ||
+        active == _OrderStage.completed;
+    final headerLabel = hasShipped
+        ? '包裹編號：P${fulfillment.id}'
+        : l10n.ordersPendingPackage;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
@@ -808,7 +823,7 @@ class _FulfillmentPackage extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  l10n.ordersPendingPackage,
+                  headerLabel,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

@@ -8,11 +8,11 @@ import '../../models/purchase.dart';
 import '../../providers/purchase_provider.dart';
 import '../../theme/app_theme_extension.dart';
 
-/// 5 timeline stages shown per fulfillment.
-enum _OrderStage { pending, toShip, shipped, delivered, completed }
+/// 訂單卡的獨立動作按鈕（配送進度/明細改為切換列，不在此列舉）。
+enum _OrderAction { inquiry, changeAddress, payInfo }
 
-/// 訂單卡「配送進度／明細」下拉選單的動作。
-enum _OrderAction { detail, inquiry, changeAddress, payInfo }
+/// 發票情境：不開立（整列不顯示）/ 已開立 / 線上列印（可開電子發票證明聯）。
+enum _InvoiceScenario { none, issued, onlinePrint }
 
 class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});
@@ -321,9 +321,6 @@ class _OrderCardState extends ConsumerState<_OrderCard> {
 
   void _handleAction(_OrderAction action) {
     switch (action) {
-      case _OrderAction.detail:
-        // 選「配送進度/明細」＝直接展開查看商品與貨態，不做收合。
-        setState(() => _expanded = true);
       case _OrderAction.inquiry:
         _openSheet(const _OrderInquirySheet());
       case _OrderAction.changeAddress:
@@ -365,12 +362,9 @@ class _OrderCardState extends ConsumerState<_OrderCard> {
         children: [
           _OrderInfoList(order: order),
           const SizedBox(height: 7),
+          // 配送進度/明細獨立一列 + 收合按鈕。
           _DetailToggleRow(
             expanded: _expanded,
-            // 待付款 / 待出貨可更換地址；備貨中及出貨後停用。
-            canChangeAddress:
-                order.status == 'pending' || order.status == 'paid',
-            onSelected: _handleAction,
             onToggle: () => setState(() => _expanded = !_expanded),
           ),
           AnimatedSize(
@@ -400,6 +394,15 @@ class _OrderCardState extends ConsumerState<_OrderCard> {
                       width: double.infinity,
                     ),
             ),
+          ),
+          const SizedBox(height: 8),
+          // 三個獨立動作按鈕（配送進度/明細下方）：訂單提問 / 更換地址 /
+          // 訂購・付款資訊。
+          _OrderActionButtons(
+            // 待付款 / 待出貨可更換地址；備貨中及出貨後停用。
+            canChangeAddress:
+                order.status == 'pending' || order.status == 'paid',
+            onSelected: _handleAction,
           ),
         ],
       ),
@@ -461,13 +464,9 @@ class _OrderInfoList extends StatelessWidget {
           emphasised: false),
       (label: l10n.ordersFieldShipping, value: order.shippingMethod ?? missing,
           emphasised: false),
-      (label: l10n.ordersFieldInvoice, value: missing, emphasised: false),
-      (
-        label: l10n.ordersFieldStatus,
-        value: _statusLabel(context, order.status) ?? missing,
-        emphasised: false,
-      ),
     ];
+    // 發票欄改到訂單資訊列：不開立 → 不顯示；已開立 → 狀態；線上列印 → 按鈕。
+    final invoice = _invoiceScenarioFor(order.status);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,7 +477,85 @@ class _OrderInfoList extends StatelessWidget {
             value: row.value,
             emphasised: row.emphasised,
           ),
+        if (invoice != _InvoiceScenario.none)
+          _InvoiceInfoRow(order: order, scenario: invoice),
+        _InfoRow(
+          label: l10n.ordersFieldStatus,
+          value: _statusLabel(context, order.status) ?? missing,
+          emphasised: false,
+        ),
       ],
+    );
+  }
+}
+
+/// 由訂單狀態推出發票情境（prototype）。
+_InvoiceScenario _invoiceScenarioFor(String? status) {
+  switch (status) {
+    case 'pending':
+      return _InvoiceScenario.none;
+    case 'completed':
+      return _InvoiceScenario.issued;
+    default:
+      return _InvoiceScenario.onlinePrint;
+  }
+}
+
+/// 訂單資訊裡的「發票」列：已開立顯示狀態；線上列印顯示按鈕開電子發票證明聯。
+class _InvoiceInfoRow extends StatelessWidget {
+  const _InvoiceInfoRow({required this.order, required this.scenario});
+
+  final Purchase order;
+  final _InvoiceScenario scenario;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            '${l10n.ordersFieldInvoice}：',
+            style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w500, color: appTheme.fg),
+          ),
+          if (scenario == _InvoiceScenario.issued)
+            Row(
+              children: [
+                Icon(Icons.check_circle, size: 16, color: appTheme.success),
+                const SizedBox(width: 4),
+                Text('已開立',
+                    style:
+                        TextStyle(fontSize: 14, color: appTheme.success)),
+              ],
+            )
+          else
+            Material(
+              color: accent,
+              borderRadius: BorderRadius.circular(appTheme.buttonRadius),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(appTheme.buttonRadius),
+                onTap: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => _InvoiceProofCard(order: order),
+                ),
+                child: const Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  child: Text('線上列印',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700)),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -498,7 +575,9 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      // label 與內容以文字基線對齊，讓不同字級的兩段文字看起來在同一行置中。
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
       children: [
         Text(
           '$label：',
@@ -506,7 +585,7 @@ class _InfoRow extends StatelessWidget {
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: appTheme.fg,
-            height: 1.4,
+            height: 1.5,
           ),
         ),
         Expanded(
@@ -525,21 +604,84 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-class _DetailToggleRow extends StatelessWidget {
-  const _DetailToggleRow({
-    required this.expanded,
+// 訂單卡三個獨立動作按鈕：訂單提問 / 更換地址 / 訂購・付款資訊。
+class _OrderActionButtons extends StatelessWidget {
+  const _OrderActionButtons({
     required this.canChangeAddress,
     required this.onSelected,
-    required this.onToggle,
   });
-
-  final bool expanded;
 
   /// 待出貨前（待付款 / 待出貨）才可更換地址；備貨中 / 出貨後停用。
   final bool canChangeAddress;
   final ValueChanged<_OrderAction> onSelected;
 
-  /// 右側箭頭：手動展開 / 收合明細。
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+
+    Widget button(IconData icon, String label,
+        {required bool enabled, required VoidCallback onTap}) {
+      final color = enabled ? appTheme.fg : appTheme.muted;
+      final iconColor = enabled ? appTheme.fgMuted : appTheme.muted;
+      return Expanded(
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(appTheme.radiusSm),
+          child: Container(
+            height: 33,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+              color: appTheme.bgElev,
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
+              border: Border.all(color: appTheme.divider),
+              boxShadow: appTheme.elevation1,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 14, color: iconColor),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: color),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        button(Icons.help_outline, '訂單提問',
+            enabled: true, onTap: () => onSelected(_OrderAction.inquiry)),
+        const SizedBox(width: 8),
+        button(Icons.place_outlined, '更換地址',
+            enabled: canChangeAddress,
+            onTap: () => onSelected(_OrderAction.changeAddress)),
+        const SizedBox(width: 8),
+        button(Icons.receipt_long_outlined, '訂購/付款資訊',
+            enabled: true, onTap: () => onSelected(_OrderAction.payInfo)),
+      ],
+    );
+  }
+}
+
+// 配送進度/明細：獨立一列 + 收合按鈕；展開顯示商品、規格與貨態。
+class _DetailToggleRow extends StatelessWidget {
+  const _DetailToggleRow({
+    required this.expanded,
+    required this.onToggle,
+  });
+
+  final bool expanded;
+
+  /// 展開 / 收合明細。
   final VoidCallback onToggle;
 
   @override
@@ -547,71 +689,23 @@ class _DetailToggleRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final appTheme = context.appTheme;
 
-    PopupMenuItem<_OrderAction> item(
-        _OrderAction value, IconData icon, String label,
-        {bool enabled = true}) {
-      final labelColor = enabled ? appTheme.fg : appTheme.muted;
-      final iconColor = enabled ? appTheme.fgMuted : appTheme.muted;
-      return PopupMenuItem<_OrderAction>(
-        value: value,
-        height: 44,
-        enabled: enabled,
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: iconColor),
-            const SizedBox(width: 10),
-            Text(label, style: TextStyle(fontSize: 14, color: labelColor)),
-          ],
-        ),
-      );
-    }
-
     return Row(
       children: [
         Expanded(
-          child: PopupMenuButton<_OrderAction>(
-            onSelected: onSelected,
-            position: PopupMenuPosition.under,
-            color: appTheme.bgElev,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(appTheme.radiusSm),
-              side: BorderSide(color: appTheme.divider),
-            ),
-            itemBuilder: (_) => [
-              item(_OrderAction.detail, Icons.local_shipping_outlined,
-                  l10n.ordersDetailToggle),
-              item(_OrderAction.inquiry, Icons.help_outline, '訂單提問'),
-              item(_OrderAction.changeAddress, Icons.place_outlined, '更換地址',
-                  enabled: canChangeAddress),
-              item(_OrderAction.payInfo, Icons.receipt_long_outlined,
-                  '訂購／付款資訊'),
-            ],
+          child: InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(appTheme.radiusSm),
             child: Container(
               height: 33,
-              decoration: BoxDecoration(
-                color: appTheme.bgElev,
-                borderRadius: BorderRadius.circular(appTheme.radiusSm),
-                border: Border.all(color: appTheme.divider),
-                boxShadow: appTheme.elevation1,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 10.5),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.ordersDetailToggle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: appTheme.fg,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 18,
-                    color: appTheme.fgMuted,
-                  ),
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                l10n.ordersDetailToggle,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: appTheme.fg,
+                ),
               ),
             ),
           ),
@@ -860,33 +954,52 @@ class _FulfillmentPackage extends StatelessWidget {
   final String orderCreatedAt;
   final String? orderStatus;
 
-  _OrderStage _activeStage() {
-    if (orderStatus == 'completed') return _OrderStage.completed;
-    switch (fulfillment.status) {
-      case 0:
-        // `0` = 待處理 → map to 待付款 when order still unpaid, else 待出貨
-        if (orderStatus == 'pending') return _OrderStage.pending;
-        return _OrderStage.toShip;
-      case 1:
-      case 2:
-        return _OrderStage.shipped;
-      case 3:
-        return _OrderStage.delivered;
+  /// 貨態階段索引：待出貨(0)/備貨中(1)/已出貨(2)/已送達(3)/已完成(4)。
+  /// 尚未付款 / 尚未配箱回傳 -1（整條時間軸呈灰色、header 顯示「尚未配箱」）。
+  int _activeIndex() {
+    switch (orderStatus) {
+      case 'paid':
+        return 0;
+      case 'preparing':
+        return 1;
+      case 'shipped':
+        return 2;
+      case 'delivered':
+        return 3;
+      case 'completed':
+        return 4;
+      default:
+        return -1; // pending / 其他
     }
-    return _OrderStage.pending;
+  }
+
+  /// 依基準時間推算 5 個階段的預估時間（prototype 用，讓每格都有時間顯示）。
+  List<String> _stageTimestamps() {
+    final base = DateTime.tryParse(fulfillment.paidAt ?? orderCreatedAt)
+        ?.toLocal();
+    if (base == null) return List.filled(5, '');
+    const offsets = [
+      Duration.zero,
+      Duration(hours: 8),
+      Duration(days: 1, hours: 3),
+      Duration(days: 2, hours: 22),
+      Duration(days: 4, hours: 10),
+    ];
+    String fmt(DateTime d) {
+      String two(int n) => n.toString().padLeft(2, '0');
+      return '${two(d.month)}/${two(d.day)} ${two(d.hour)}:${two(d.minute)}';
+    }
+
+    return [for (final o in offsets) fmt(base.add(o))];
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final active = _activeStage();
-    // 已出貨（含配送中 / 已送達 / 已完成）才有包裹編號；之前一律「待處理包裹」。
-    final hasShipped = active == _OrderStage.shipped ||
-        active == _OrderStage.delivered ||
-        active == _OrderStage.completed;
-    final headerLabel = hasShipped
-        ? '包裹編號：P${fulfillment.id}'
-        : l10n.ordersPendingPackage;
+    final activeIndex = _activeIndex();
+    // 已配箱（待出貨起）才有包裹編號；尚未配箱則顯示「尚未配箱」。
+    final headerLabel =
+        activeIndex >= 0 ? '包裹編號：${fulfillment.id}' : '尚未配箱';
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
@@ -934,14 +1047,16 @@ class _FulfillmentPackage extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(
               horizontal: 12,
-              vertical: 10,
+              vertical: 12,
             ),
             child: _Timeline(
-              active: active,
-              pendingAt: fulfillment.paidAt ?? orderCreatedAt,
-              shippedAt: fulfillment.shippedAt,
-              deliveredAt: fulfillment.deliveredAt,
-              completedAt: fulfillment.completedAt,
+              activeIndex: activeIndex,
+              timestamps: _stageTimestamps(),
+              onTrackTap: () => showDialog<void>(
+                context: context,
+                builder: (_) =>
+                    _ShippingProgressCard(packageNo: 'F${fulfillment.id}'),
+              ),
             ),
           ),
         ],
@@ -952,74 +1067,52 @@ class _FulfillmentPackage extends StatelessWidget {
 
 class _Timeline extends StatelessWidget {
   const _Timeline({
-    required this.active,
-    required this.pendingAt,
-    required this.shippedAt,
-    required this.deliveredAt,
-    required this.completedAt,
+    required this.activeIndex,
+    required this.timestamps,
+    required this.onTrackTap,
   });
 
-  final _OrderStage active;
-  final String? pendingAt;
-  final String? shippedAt;
-  final String? deliveredAt;
-  final String? completedAt;
+  /// 已到達的最後階段索引；-1 表示尚未配箱（整條灰色）。
+  final int activeIndex;
 
-  String _fmtShort(String? raw) {
-    if (raw == null) return '';
-    final dt = DateTime.tryParse(raw)?.toLocal();
-    if (dt == null) return '';
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${two(dt.month)}/${two(dt.day)} ${two(dt.hour)}:${two(dt.minute)}';
-  }
+  /// 5 個階段的時間文字（依序：待出貨/備貨中/已出貨/已送達/已完成）。
+  final List<String> timestamps;
+
+  /// 點「已出貨（查看配送進度）」時開啟物流配送進度彈窗。
+  final VoidCallback onTrackTap;
+
+  static const _stages = <({String label, String icon, bool trackLink})>[
+    (label: '待出貨', icon: 'assets/icons/orders/box.svg', trackLink: false),
+    (
+      label: '備貨中',
+      icon: 'assets/icons/orders/package-outline.svg',
+      trackLink: false
+    ),
+    (label: '已出貨', icon: 'assets/icons/orders/truck.svg', trackLink: true),
+    (label: '已送達', icon: 'assets/icons/orders/check.svg', trackLink: false),
+    (label: '已完成', icon: 'assets/icons/orders/check.svg', trackLink: false),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final stages = <({_OrderStage stage, String label, String icon, String? timestamp})>[
-      (
-        stage: _OrderStage.pending,
-        label: l10n.ordersTimelinePending,
-        icon: 'assets/icons/orders/credit-card.svg',
-        timestamp: _fmtShort(pendingAt),
-      ),
-      (
-        stage: _OrderStage.toShip,
-        label: l10n.ordersTimelineToShip,
-        icon: 'assets/icons/orders/box.svg',
-        timestamp: null,
-      ),
-      (
-        stage: _OrderStage.shipped,
-        label: l10n.ordersTimelineShipped,
-        icon: 'assets/icons/orders/truck.svg',
-        timestamp: _fmtShort(shippedAt),
-      ),
-      (
-        stage: _OrderStage.delivered,
-        label: l10n.ordersTimelineDelivered,
-        icon: 'assets/icons/orders/check.svg',
-        timestamp: _fmtShort(deliveredAt),
-      ),
-      (
-        stage: _OrderStage.completed,
-        label: l10n.ordersTimelineCompleted,
-        icon: 'assets/icons/orders/check.svg',
-        timestamp: _fmtShort(completedAt),
-      ),
-    ];
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var i = 0; i < stages.length; i++)
+        for (var i = 0; i < _stages.length; i++)
           Expanded(
-            flex: i == stages.length - 1 ? 0 : 1,
             child: _TimelineEvent(
-              label: stages[i].label,
-              icon: stages[i].icon,
-              isActive: stages[i].stage == active,
-              isLast: i == stages.length - 1,
-              timestamp: stages[i].stage == active ? stages[i].timestamp : null,
+              label: _stages[i].label,
+              icon: _stages[i].icon,
+              timestamp: i < timestamps.length ? timestamps[i] : '',
+              reached: i <= activeIndex,
+              isFirst: i == 0,
+              isLast: i == _stages.length - 1,
+              // 進入本格（左線）／離開本格（右線）的區段是否已完成。
+              leftActive: i <= activeIndex,
+              rightActive: (i + 1) <= activeIndex,
+              // 只有「已出貨」為目前階段時，才顯示（查看配送進度）。
+              showTrackLink: _stages[i].trackLink && i == activeIndex,
+              onTrackTap: onTrackTap,
             ),
           ),
       ],
@@ -1031,78 +1124,124 @@ class _TimelineEvent extends StatelessWidget {
   const _TimelineEvent({
     required this.label,
     required this.icon,
-    required this.isActive,
-    required this.isLast,
     required this.timestamp,
+    required this.reached,
+    required this.isFirst,
+    required this.isLast,
+    required this.leftActive,
+    required this.rightActive,
+    required this.showTrackLink,
+    required this.onTrackTap,
   });
 
   final String label;
   final String icon;
-  final bool isActive;
+  final String timestamp;
+  final bool reached;
+  final bool isFirst;
   final bool isLast;
-  final String? timestamp;
+  final bool leftActive;
+  final bool rightActive;
+  final bool showTrackLink;
+  final VoidCallback onTrackTap;
 
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
-    final markerColor = isActive
-        ? appTheme.brandPalette.tone500
-        : const Color(0xFFCBD5E1);
-    final iconColor = isActive ? Colors.white : const Color(0xFF94A3B8);
-    final labelColor =
-        isActive ? const Color(0xFF334155) : const Color(0xFF94A3B8);
+    final accent = appTheme.brandPalette.tone500;
+    const grey = Color(0xFF94A3B8);
+    const lineGrey = Color(0xFFE2E8F0);
+    final labelColor = reached ? const Color(0xFF334155) : grey;
+
+    Widget line(bool show, bool active) => Expanded(
+          child: show
+              ? Container(height: 2, color: active ? accent : lineGrey)
+              : const SizedBox(),
+        );
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 時間（圓點上方）— 只有亮燈（已到達）的階段才顯示時間。
+        SizedBox(
+          height: 15,
+          child: Text(
+            reached ? timestamp : '',
+            maxLines: 1,
+            style: const TextStyle(
+              fontSize: 10,
+              color: Color(0xFF334155),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        // 左線 + 圓點 + 右線
         Row(
           children: [
+            line(!isFirst, leftActive),
             Container(
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: markerColor,
+                color: reached ? accent : Colors.white,
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: reached ? accent : const Color(0xFFCBD5E1),
+                  width: 1.5,
+                ),
               ),
               alignment: Alignment.center,
               child: SvgPicture.asset(
                 icon,
                 width: 14,
                 height: 14,
-                colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    reached ? Colors.white : grey, BlendMode.srcIn),
               ),
             ),
-            if (!isLast)
-              Expanded(
-                child: Container(
-                  height: 2,
-                  color: const Color(0xFFE2E8F0),
-                ),
-              ),
+            line(!isLast, rightActive),
           ],
         ),
-        const SizedBox(height: 14),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: labelColor,
-            fontStyle: isActive && timestamp != null && timestamp!.isNotEmpty
-                ? FontStyle.italic
-                : FontStyle.normal,
-          ),
-        ),
-        if (timestamp != null && timestamp!.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Text(
-              timestamp!,
-              style: TextStyle(
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-                color: labelColor,
+        const SizedBox(height: 6),
+        // 標籤（圓點下方）；已出貨為目前階段時，狀態名稱加底線並可點開物流進度。
+        if (showTrackLink)
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: onTrackTap,
+              child: Column(
+                children: [
+                  Text(
+                    label,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: accent,
+                      decoration: TextDecoration.underline,
+                      decorationColor: accent,
+                    ),
+                  ),
+                  Text(
+                    '查看配送進度',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                      color: accent,
+                    ),
+                  ),
+                ],
               ),
+            ),
+          )
+        else
+          Text(
+            label,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: labelColor,
             ),
           ),
       ],
@@ -2038,9 +2177,6 @@ class _PayInfoSheet extends StatefulWidget {
 }
 
 class _PayInfoSheetState extends State<_PayInfoSheet> {
-  // 發票狀態：已完成訂單預設「已開立」，其餘「尚未開立」（可線上開立）。
-  late bool _invoiceIssued = widget.order.status == 'completed';
-
   // 姓名遮罩：保留中間、遮首尾（陳曉娟 → *曉*）。
   String _maskName(String name) {
     if (name.length <= 1) return name;
@@ -2059,7 +2195,6 @@ class _PayInfoSheetState extends State<_PayInfoSheet> {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
-    final accent = appTheme.brandPalette.tone500;
     final order = widget.order;
 
     Widget row(String label, Widget value) => Padding(
@@ -2095,55 +2230,376 @@ class _PayInfoSheetState extends State<_PayInfoSheet> {
             row('收件人姓名', txt(_maskName('陳曉娟'))),
             row('手機號碼', txt(_maskPhone('0912345678'))),
             row('收件地址', txt('高雄市三民區北平一街 103 號')),
-            row('發票類型', txt('自然人憑證')),
-            // 發票開立狀態：已開立 / 尚未開立（+ 線上開立按鈕）
-            row(
-              '發票',
-              _invoiceIssued
-                  ? Row(
-                      children: [
-                        Icon(Icons.check_circle,
-                            size: 16, color: appTheme.success),
-                        const SizedBox(width: 4),
-                        txt('已開立', color: appTheme.success),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        txt('尚未開立', color: appTheme.fgMuted),
-                        const Spacer(),
-                        Material(
-                          color: accent,
-                          borderRadius:
-                              BorderRadius.circular(appTheme.buttonRadius),
-                          child: InkWell(
-                            borderRadius:
-                                BorderRadius.circular(appTheme.buttonRadius),
-                            onTap: () {
-                              setState(() => _invoiceIssued = true);
-                              ScaffoldMessenger.of(context)
-                                ..hideCurrentSnackBar()
-                                ..showSnackBar(const SnackBar(
-                                    content: Text('發票已線上開立')));
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              child: Text('線上開立',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
             row('付款方式', txt(order.paymentMethod ?? 'ATM 繳費帳號')),
           ],
         ),
       ),
+    );
+  }
+}
+
+// 彈窗共用：標題列（標題 + 關閉 X）。
+Widget _dialogHeader(BuildContext context, String title) {
+  final appTheme = context.appTheme;
+  return Row(
+    children: [
+      Expanded(
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w800,
+            color: appTheme.fg,
+          ),
+        ),
+      ),
+      InkWell(
+        onTap: () => Navigator.of(context).pop(),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 30,
+          height: 30,
+          alignment: Alignment.center,
+          child: Icon(Icons.close, size: 20, color: appTheme.fgMuted),
+        ),
+      ),
+    ],
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 電子發票證明聯彈窗（prototype 範例資料，點「線上列印」開啟）。
+// ─────────────────────────────────────────────────────────────────────────
+class _InvoiceProofCard extends StatelessWidget {
+  const _InvoiceProofCard({required this.order});
+
+  final Purchase order;
+
+  String _fmtDateTime(String raw) {
+    final dt = DateTime.tryParse(raw)?.toLocal();
+    if (dt == null) return raw;
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${dt.year}/${two(dt.month)}/${two(dt.day)} '
+        '${two(dt.hour)}:${two(dt.minute)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final total = order.amount;
+    final untaxed = (total / 1.05).round();
+    final tax = (total - untaxed).round();
+    final qty = order.itemCount <= 0 ? 1 : order.itemCount;
+    final unit = (total / qty).round();
+    final invNo = 'RE-${order.id.toString().padLeft(8, '0')}';
+    final random = (order.id % 10000).toString().padLeft(4, '0');
+    String money(num v) => 'NT\$${v.toStringAsFixed(0)}';
+
+    Widget headerCell(String t, {int flex = 1, TextAlign align = TextAlign.left}) =>
+        Expanded(
+          flex: flex,
+          child: Text(t,
+              textAlign: align,
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: appTheme.fg)),
+        );
+    Widget cell(String t, {int flex = 1, TextAlign align = TextAlign.left}) =>
+        Expanded(
+          flex: flex,
+          child: Text(t,
+              textAlign: align,
+              style: TextStyle(fontSize: 12, color: appTheme.fg)),
+        );
+    Widget totalRow(String label, String value, {bool strong = false}) =>
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(label,
+                  style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
+              const SizedBox(width: 12),
+              Text(value,
+                  style: TextStyle(
+                    fontSize: strong ? 15 : 12,
+                    fontWeight: strong ? FontWeight.w800 : FontWeight.w500,
+                    color: strong ? accent : appTheme.fg,
+                  )),
+            ],
+          ),
+        );
+
+    return Dialog(
+      backgroundColor: appTheme.bgElev,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(appTheme.cardRadius),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 440),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _dialogHeader(context, '電子發票證明聯'),
+                const SizedBox(height: 12),
+                // 深色發票號碼區塊
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF322F55),
+                    borderRadius: BorderRadius.circular(appTheme.radiusSm),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 14),
+                  child: Column(
+                    children: [
+                      const Text('財政部電子發票整合服務平台',
+                          style: TextStyle(fontSize: 11, color: Colors.white70)),
+                      const SizedBox(height: 4),
+                      Text(invNo,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.5,
+                            color: Colors.white,
+                          )),
+                      const SizedBox(height: 4),
+                      Text('發票日期：${_fmtDateTime(order.createdAt)}',
+                          style: const TextStyle(
+                              fontSize: 11, color: Colors.white70)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _LabeledValue(
+                          label: '賣方統編', value: '12345678'),
+                    ),
+                    Expanded(
+                      child: _LabeledValue(
+                          label: '發票類型', value: '手機條碼'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text('直播管家 xSmartLive 股份有限公司',
+                    style: TextStyle(fontSize: 13, color: appTheme.fg)),
+                const SizedBox(height: 12),
+                // 品項表
+                Container(
+                  color: appTheme.bgSubtle,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 8),
+                  child: Row(
+                    children: [
+                      headerCell('品名', flex: 5),
+                      headerCell('數量', flex: 2, align: TextAlign.right),
+                      headerCell('單價', flex: 3, align: TextAlign.right),
+                      headerCell('小計', flex: 3, align: TextAlign.right),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 10),
+                  child: Row(
+                    children: [
+                      cell('寶寶可愛印花圍兜', flex: 5),
+                      cell('$qty', flex: 2, align: TextAlign.right),
+                      cell(money(unit), flex: 3, align: TextAlign.right),
+                      cell(money(total), flex: 3, align: TextAlign.right),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: appTheme.divider),
+                const SizedBox(height: 8),
+                totalRow('銷售額（未稅）', money(untaxed)),
+                totalRow('營業稅（5%）', money(tax)),
+                totalRow('總計', money(total), strong: true),
+                const SizedBox(height: 10),
+                Divider(height: 1, color: appTheme.divider),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    '隨機碼：$random    ・    訂單編號：${order.id}',
+                    style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: appTheme.fg,
+                          side: BorderSide(color: appTheme.divider),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(appTheme.buttonRadius),
+                          ),
+                        ),
+                        child: const Text('關閉',
+                            style: TextStyle(fontWeight: FontWeight.w700)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                                const SnackBar(content: Text('發票列印中…')));
+                        },
+                        style: FilledButton.styleFrom(
+                          backgroundColor: accent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(appTheme.buttonRadius),
+                          ),
+                        ),
+                        icon: const Icon(Icons.print_outlined, size: 18),
+                        label: const Text('列印',
+                            style: TextStyle(fontWeight: FontWeight.w700)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 物流配送進度彈窗（prototype 範例資料，點時間軸「已出貨（查看配送進度）」開啟）。
+// ─────────────────────────────────────────────────────────────────────────
+class _ShippingProgressCard extends StatelessWidget {
+  const _ShippingProgressCard({required this.packageNo});
+
+  final String packageNo;
+
+  static const _rows = <({String status, String time, String unit, String note})>[
+    (status: '貨件送達', time: '2026/02/10 08:00', unit: '○○超商', note: '簽收'),
+    (status: '配送中', time: '2026/02/10 01:00', unit: '新竹物流', note: ''),
+    (status: '轉運作業中', time: '2026/02/09 16:00', unit: '高轉', note: '貨件到站'),
+    (status: '取件完成', time: '2026/02/09 13:00', unit: '直營', note: ''),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+
+    Widget headerCell(String t, int flex) => Expanded(
+          flex: flex,
+          child: Text(t,
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: appTheme.fg)),
+        );
+    Widget cell(String t, int flex, {bool strong = false}) => Expanded(
+          flex: flex,
+          child: Text(t,
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: strong ? FontWeight.w700 : FontWeight.w400,
+                  color: appTheme.fg)),
+        );
+
+    return Dialog(
+      backgroundColor: appTheme.bgElev,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(appTheme.cardRadius),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _dialogHeader(context, '物流配送進度'),
+                const SizedBox(height: 14),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _LabeledValue(label: '配送方式', value: '新竹物流'),
+                    ),
+                    Expanded(
+                      child: _LabeledValue(label: '出貨單號', value: packageNo),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      headerCell('狀態', 3),
+                      headerCell('處理時間', 4),
+                      headerCell('負責單位', 3),
+                      headerCell('備註', 2),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: appTheme.divider),
+                for (final r in _rows)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    child: Row(
+                      children: [
+                        cell(r.status, 3, strong: true),
+                        cell(r.time, 4),
+                        cell(r.unit, 3),
+                        cell(r.note, 2),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 直式「標籤 + 值」（彈窗內兩欄用）。
+class _LabeledValue extends StatelessWidget {
+  const _LabeledValue({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: TextStyle(fontSize: 11, color: appTheme.fgMuted)),
+        const SizedBox(height: 2),
+        Text(value, style: TextStyle(fontSize: 14, color: appTheme.fg)),
+      ],
     );
   }
 }

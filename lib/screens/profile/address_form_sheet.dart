@@ -7,10 +7,13 @@ import '../../theme/app_theme_extension.dart';
 
 enum AddressFormType { home, pickup }
 
-/// 開啟新增地址表單（底部彈出，全高、可捲動、自動避開鍵盤）。
+/// 開啟新增 / 編輯地址表單（底部彈出，全高、可捲動、自動避開鍵盤）。
+/// 傳入 [editHome] / [editPickup] 即進入「編輯」模式並帶入既有資料。
 Future<void> showAddressFormSheet(
   BuildContext context, {
   required AddressFormType type,
+  HomeDeliveryAddress? editHome,
+  StorePickupAddress? editPickup,
 }) {
   final appTheme = context.appTheme;
   return showModalBottomSheet<void>(
@@ -22,13 +25,23 @@ Future<void> showAddressFormSheet(
         top: Radius.circular(appTheme.sheetRadius),
       ),
     ),
-    builder: (_) => _AddressFormSheet(type: type),
+    builder: (_) => _AddressFormSheet(
+      type: type,
+      editHome: editHome,
+      editPickup: editPickup,
+    ),
   );
 }
 
 class _AddressFormSheet extends ConsumerStatefulWidget {
-  const _AddressFormSheet({required this.type});
+  const _AddressFormSheet({
+    required this.type,
+    this.editHome,
+    this.editPickup,
+  });
   final AddressFormType type;
+  final HomeDeliveryAddress? editHome;
+  final StorePickupAddress? editPickup;
 
   @override
   ConsumerState<_AddressFormSheet> createState() => _AddressFormSheetState();
@@ -59,6 +72,39 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
   String? _error;
 
   bool get _isHome => widget.type == AddressFormType.home;
+  bool get _isEdit => widget.editHome != null || widget.editPickup != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final h = widget.editHome;
+    final p = widget.editPickup;
+    if (h != null) {
+      _nameCtrl.text = h.recipientName;
+      _phoneCtrl.text = h.recipientPhone;
+      if (_codes.contains(h.recipientPhoneCountryCode)) {
+        _phoneCode = h.recipientPhoneCountryCode;
+      }
+      _cityCtrl.text = h.city;
+      _districtCtrl.text = h.district;
+      _addressCtrl.text = h.addressLine;
+      _postalCtrl.text = h.postalCode;
+      _isDefault = h.isDefault;
+      _countryId = h.countryId;
+    } else if (p != null) {
+      _nameCtrl.text = p.recipientName;
+      _phoneCtrl.text = p.recipientPhone;
+      if (_codes.contains(p.recipientPhoneCountryCode)) {
+        _phoneCode = p.recipientPhoneCountryCode;
+      }
+      if (p.pickupProvider.isNotEmpty) _brand = p.pickupProvider;
+      _storeCodeCtrl.text = p.pickupStoreCode;
+      _storeNameCtrl.text = p.pickupStoreName;
+      _storeAddrCtrl.text = p.pickupStoreAddress;
+      _isDefault = p.isDefault;
+      _countryId = p.countryId;
+    }
+  }
 
   @override
   void dispose() {
@@ -91,6 +137,17 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
     final err = _validate();
     if (err != null) {
       setState(() => _error = err);
+      return;
+    }
+    // 編輯模式：後端尚未提供更新地址 API，prototype 以提示回饋（web 預覽的
+    // 地址亦為範例資料、不可變）。真機接上 update API 後改走 update。
+    if (_isEdit) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('地址已更新'), duration: Duration(seconds: 2)),
+        );
       return;
     }
     setState(() {
@@ -180,7 +237,9 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
               child: Row(
                 children: [
                   Text(
-                    _isHome ? '新增宅配地址' : '新增超商取貨門市',
+                    _isHome
+                        ? (_isEdit ? '編輯宅配地址' : '新增宅配地址')
+                        : (_isEdit ? '編輯超商取貨門市' : '新增超商取貨門市'),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

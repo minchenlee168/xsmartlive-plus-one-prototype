@@ -56,10 +56,14 @@ class PreviewCartItem {
     this.specPending = false,
     this.specOptions,
     this.specAllocation,
+    this.isAddon = false,
   });
 
   final String id;
   final String name;
+
+  /// 是否為「加購區」加入的商品；為 true 時商品名稱前顯示「加購」標籤。
+  final bool isAddon;
 
   /// 名稱後的來源標記，例如「（直播卡）」；null 則不顯示。
   final String? cardTypeLabel;
@@ -132,6 +136,7 @@ class PreviewCartItem {
         specPending: specPending ?? this.specPending,
         specOptions: specOptions,
         specAllocation: specAllocation ?? this.specAllocation,
+        isAddon: isAddon,
       );
 }
 
@@ -278,6 +283,77 @@ class PreviewCartNotifier extends Notifier<List<PreviewCartGroup>> {
         else
           g,
     ];
+  }
+
+  /// 從「加購區」加入商品，並標記 [PreviewCartItem.isAddon]。
+  ///
+  /// [groupId] 指定要加入哪一台（加購區「購物車」下拉選定的台）；
+  /// 為 null 時退回第一個可選購（pickable）台。目標台已有同品 → 數量 +1，
+  /// 否則新增一列；連目標台都找不到時，建立專屬「加購商品」台。
+  ///
+  /// 回傳實際加入的台名稱（供畫面提示「已加入某台」）。
+  String addAddon(String name, int price, {String? groupId}) {
+    final itemId = 'addon_$name';
+
+    final targetIndex = groupId != null
+        ? state.indexWhere((g) => g.id == groupId)
+        : state.indexWhere((g) => g.isEditable);
+
+    if (targetIndex >= 0) {
+      final target = state[targetIndex];
+      // 目標台已有同一加購品 → 數量 +1
+      if (target.items.any((it) => it.id == itemId)) {
+        _mutateItem(target.id, itemId, (i) => i.copyWith(qty: i.qty + 1));
+        return target.sellerName;
+      }
+      final newItem = PreviewCartItem(
+        id: itemId,
+        name: name,
+        spec: '',
+        qty: 1,
+        price: price,
+        checked: true,
+        isAddon: true,
+      );
+      state = [
+        for (var i = 0; i < state.length; i++)
+          if (i == targetIndex)
+            target.copyWith(items: [...target.items, newItem])
+          else
+            state[i],
+      ];
+      return target.sellerName;
+    }
+
+    // 連可選購台都沒有 → 建立專屬「加購商品」台
+    return _addToNewAddonGroup(itemId, name, price);
+  }
+
+  /// 建立專屬「加購商品」台並放入一筆加購品；回傳台名。
+  String _addToNewAddonGroup(String itemId, String name, int price) {
+    const addonGroupName = '加購商品';
+    state = [
+      ...state,
+      PreviewCartGroup(
+        id: 'g_addon',
+        sellerName: addonGroupName,
+        badge: '可選購',
+        mode: PreviewCheckoutMode.pickable,
+        tempTag: '常溫',
+        items: [
+          PreviewCartItem(
+            id: itemId,
+            name: name,
+            spec: '',
+            qty: 1,
+            price: price,
+            checked: true,
+            isAddon: true,
+          ),
+        ],
+      ),
+    ];
+    return addonGroupName;
   }
 
   /// 全選 / 全不選：只作用於 pickable 台的項目

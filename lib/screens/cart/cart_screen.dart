@@ -109,6 +109,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 _ItemVM(
                   name: it.name,
                   cardTypeLabel: it.cardTypeLabel,
+                  isAddon: it.isAddon,
                   specLabel: it.spec,
                   qty: it.qty,
                   unitPrice: it.effectiveUnitPrice,
@@ -488,6 +489,7 @@ class _ItemVM {
   const _ItemVM({
     required this.name,
     this.cardTypeLabel,
+    this.isAddon = false,
     required this.specLabel,
     required this.qty,
     required this.unitPrice,
@@ -510,6 +512,9 @@ class _ItemVM {
   });
   final String name;
   final String? cardTypeLabel;
+
+  /// 是否為加購商品：為 true 時名稱前顯示「加購」標籤。
+  final bool isAddon;
   final String specLabel;
   final int qty;
   final num unitPrice;
@@ -775,6 +780,14 @@ class _CartItemRow extends StatelessWidget {
                 Text.rich(
                   TextSpan(
                     children: [
+                      if (vm.isAddon)
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: _AddonTag(),
+                          ),
+                        ),
                       TextSpan(
                         text: vm.name,
                         style: TextStyle(
@@ -1706,38 +1719,102 @@ String _format(num value) {
 //   • 商品以 2 欄格狀排列；區塊高度固定，預設露出兩排，其餘以捲軸捲動。
 // 內容為 prototype 範例資料；樣式沿用 Theme token。
 // ─────────────────────────────────────────────────────────────────────────
-class _AddonProduct {
-  const _AddonProduct({required this.name, required this.price});
-  final String name;
-  final int price;
-}
-
-const List<_AddonProduct> _kAddonProducts = [
-  _AddonProduct(name: '寶寶嬰兒紗布手帕 5 入組', price: 89),
-  _AddonProduct(name: '寶寶柔嫩濕紙巾 80 抽 / 包', price: 49),
-  _AddonProduct(name: '不鏽鋼防滑安撫奶嘴', price: 129),
-  _AddonProduct(name: '嬰兒安全電動指甲剪', price: 199),
-  _AddonProduct(name: '寶寶副食品試吃綜合包', price: 99),
-  _AddonProduct(name: '媽咪保溫水壺 500ml', price: 290),
-  _AddonProduct(name: '嬰兒防踢被 純棉睡袋', price: 359),
-  _AddonProduct(name: '寶寶學步防滑襪 3 雙組', price: 129),
-  _AddonProduct(name: '嬰兒副食品調理研磨組', price: 249),
-  _AddonProduct(name: '寶寶矽膠圍兜 防水款', price: 79),
-  _AddonProduct(name: '嬰兒安撫音樂鈴', price: 450),
-  _AddonProduct(name: '寶寶哺乳枕 多功能', price: 399),
-  _AddonProduct(name: '寶寶洗澡溫度計 小鴨造型', price: 89),
-  _AddonProduct(name: '嬰兒紗布浴巾 6 層', price: 159),
-  _AddonProduct(name: '寶寶學飲杯 防漏鴨嘴', price: 119),
-  _AddonProduct(name: '嬰兒指甲剪安全護套', price: 59),
-];
-
-class _AddonSection extends StatelessWidget {
-  const _AddonSection();
-
+/// 商品名稱前的「加購」標籤（加購區加入的商品專用）。
+class _AddonTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        '加購',
+        style: TextStyle(
+          fontSize: 11,
+          height: 1.1,
+          fontWeight: FontWeight.w700,
+          color: accent,
+        ),
+      ),
+    );
+  }
+}
+
+class _AddonProduct {
+  const _AddonProduct({
+    required this.name,
+    required this.price,
+    required this.groupId,
+    required this.groupName,
+  });
+  final String name;
+  final int price;
+
+  /// 此加購商品所屬的購物車台 id 與名稱（下標同一場直播的加購）。
+  final String groupId;
+  final String groupName;
+}
+
+/// 各台加購商品：每一台（直播場次）有自己的加購商品，主題貼合該場次。
+/// 下拉選「全部購物車」呈現全部；選某台只顯示該台的加購商品。
+const List<_AddonProduct> _kAddonProducts = [
+  // 07/12 晚間直播搶購場（彩妝）
+  _AddonProduct(name: '美妝蛋 3 入組', price: 99, groupId: 'g_bid', groupName: '07/12 晚間直播搶購場'),
+  _AddonProduct(name: '拋棄式睫毛刷 20 支', price: 59, groupId: 'g_bid', groupName: '07/12 晚間直播搶購場'),
+  _AddonProduct(name: '隨身唇釉分裝瓶', price: 49, groupId: 'g_bid', groupName: '07/12 晚間直播搶購場'),
+  _AddonProduct(name: '防水彩妝收納袋', price: 129, groupId: 'g_bid', groupName: '07/12 晚間直播搶購場'),
+  // Kelly 美妝快閃直播（美妝工具）
+  _AddonProduct(name: '洗臉海綿 5 入', price: 79, groupId: 'g_kelly', groupName: 'Kelly 美妝快閃直播'),
+  _AddonProduct(name: '化妝刷清潔皂', price: 99, groupId: 'g_kelly', groupName: 'Kelly 美妝快閃直播'),
+  _AddonProduct(name: '隨身補光化妝鏡', price: 199, groupId: 'g_kelly', groupName: 'Kelly 美妝快閃直播'),
+  _AddonProduct(name: '電動眉筆削筆器', price: 39, groupId: 'g_kelly', groupName: 'Kelly 美妝快閃直播'),
+  // Mia 保養專場（保養）
+  _AddonProduct(name: '保養品旅行分裝組', price: 149, groupId: 'g_mia', groupName: 'Mia 保養專場'),
+  _AddonProduct(name: '蠶絲面膜紙 10 入', price: 89, groupId: 'g_mia', groupName: 'Mia 保養專場'),
+  _AddonProduct(name: '純棉化妝棉 200 抽', price: 69, groupId: 'g_mia', groupName: 'Mia 保養專場'),
+  _AddonProduct(name: '臉部導入凝膠', price: 259, groupId: 'g_mia', groupName: 'Mia 保養專場'),
+  // Jane 香氛小舖（香氛）
+  _AddonProduct(name: '擴香竹替換棒 10 入', price: 99, groupId: 'g_jane', groupName: 'Jane 香氛小舖'),
+  _AddonProduct(name: '不鏽鋼燭芯剪', price: 199, groupId: 'g_jane', groupName: 'Jane 香氛小舖'),
+  _AddonProduct(name: '精油空瓶 10ml 5 入', price: 59, groupId: 'g_jane', groupName: 'Jane 香氛小舖'),
+  _AddonProduct(name: '車用擴香出風口夾', price: 149, groupId: 'g_jane', groupName: 'Jane 香氛小舖'),
+];
+
+/// 加購商品去重後的所屬台清單（依商品出現順序），供下拉選單使用。
+List<({String id, String name})> _addonGroupsFromProducts() {
+  final seen = <String>{};
+  final out = <({String id, String name})>[];
+  for (final p in _kAddonProducts) {
+    if (seen.add(p.groupId)) out.add((id: p.groupId, name: p.groupName));
+  }
+  return out;
+}
+
+/// 加購區「購物車」下拉「全部購物車」的哨符值（顯示全部台的加購商品）。
+const _kAddonAllCarts = '__all__';
+
+/// 加購區「購物車」下拉目前的篩選：[_kAddonAllCarts]（預設，全部台的加購商品）
+/// 或某台 id（只顯示該台的加購商品）。加入時商品一律回到它所屬的台。
+final _addonTargetGroupProvider =
+    StateProvider<String>((ref) => _kAddonAllCarts);
+
+class _AddonSection extends ConsumerWidget {
+  const _AddonSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+
+    final filter = ref.watch(_addonTargetGroupProvider);
+    final isAll = filter == _kAddonAllCarts;
+    final products = isAll
+        ? _kAddonProducts
+        : _kAddonProducts.where((p) => p.groupId == filter).toList();
 
     return Container(
       decoration: BoxDecoration(
@@ -1773,7 +1850,7 @@ class _AddonSection extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 2),
                       child: Text(
-                        '共 ${_kAddonProducts.length} 件',
+                        '共 ${products.length} 件',
                         style: TextStyle(
                             fontSize: 11, color: appTheme.fgMuted),
                       ),
@@ -1787,7 +1864,7 @@ class _AddonSection extends StatelessWidget {
                   children: [
                     Expanded(child: _AddonDropChip(label: '直播場次')),
                     const SizedBox(width: 8),
-                    Expanded(child: _AddonDropChip(label: '購物車')),
+                    Expanded(child: _AddonCartDropdown()),
                   ],
                 ),
               ],
@@ -1811,9 +1888,12 @@ class _AddonSection extends StatelessWidget {
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 12,
                   ),
-                  itemCount: _kAddonProducts.length,
-                  itemBuilder: (context, i) =>
-                      _AddonCard(product: _kAddonProducts[i]),
+                  itemCount: products.length,
+                  itemBuilder: (context, i) => _AddonCard(
+                    product: products[i],
+                    // 「全部購物車」時每張卡標示所屬台，方便辨識屬於哪一台。
+                    showGroupLabel: isAll,
+                  ),
                 );
               },
             ),
@@ -1881,21 +1961,126 @@ class _AddonDropChip extends StatelessWidget {
   }
 }
 
-class _AddonCard extends StatelessWidget {
-  const _AddonCard({required this.product});
+/// 加購區「購物車」下拉（篩選）：選「全部購物車」看所有台的加購商品，
+/// 選某台只看該台的加購商品。純篩選，不影響加入時的所屬台。
+class _AddonCartDropdown extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appTheme = context.appTheme;
+    final selectedId = ref.watch(_addonTargetGroupProvider);
+    final isAll = selectedId == _kAddonAllCarts;
+    final addonGroups = _addonGroupsFromProducts();
+
+    String? selectedName;
+    for (final g in addonGroups) {
+      if (g.id == selectedId) {
+        selectedName = g.name;
+        break;
+      }
+    }
+    final label = isAll ? '全部購物車' : (selectedName ?? '全部購物車');
+
+    return PopupMenuButton<String>(
+      tooltip: '選擇購物車場次',
+      position: PopupMenuPosition.under,
+      constraints: const BoxConstraints(minWidth: 220),
+      color: appTheme.bgElev,
+      surfaceTintColor: appTheme.bgElev,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
+        side: BorderSide(color: appTheme.divider),
+      ),
+      onSelected: (id) =>
+          ref.read(_addonTargetGroupProvider.notifier).state = id,
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          value: _kAddonAllCarts,
+          child: Text(
+            '全部購物車',
+            style: TextStyle(
+              fontSize: 13,
+              color: appTheme.brandPalette.tone500,
+              fontWeight: isAll ? FontWeight.w800 : FontWeight.w700,
+            ),
+          ),
+        ),
+        for (final g in addonGroups)
+          PopupMenuItem<String>(
+            value: g.id,
+            child: Text(
+              g.name,
+              style: TextStyle(
+                fontSize: 13,
+                color: appTheme.fg,
+                fontWeight:
+                    g.id == selectedId ? FontWeight.w700 : FontWeight.w400,
+              ),
+            ),
+          ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: appTheme.bgElev,
+          borderRadius: BorderRadius.circular(appTheme.radiusSm),
+          border: Border.all(color: appTheme.divider),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(fontSize: 12, color: appTheme.fg),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Icon(Icons.keyboard_arrow_down, size: 16, color: appTheme.fgMuted),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AddonCard extends ConsumerWidget {
+  const _AddonCard({required this.product, this.showGroupLabel = false});
   final _AddonProduct product;
 
+  /// 「全部購物車」時顯示所屬台名稱（讓使用者知道這是哪一台的加購商品）。
+  final bool showGroupLabel;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 所屬台標示（僅「全部購物車」時）
+        if (showGroupLabel) ...[
+          Row(
+            children: [
+              Icon(Icons.storefront_outlined,
+                  size: 11, color: appTheme.fgMuted),
+              const SizedBox(width: 3),
+              Expanded(
+                child: Text(
+                  product.groupName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 10, color: appTheme.fgMuted),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+        ],
         // 商品圖（prototype 以佔位圖示呈現）
         Container(
-          height: 96,
+          height: showGroupLabel ? 80 : 96,
           width: double.infinity,
           decoration: BoxDecoration(
             color: appTheme.bgSubtle,
@@ -1939,10 +2124,19 @@ class _AddonCard extends StatelessWidget {
             child: InkWell(
               borderRadius: BorderRadius.circular(appTheme.buttonRadius),
               onTap: () {
+                // 加購商品一律回到它所屬的台。
+                ref.read(previewCartProvider.notifier).addAddon(
+                      product.name,
+                      product.price,
+                      groupId: product.groupId,
+                    );
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(
-                    SnackBar(content: Text('已加入購物車：${product.name}')),
+                    SnackBar(
+                      content:
+                          Text('已加入「${product.groupName}」：${product.name}'),
+                    ),
                   );
               },
               child: const Padding(

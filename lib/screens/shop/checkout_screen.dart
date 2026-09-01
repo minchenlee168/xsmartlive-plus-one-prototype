@@ -1018,6 +1018,14 @@ class _CartItemRow extends StatelessWidget {
               children: [
                 Text.rich(
                   TextSpan(children: [
+                    if (item.isAddon)
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: _AddonTag(),
+                        ),
+                      ),
                     TextSpan(
                       text: item.name,
                       style: TextStyle(
@@ -1685,6 +1693,31 @@ class _AddNewRow extends StatelessWidget {
 }
 
 /// 虛線圓角矩形外框（用於「＋ 新增…」列）。
+/// 商品名稱前的「加購」標籤（加購區加入的商品專用）。
+class _AddonTag extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        '加購',
+        style: TextStyle(
+          fontSize: 11,
+          height: 1.1,
+          fontWeight: FontWeight.w700,
+          color: accent,
+        ),
+      ),
+    );
+  }
+}
+
 class _DashedRectPainter extends CustomPainter {
   const _DashedRectPainter({required this.color, required this.radius});
   final Color color;

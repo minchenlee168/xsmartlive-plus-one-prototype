@@ -96,6 +96,8 @@ class _HomeDeliveryTab extends ConsumerWidget {
                               .setDefault(a.id),
                           '已設為預設',
                         ),
+                onEdit: () => showAddressFormSheet(context,
+                    type: AddressFormType.home, editHome: a),
                 onDelete: () => _confirmDelete(
                   context,
                   () => ref
@@ -153,6 +155,8 @@ class _StorePickupTab extends ConsumerWidget {
                               .setDefault(a.id),
                           '已設為預設',
                         ),
+                onEdit: () => showAddressFormSheet(context,
+                    type: AddressFormType.pickup, editPickup: a),
                 onDelete: () => _confirmDelete(
                   context,
                   () => ref
@@ -226,11 +230,13 @@ class _HomeDeliveryCard extends StatelessWidget {
   const _HomeDeliveryCard({
     required this.address,
     required this.onSetDefault,
+    required this.onEdit,
     required this.onDelete,
   });
 
   final HomeDeliveryAddress address;
   final VoidCallback? onSetDefault;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   @override
@@ -249,6 +255,7 @@ class _HomeDeliveryCard extends StatelessWidget {
           ? address.unsupportedReason
           : null,
       onSetDefault: onSetDefault,
+      onEdit: onEdit,
       onDelete: onDelete,
     );
   }
@@ -261,11 +268,13 @@ class _StorePickupCard extends StatelessWidget {
   const _StorePickupCard({
     required this.address,
     required this.onSetDefault,
+    required this.onEdit,
     required this.onDelete,
   });
 
   final StorePickupAddress address;
   final VoidCallback? onSetDefault;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   @override
@@ -290,6 +299,7 @@ class _StorePickupCard extends StatelessWidget {
       ].join('\n'),
       warning: warning,
       onSetDefault: onSetDefault,
+      onEdit: onEdit,
       onDelete: onDelete,
     );
   }
@@ -307,6 +317,7 @@ class _AddressCardShell extends StatelessWidget {
     required this.body,
     required this.warning,
     required this.onSetDefault,
+    required this.onEdit,
     required this.onDelete,
   });
 
@@ -317,6 +328,7 @@ class _AddressCardShell extends StatelessWidget {
   final String body;
   final String? warning;
   final VoidCallback? onSetDefault;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   @override
@@ -425,6 +437,12 @@ class _AddressCardShell extends StatelessWidget {
                   onTap: onSetDefault!,
                 ),
               const Spacer(),
+              _CardAction(
+                icon: Icons.edit_outlined,
+                label: '編輯',
+                onTap: onEdit,
+              ),
+              const SizedBox(width: 16),
               _CardAction(
                 icon: Icons.delete_outline,
                 label: '刪除',

@@ -176,6 +176,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 route: '/following',
               ),
               (
+                label: '編輯個人資料',
+                icon: Icons.person_outline,
+                value: null,
+                badge: 0,
+                route: '/settings/profile',
+              ),
+              (
+                label: '第三方帳號',
+                icon: Icons.link,
+                value: null,
+                badge: 0,
+                route: '/settings/third-party',
+              ),
+              (
                 label: '語言 / Language',
                 icon: Icons.language,
                 value: null,

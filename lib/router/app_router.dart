@@ -27,6 +27,8 @@ import '../screens/profile/bonus_screen.dart';
 import '../screens/profile/following_screen.dart';
 import '../screens/profile/change_mobile_screen.dart';
 import '../screens/profile/change_password_screen.dart';
+import '../screens/profile/edit_profile_screen.dart';
+import '../screens/profile/third_party_screen.dart';
 import '../screens/profile/language_picker_screen.dart';
 import '../screens/profile/theme_picker_screen.dart';
 import '../screens/search/search_screen.dart';
@@ -190,6 +192,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/settings/language',
         builder: (context, state) => const LanguagePickerScreen(),
+      ),
+      GoRoute(
+        path: '/settings/profile',
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/settings/third-party',
+        builder: (context, state) => const ThirdPartyScreen(),
       ),
       GoRoute(
         path: '/settings/mobile',

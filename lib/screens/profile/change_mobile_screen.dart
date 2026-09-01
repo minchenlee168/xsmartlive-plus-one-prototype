@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/profile_provider.dart';
 import '../../providers/repository_providers.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../utils/platform_preview.dart';
 
 /// 更改手機號碼 — 2-step flow:
 ///   1. Enter new country code + mobile, tap 送出驗證碼
@@ -38,6 +39,10 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
     _otpCtrl.dispose();
     super.dispose();
   }
+
+  /// 手機號碼是否輸入完整（至少 9 碼數字才視為完整）。
+  bool get _mobileComplete =>
+      _mobileCtrl.text.replaceAll(RegExp(r'[^0-9]'), '').length >= 9;
 
   Future<void> _sendOtp() async {
     final mobile = _mobileCtrl.text.trim();
@@ -109,6 +114,14 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
+    // 目前手機號碼：登入時取自會員資料；web 預覽未登入則用範例。
+    final profileMobile =
+        ref.watch(memberProfileProvider).valueOrNull?.mobile;
+    final currentMobile = (profileMobile != null && profileMobile.isNotEmpty)
+        ? profileMobile
+        : (isWebPreview ? '+886 0912345678' : null);
+    // 送出驗證碼按鈕：號碼未輸入完整前呈 disabled。
+    final canSend = !_busy && _mobileComplete;
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
@@ -133,6 +146,33 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
         children: [
+          Text('目前手機號碼',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: appTheme.fgMuted,
+                  fontWeight: FontWeight.w500)),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+              color: appTheme.bgSubtle,
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
+              border: Border.all(color: appTheme.divider),
+            ),
+            child: Text(
+              currentMobile ?? '尚未設定手機號碼',
+              style: TextStyle(
+                fontSize: 14,
+                color: currentMobile != null
+                    ? appTheme.fg
+                    : appTheme.fgMuted,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           Text('新手機號碼',
               style: TextStyle(
                   fontSize: 12,
@@ -172,6 +212,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                 child: TextField(
                   controller: _mobileCtrl,
                   enabled: !_busy && !_otpSent,
+                  onChanged: (_) => setState(() {}),
                   keyboardType: TextInputType.phone,
                   style: TextStyle(color: appTheme.fg, fontSize: 14),
                   decoration: InputDecoration(
@@ -265,17 +306,20 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
             ),
           ],
           const SizedBox(height: 24),
-          SizedBox(
+          Builder(builder: (context) {
+            // 送出驗證碼：號碼未完整前 disabled；確認更新階段維持原本行為。
+            final enabled = _otpSent ? !_busy : canSend;
+            return SizedBox(
             width: double.infinity,
             height: 48,
             child: Material(
-              color: _busy ? appTheme.muted : accent,
+              color: enabled ? accent : appTheme.muted,
               borderRadius:
                   BorderRadius.circular(appTheme.cardRadius),
               child: InkWell(
                 borderRadius:
                     BorderRadius.circular(appTheme.cardRadius),
-                onTap: _busy
+                onTap: !enabled
                     ? null
                     : (_otpSent ? _confirm : _sendOtp),
                 child: Center(
@@ -297,7 +341,8 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                 ),
               ),
             ),
-          ),
+          );
+          }),
         ],
       ),
     );

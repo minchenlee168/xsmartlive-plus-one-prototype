@@ -358,12 +358,25 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       const SizedBox(height: 14),
                       _SectionTitle(
                         text: '付款方式',
-                        trailing: Image.asset(
-                          'assets/icons/pay/linepay.png',
-                          height: 18,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stack) =>
-                              const SizedBox.shrink(),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '歡迎使用',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: appTheme.fgMuted,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Image.asset(
+                              'assets/icons/pay/linepay.png',
+                              height: 18,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stack) =>
+                                  const SizedBox.shrink(),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 8),

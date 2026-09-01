@@ -397,20 +397,19 @@ class _HistoryRow extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (entry.expiryText != null) ...[
-                      SizedBox(width: appTheme.spacingMd),
-                      Flexible(
-                        child: Text(
-                          entry.expiryText!,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: appTheme.fgMuted,
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
+                // 有效期限放在使用時間下方，左緣對齊上方月曆 icon。
+                if (entry.expiryText != null) ...[
+                  SizedBox(height: appTheme.spacingXs),
+                  Text(
+                    entry.expiryText!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: appTheme.fgMuted,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

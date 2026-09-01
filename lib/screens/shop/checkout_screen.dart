@@ -306,6 +306,24 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       }
                     });
                   }
+                  // 費用明細（最底下）：全部購物車加總。
+                  final productTotal =
+                      groups.fold<int>(0, (s, g) => s + _groupSubtotal(g));
+                  final shippingTotal = groups.fold<int>(0, (s, g) {
+                    final m = _cartDelivery[g.id];
+                    return s + (m != null ? _feeFor(m) : 0);
+                  });
+                  // 有選配送方式即達免運門檻，運費全額折抵。
+                  final feeDiscount = shippingTotal;
+                  final couponDiscount = groups.fold<int>(
+                      0, (s, g) => s + (_cartCoupon[g.id]?.discount ?? 0));
+                  final bonusDiscount = groups.fold<int>(
+                      0, (s, g) => s + (_cartBonus[g.id] ?? 0));
+                  final grandTotal = productTotal +
+                      shippingTotal -
+                      feeDiscount -
+                      couponDiscount -
+                      bonusDiscount;
                   return ListView(
                     padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                     children: [
@@ -328,6 +346,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           location: _cartLocation[g.id],
                           coupon: _cartCoupon[g.id],
                           bonus: _cartBonus[g.id] ?? 0,
+                          // 紅利點數為全部訂單共用同一餘額：其他訂單已用的點數，
+                          // 會壓縮這張訂單的可用上限與「尚有」顯示。
+                          bonusUsedByOthers:
+                              bonusDiscount - (_cartBonus[g.id] ?? 0),
                           onChangeDelivery: () => _openCartSheet(g.id),
                           onSelectCoupon: () => _openCouponPicker(g.id),
                           onBonusChanged: (v) => setState(() {
@@ -386,6 +408,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         onChanged: (id) => ref
                             .read(checkoutProvider.notifier)
                             .changePayment(id),
+                      ),
+                      const SizedBox(height: 14),
+                      _FeeSummaryCard(
+                        productTotal: productTotal,
+                        shippingTotal: shippingTotal,
+                        feeDiscount: feeDiscount,
+                        couponDiscount: couponDiscount,
+                        bonusDiscount: bonusDiscount,
+                        grandTotal: grandTotal,
                       ),
                       const SizedBox(height: 24),
                     ],
@@ -822,6 +853,7 @@ class _CartOrderCard extends StatefulWidget {
     required this.location,
     required this.coupon,
     required this.bonus,
+    required this.bonusUsedByOthers,
     required this.onChangeDelivery,
     required this.onSelectCoupon,
     required this.onBonusChanged,
@@ -834,6 +866,9 @@ class _CartOrderCard extends StatefulWidget {
 
   /// 目前折抵的紅利點數（由父層狀態帶入，1 點 = NT$1）。
   final int bonus;
+
+  /// 其他訂單已折抵的紅利點數（全部訂單共用同一紅利餘額）。
+  final int bonusUsedByOthers;
   final VoidCallback onChangeDelivery;
   final VoidCallback onSelectCoupon;
 
@@ -857,7 +892,8 @@ class _CartOrderCardState extends State<_CartOrderCard> {
     super.dispose();
   }
 
-  /// 此台可折抵的紅利上限：不超過餘額，也不超過折抵前的應付金額。
+  /// 此台可折抵的紅利上限：不超過「共用餘額扣掉其他訂單已用」的剩餘，
+  /// 也不超過折抵前的應付金額。
   int _maxUsableBonus() {
     final g = widget.group;
     final subtotal = _groupSubtotal(g);
@@ -866,14 +902,17 @@ class _CartOrderCardState extends State<_CartOrderCard> {
     final feeDiscount = hasMethod ? fee : 0;
     final couponDiscount = widget.coupon?.discount ?? 0;
     final beforeBonus = subtotal + fee - feeDiscount - couponDiscount;
-    final cap = beforeBonus < _kBonusBalance ? beforeBonus : _kBonusBalance;
-    return cap < 0 ? 0 : cap;
+    // 共用紅利餘額扣掉其他訂單已折抵的部分。
+    final sharedLeft = _kBonusBalance - widget.bonusUsedByOthers;
+    var cap = beforeBonus < sharedLeft ? beforeBonus : sharedLeft;
+    if (cap < 0) cap = 0;
+    return cap;
   }
 
-  void _onBonusInput(String raw) {
-    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
-    var v = int.tryParse(digits) ?? 0;
+  /// 設定紅利點數（夾在 0 ~ 可用上限），同步輸入框與父層。
+  void _setBonus(int v) {
     final max = _maxUsableBonus();
+    if (v < 0) v = 0;
     if (v > max) v = max;
     final text = v.toString();
     if (text != _bonusCtrl.text) {
@@ -883,6 +922,33 @@ class _CartOrderCardState extends State<_CartOrderCard> {
       );
     }
     widget.onBonusChanged(v);
+  }
+
+  void _onBonusInput(String raw) {
+    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    _setBonus(int.tryParse(digits) ?? 0);
+  }
+
+  /// 紅利點數 +/− 步進按鈕。
+  Widget _bonusStepButton(BuildContext context, IconData icon,
+      {required bool enabled, required VoidCallback onTap}) {
+    final appTheme = context.appTheme;
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(appTheme.radiusSm),
+      child: Container(
+        width: 30,
+        height: 32,
+        decoration: BoxDecoration(
+          color: appTheme.bgSubtle,
+          borderRadius: BorderRadius.circular(appTheme.radiusSm),
+          border: Border.all(color: appTheme.divider),
+        ),
+        alignment: Alignment.center,
+        child: Icon(icon,
+            size: 16, color: enabled ? appTheme.fg : appTheme.muted),
+      ),
+    );
   }
 
   @override
@@ -909,8 +975,10 @@ class _CartOrderCardState extends State<_CartOrderCard> {
     final feeDiscount = hasMethod ? fee : 0;
     final couponDiscount = widget.coupon?.discount ?? 0;
     // 紅利折抵：夾在 0 ~ 可用上限；由此推得「尚有」與應付小計。
+    // 「尚有」為共用餘額扣掉全部訂單（含本張與其他張）已折抵的點數。
     final usedBonus = widget.bonus.clamp(0, _maxUsableBonus());
-    final remainingBonus = _kBonusBalance - usedBonus;
+    final remainingBonus =
+        _kBonusBalance - widget.bonusUsedByOthers - usedBonus;
     final total = subtotal + fee - feeDiscount - couponDiscount - usedBonus;
 
     return _Card(
@@ -1080,29 +1148,51 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                   middle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: 72,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: appTheme.bgSubtle,
-                            borderRadius:
-                                BorderRadius.circular(appTheme.radiusSm),
-                            border: Border.all(color: appTheme.divider),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _bonusStepButton(
+                            context,
+                            Icons.remove,
+                            enabled: usedBonus > 0,
+                            onTap: () => _setBonus(usedBonus - 1),
                           ),
-                          child: TextField(
-                            controller: _bonusCtrl,
-                            onChanged: _onBonusInput,
-                            style: TextStyle(fontSize: 12, color: appTheme.fg),
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              isDense: true,
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 8),
+                          Container(
+                            width: 56,
+                            height: 32,
+                            margin:
+                                const EdgeInsets.symmetric(horizontal: 6),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              // 白底 + 明顯邊框，看起來可輸入。
+                              color: appTheme.bgElev,
+                              borderRadius:
+                                  BorderRadius.circular(appTheme.radiusSm),
+                              border: Border.all(color: appTheme.divider),
+                            ),
+                            child: TextField(
+                              controller: _bonusCtrl,
+                              onChanged: _onBonusInput,
+                              style:
+                                  TextStyle(fontSize: 13, color: appTheme.fg),
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              cursorColor: accent,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 6),
+                              ),
                             ),
                           ),
-                        ),
+                          _bonusStepButton(
+                            context,
+                            Icons.add,
+                            enabled: usedBonus < _maxUsableBonus(),
+                            onTap: () => _setBonus(usedBonus + 1),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -2371,6 +2461,108 @@ class _CouponPickRow extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 費用明細卡（最底下）：商品總金額 / 運費總金額 +（有折抵才顯示）運費折抵 /
+// 優惠券折扣 / 紅利點數折抵，最後結算總付款金額。
+// ─────────────────────────────────────────────────────────────────────────
+class _FeeSummaryCard extends StatelessWidget {
+  const _FeeSummaryCard({
+    required this.productTotal,
+    required this.shippingTotal,
+    required this.feeDiscount,
+    required this.couponDiscount,
+    required this.bonusDiscount,
+    required this.grandTotal,
+  });
+
+  final int productTotal;
+  final int shippingTotal;
+  final int feeDiscount;
+  final int couponDiscount;
+  final int bonusDiscount;
+  final int grandTotal;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+
+    Widget row(String label, String value,
+        {IconData? icon, Color? valueColor}) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 14, color: appTheme.fgMuted),
+              const SizedBox(width: 6),
+            ],
+            Expanded(
+              child: Text(label,
+                  style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
+            ),
+            Text(value,
+                style: TextStyle(
+                    fontSize: 12, color: valueColor ?? appTheme.fg)),
+          ],
+        ),
+      );
+    }
+
+    return _Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('費用明細',
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: appTheme.fg)),
+          const SizedBox(height: 6),
+          row('商品總金額', 'NT\$${_fmt(productTotal)}'),
+          row('運費總金額', 'NT\$${_fmt(shippingTotal)}'),
+          // 有折抵折扣時才顯示。
+          if (feeDiscount > 0)
+            row('運費折抵', '- NT\$${_fmt(feeDiscount)}',
+                icon: Icons.local_shipping_outlined,
+                valueColor: appTheme.danger),
+          if (couponDiscount > 0)
+            row('優惠券折扣', '- NT\$${_fmt(couponDiscount)}',
+                icon: Icons.local_offer_outlined,
+                valueColor: appTheme.danger),
+          if (bonusDiscount > 0)
+            row('紅利點數折抵', '- NT\$${_fmt(bonusDiscount)}',
+                icon: Icons.stars_outlined, valueColor: appTheme.danger),
+          const SizedBox(height: 8),
+          Divider(height: 1, color: appTheme.divider),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('總付款金額',
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: appTheme.fg)),
+              Text(
+                'NT\$${_fmt(grandTotal)}',
+                style: GoogleFonts.getFont(
+                  appTheme.fontDisplay,
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: accent,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

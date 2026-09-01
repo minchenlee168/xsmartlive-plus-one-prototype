@@ -85,12 +85,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         for (final g in cartGroups)
           _GroupVM(
             name: g.sellerName,
-            // 可選購不顯示 tag；整台一起結 → 禁止棄標；暫停收單保留。
-            badge: g.mode == PreviewCheckoutMode.pickable
+            // 可選購 / 棄標結帳不顯示 tag；整台一起結 → 禁止棄標；暫停結帳保留。
+            badge: g.mode == PreviewCheckoutMode.pickable ||
+                    g.mode == PreviewCheckoutMode.abandon
                 ? null
                 : g.mode == PreviewCheckoutMode.def
                     ? '禁止棄標'
-                    : '暫停收單',
+                    : '暫停結帳',
             badgeNormal: false,
             tempTag: g.tempTag,
             note: g.note,
@@ -119,7 +120,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   bundleItems: it.bundleItems,
                   bundleExpanded: it.bundleExpanded,
                   onToggleBundle: () => notifier.toggleBundle(g.id, it.id),
-                  // 逐項勾選只在可選購台顯示；整台一起結由 header 全選控制。
+                  // 逐項勾選只在可選購台顯示；整台一起結 / 棄標結帳由 header 全選控制。
                   showCheckbox: g.mode == PreviewCheckoutMode.pickable,
                   // 整台一起結不可單獨刪項（整台一起）。
                   canDelete: g.mode != PreviewCheckoutMode.def,

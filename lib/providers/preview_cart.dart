@@ -12,7 +12,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// - [pickable]：可逐項勾選 / 改量 / 刪除，允許分批結帳
 /// - [def]（default）：整台一起結，全部強制勾選、不可勾選 / 改量
 /// - [paused]：暫停收單，僅供瀏覽，不可勾選 / 改量 / 結帳
-enum PreviewCheckoutMode { pickable, def, paused }
+/// - [abandon]：棄標結帳，整台一起結但每項皆可刪除（棄標），不顯示 tag
+enum PreviewCheckoutMode { pickable, def, paused, abandon }
 
 /// 組合商品的子品項。
 class BundleSubItem {
@@ -475,8 +476,8 @@ List<PreviewCartGroup> _seed() => const [
       PreviewCartGroup(
         id: 'g_mia',
         sellerName: 'Mia 保養專場',
-        badge: '整台一起結',
-        mode: PreviewCheckoutMode.def,
+        badge: '棄標結帳',
+        mode: PreviewCheckoutMode.abandon,
         tempTag: '常溫',
         items: [
           PreviewCartItem(
@@ -502,7 +503,7 @@ List<PreviewCartGroup> _seed() => const [
       PreviewCartGroup(
         id: 'g_jane',
         sellerName: 'Jane 香氛小舖',
-        badge: '暫停收單',
+        badge: '暫停結帳',
         mode: PreviewCheckoutMode.paused,
         tempTag: '冷藏',
         items: [

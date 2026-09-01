@@ -36,19 +36,56 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 
 // Invoice type — mock values matching prototype `<select>` options.
 // TODO(API): map to real /invoice endpoint when backend exposes it.
-enum _InvoiceType { member, phone, donate, vat }
+enum _InvoiceType { member, paper, phone, vat, donate }
 
 extension on _InvoiceType {
   String get label => switch (this) {
-        _InvoiceType.member => '會員載具（電子信箱）',
+        _InvoiceType.member => '會員載具',
+        _InvoiceType.paper => '個人發票（紙本）',
         _InvoiceType.phone => '手機條碼',
-        _InvoiceType.donate => '發票捐贈',
-        _InvoiceType.vat => '公司戶（三聯式）',
+        _InvoiceType.vat => '公司統編',
+        _InvoiceType.donate => '捐贈',
       };
 }
 
+/// 各購物車台支援的付款方式（付款方式 id，對照 [_PaymentCard] 的清單）。
+/// 結帳時取所有結帳購物車的「交集」——全部台都支援的付款方式才會顯示。
+/// 未列出的台（例如加購商品台）視為支援全部，不影響交集。
+const Map<String, Set<int>> _kCartPayments = {
+  'g_bid': {1, 2, 3, 4, 6, 8, 9},
+  'g_kelly': {1, 2, 3, 5, 6, 7, 8, 9},
+  'g_mia': {1, 3, 4, 6, 7, 8, 9},
+  'g_jane': {1, 3, 6, 8, 9},
+};
+
+/// 全部付款方式 id（顯示順序）。
+const List<int> _kAllPaymentIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+/// 取所有結帳購物車都支援的付款方式（交集），維持顯示順序。
+List<int> _availablePaymentIds(List<PreviewCartGroup> groups) {
+  const full = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+  return _kAllPaymentIds
+      .where((id) =>
+          groups.every((g) => (_kCartPayments[g.id] ?? full).contains(id)))
+      .toList();
+}
+
+/// 捐贈單位範例清單（prototype）。
+const List<String> _kDonateUnits = [
+  '創世社會福利基金會',
+  '陽光社會福利基金會',
+  '家扶基金會',
+  '台灣世界展望會',
+];
+
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _emailCtrl = TextEditingController(text: 'abc@gmail.com');
+  // 發票各類型的動態欄位（依所選發票類型顯示對應欄位）。
+  final _phoneCarrierCtrl = TextEditingController();
+  final _companyNameCtrl = TextEditingController();
+  final _taxIdCtrl = TextEditingController();
+  final _donateCodeCtrl = TextEditingController();
+  String? _donateUnit;
   _InvoiceType _invoiceType = _InvoiceType.member;
 
   /// 每張購物車各自選到的配送方式 code，key = 購物車分組 id
@@ -62,16 +99,27 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   /// 每張購物車套用的優惠券（缺 key = 未使用）。
   final Map<String, _CheckoutCoupon> _cartCoupon = {};
 
+  /// 每張購物車折抵的紅利點數（1 點 = NT$1，缺 key = 未折抵）。
+  final Map<String, int> _cartBonus = {};
+
   @override
   void dispose() {
     _emailCtrl.dispose();
+    _phoneCarrierCtrl.dispose();
+    _companyNameCtrl.dispose();
+    _taxIdCtrl.dispose();
+    _donateCodeCtrl.dispose();
     super.dispose();
   }
 
-  /// 全部購物車小計加總（各台商品金額 − 該台優惠券折抵）。
+  /// 全部購物車小計加總（各台商品金額 − 該台優惠券折抵 − 該台紅利折抵）。
   int _grandTotal(List<PreviewCartGroup> groups) => groups.fold(
         0,
-        (s, g) => s + _groupSubtotal(g) - (_cartCoupon[g.id]?.discount ?? 0),
+        (s, g) =>
+            s +
+            _groupSubtotal(g) -
+            (_cartCoupon[g.id]?.discount ?? 0) -
+            (_cartBonus[g.id] ?? 0),
       );
 
   Future<void> _openCouponPicker(String groupId) async {
@@ -245,6 +293,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               Expanded(
                 child: Builder(builder: (context) {
                   final groups = ref.watch(previewCartProvider);
+                  // 付款方式取所有結帳購物車的交集；若目前選中的方式不在交集內，
+                  // 自動改選第一個可用的付款方式。
+                  final availablePayments = _availablePaymentIds(groups);
+                  if (availablePayments.isNotEmpty &&
+                      !availablePayments.contains(checkout.paymentMethodId)) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        ref
+                            .read(checkoutProvider.notifier)
+                            .changePayment(availablePayments.first);
+                      }
+                    });
+                  }
                   return ListView(
                     padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                     children: [
@@ -266,8 +327,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           method: _cartDelivery[g.id],
                           location: _cartLocation[g.id],
                           coupon: _cartCoupon[g.id],
+                          bonus: _cartBonus[g.id] ?? 0,
                           onChangeDelivery: () => _openCartSheet(g.id),
                           onSelectCoupon: () => _openCouponPicker(g.id),
+                          onBonusChanged: (v) => setState(() {
+                            if (v <= 0) {
+                              _cartBonus.remove(g.id);
+                            } else {
+                              _cartBonus[g.id] = v;
+                            }
+                          }),
                         ),
                         const SizedBox(height: 14),
                       ],
@@ -276,14 +345,31 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       _InvoiceCard(
                         type: _invoiceType,
                         emailCtrl: _emailCtrl,
+                        phoneCarrierCtrl: _phoneCarrierCtrl,
+                        companyNameCtrl: _companyNameCtrl,
+                        taxIdCtrl: _taxIdCtrl,
+                        donateCodeCtrl: _donateCodeCtrl,
+                        donateUnit: _donateUnit,
                         onTypeChanged: (t) =>
                             setState(() => _invoiceType = t),
+                        onDonateUnitChanged: (v) =>
+                            setState(() => _donateUnit = v),
                       ),
                       const SizedBox(height: 14),
-                      const _SectionTitle(text: '付款方式'),
+                      _SectionTitle(
+                        text: '付款方式',
+                        trailing: Image.asset(
+                          'assets/icons/pay/linepay.png',
+                          height: 18,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stack) =>
+                              const SizedBox.shrink(),
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       _PaymentCard(
                         selectedId: checkout.paymentMethodId,
+                        availableIds: availablePayments,
                         onChanged: (id) => ref
                             .read(checkoutProvider.notifier)
                             .changePayment(id),
@@ -313,21 +399,32 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 // Reusable section title (above each section card).
 // ─────────────────────────────────────────────────────────────────────────
 class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.text});
+  const _SectionTitle({required this.text, this.trailing});
   final String text;
+
+  /// 標題右側選填內容（如付款方式列的 LINE Pay logo）。
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 0),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: appTheme.fg,
-        ),
+      child: Row(
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: appTheme.fg,
+            ),
+          ),
+          if (trailing != null) ...[
+            const Spacer(),
+            trailing!,
+          ],
+        ],
       ),
     );
   }
@@ -366,12 +463,24 @@ class _InvoiceCard extends StatelessWidget {
   const _InvoiceCard({
     required this.type,
     required this.emailCtrl,
+    required this.phoneCarrierCtrl,
+    required this.companyNameCtrl,
+    required this.taxIdCtrl,
+    required this.donateCodeCtrl,
+    required this.donateUnit,
     required this.onTypeChanged,
+    required this.onDonateUnitChanged,
   });
 
   final _InvoiceType type;
   final TextEditingController emailCtrl;
+  final TextEditingController phoneCarrierCtrl;
+  final TextEditingController companyNameCtrl;
+  final TextEditingController taxIdCtrl;
+  final TextEditingController donateCodeCtrl;
+  final String? donateUnit;
   final ValueChanged<_InvoiceType> onTypeChanged;
+  final ValueChanged<String?> onDonateUnitChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -380,9 +489,7 @@ class _InvoiceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('發票類型',
-              style:
-                  TextStyle(fontSize: 11, color: appTheme.fgMuted)),
+          _label(context, '發票類型'),
           const SizedBox(height: 6),
           Container(
             padding:
@@ -414,30 +521,119 @@ class _InvoiceCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Text('電子信箱',
-              style:
-                  TextStyle(fontSize: 11, color: appTheme.fgMuted)),
-          const SizedBox(height: 6),
-          Container(
-            decoration: BoxDecoration(
-              color: appTheme.bgSubtle,
-              borderRadius: BorderRadius.circular(appTheme.radiusSm),
-              border: Border.all(color: appTheme.divider),
-            ),
-            child: TextField(
-              controller: emailCtrl,
-              style: TextStyle(fontSize: 12, color: appTheme.fg),
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 10),
-              ),
-            ),
-          ),
+          // 依所選發票類型顯示對應欄位。
+          ..._fields(context),
         ],
+      ),
+    );
+  }
+
+  /// 依發票類型回傳其對應欄位（含上方間距）。
+  List<Widget> _fields(BuildContext context) {
+    switch (type) {
+      case _InvoiceType.member:
+      case _InvoiceType.paper:
+        return [
+          _gap,
+          _label(context, 'Email'),
+          const SizedBox(height: 6),
+          _field(context, controller: emailCtrl, hint: 'abc@gmail.com',
+              keyboardType: TextInputType.emailAddress),
+        ];
+      case _InvoiceType.phone:
+        return [
+          _gap,
+          _label(context, '手機條碼'),
+          const SizedBox(height: 6),
+          _field(context, controller: phoneCarrierCtrl, hint: '/.12345'),
+        ];
+      case _InvoiceType.vat:
+        return [
+          _gap,
+          _label(context, '公司名稱'),
+          const SizedBox(height: 6),
+          _field(context, controller: companyNameCtrl, hint: '請輸入公司名稱'),
+          _gap,
+          _label(context, '統一編號'),
+          const SizedBox(height: 6),
+          _field(context, controller: taxIdCtrl, hint: '請輸入統一編號',
+              keyboardType: TextInputType.number),
+        ];
+      case _InvoiceType.donate:
+        return [
+          _gap,
+          _label(context, '捐贈單位'),
+          const SizedBox(height: 6),
+          _donateUnitField(context),
+          _gap,
+          _label(context, '機構編號'),
+          const SizedBox(height: 6),
+          _field(context, controller: donateCodeCtrl, hint: '請輸入愛心捐贈碼',
+              keyboardType: TextInputType.number),
+        ];
+    }
+  }
+
+  static const _gap = SizedBox(height: 12);
+
+  Widget _label(BuildContext context, String text) => Text(
+        text,
+        style: TextStyle(fontSize: 11, color: context.appTheme.fgMuted),
+      );
+
+  Widget _field(
+    BuildContext context, {
+    required TextEditingController controller,
+    String? hint,
+    TextInputType? keyboardType,
+  }) {
+    final appTheme = context.appTheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: appTheme.bgSubtle,
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
+        border: Border.all(color: appTheme.divider),
+      ),
+      child: TextField(
+        controller: controller,
+        style: TextStyle(fontSize: 12, color: appTheme.fg),
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          isDense: true,
+          hintText: hint,
+          hintStyle: TextStyle(fontSize: 12, color: appTheme.fgMuted),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+      ),
+    );
+  }
+
+  Widget _donateUnitField(BuildContext context) {
+    final appTheme = context.appTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: appTheme.bgSubtle,
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
+        border: Border.all(color: appTheme.divider),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: donateUnit,
+          isExpanded: true,
+          isDense: true,
+          hint: Text('請選擇或輸入捐贈單位',
+              style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
+          style: TextStyle(fontSize: 12, color: appTheme.fg),
+          dropdownColor: appTheme.bgElev,
+          icon: Icon(Icons.keyboard_arrow_down, color: appTheme.fgMuted),
+          items: _kDonateUnits
+              .map((u) => DropdownMenuItem(value: u, child: Text(u)))
+              .toList(),
+          onChanged: onDonateUnitChanged,
+        ),
       ),
     );
   }
@@ -612,28 +808,80 @@ class _CartOrderCard extends StatefulWidget {
     required this.method,
     required this.location,
     required this.coupon,
+    required this.bonus,
     required this.onChangeDelivery,
     required this.onSelectCoupon,
+    required this.onBonusChanged,
   });
 
   final PreviewCartGroup group;
   final String? method;
   final String? location;
   final _CheckoutCoupon? coupon;
+
+  /// 目前折抵的紅利點數（由父層狀態帶入，1 點 = NT$1）。
+  final int bonus;
   final VoidCallback onChangeDelivery;
   final VoidCallback onSelectCoupon;
+
+  /// 使用者調整紅利點數（已夾在 0 ~ 可用上限）後回傳給父層。
+  final ValueChanged<int> onBonusChanged;
 
   @override
   State<_CartOrderCard> createState() => _CartOrderCardState();
 }
 
+/// 會員可用的紅利點數餘額（prototype 固定值，對齊畫面「尚有 … 點」）。
+const int _kBonusBalance = 500;
+
 class _CartOrderCardState extends State<_CartOrderCard> {
-  final _bonusCtrl = TextEditingController(text: '0');
+  late final TextEditingController _bonusCtrl =
+      TextEditingController(text: widget.bonus.toString());
 
   @override
   void dispose() {
     _bonusCtrl.dispose();
     super.dispose();
+  }
+
+  /// 此台可折抵的紅利上限：不超過餘額，也不超過折抵前的應付金額。
+  int _maxUsableBonus() {
+    final g = widget.group;
+    final subtotal = _groupSubtotal(g);
+    final hasMethod = widget.method != null;
+    final fee = _feeFor(widget.method);
+    final feeDiscount = hasMethod ? fee : 0;
+    final couponDiscount = widget.coupon?.discount ?? 0;
+    final beforeBonus = subtotal + fee - feeDiscount - couponDiscount;
+    final cap = beforeBonus < _kBonusBalance ? beforeBonus : _kBonusBalance;
+    return cap < 0 ? 0 : cap;
+  }
+
+  void _onBonusInput(String raw) {
+    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    var v = int.tryParse(digits) ?? 0;
+    final max = _maxUsableBonus();
+    if (v > max) v = max;
+    final text = v.toString();
+    if (text != _bonusCtrl.text) {
+      _bonusCtrl.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    }
+    widget.onBonusChanged(v);
+  }
+
+  @override
+  void didUpdateWidget(covariant _CartOrderCard old) {
+    super.didUpdateWidget(old);
+    // 優惠券 / 配送改變導致可折抵上限下降時，重新夾住已輸入的點數。
+    final max = _maxUsableBonus();
+    if (widget.bonus > max) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _onBonusInput(max.toString());
+      });
+    }
   }
 
   @override
@@ -647,7 +895,10 @@ class _CartOrderCardState extends State<_CartOrderCard> {
     // 免運門檻：有選配送方式即視為達標，運費折抵抵銷運費，小計＝商品金額。
     final feeDiscount = hasMethod ? fee : 0;
     final couponDiscount = widget.coupon?.discount ?? 0;
-    final total = subtotal + fee - feeDiscount - couponDiscount;
+    // 紅利折抵：夾在 0 ~ 可用上限；由此推得「尚有」與應付小計。
+    final usedBonus = widget.bonus.clamp(0, _maxUsableBonus());
+    final remainingBonus = _kBonusBalance - usedBonus;
+    final total = subtotal + fee - feeDiscount - couponDiscount - usedBonus;
 
     return _Card(
       padding: EdgeInsets.zero,
@@ -827,6 +1078,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                           ),
                           child: TextField(
                             controller: _bonusCtrl,
+                            onChanged: _onBonusInput,
                             style: TextStyle(fontSize: 12, color: appTheme.fg),
                             keyboardType: TextInputType.number,
                             textAlign: TextAlign.center,
@@ -841,13 +1093,17 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '尚有 500 點',
+                        '尚有 $remainingBonus 點',
                         style:
                             TextStyle(fontSize: 11, color: appTheme.fgMuted),
                       ),
                     ],
                   ),
-                  right: _rightValue(context, '—'),
+                  right: _rightValue(
+                    context,
+                    usedBonus > 0 ? '- NT\$${_fmt(usedBonus)}' : '—',
+                    color: usedBonus > 0 ? appTheme.danger : null,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Divider(height: 1, color: appTheme.divider),
@@ -2108,108 +2364,111 @@ class _CouponPickRow extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Payment method card (radio list).
+// Payment method card — 兩欄勾選格狀清單（單選，選中呈紫色勾選方框）。
 // ─────────────────────────────────────────────────────────────────────────
 class _PaymentCard extends StatelessWidget {
-  const _PaymentCard({required this.selectedId, required this.onChanged});
+  const _PaymentCard({
+    required this.selectedId,
+    required this.availableIds,
+    required this.onChanged,
+  });
 
   final int selectedId;
+
+  /// 目前可選的付款方式 id（所有結帳購物車的交集）。
+  final List<int> availableIds;
   final ValueChanged<int> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    // Single-line list per prototype `checkout.jsx` lines 164-168.
-    // No subtitle — just label + icon.
-    final methods = <({int id, String label, IconData icon})>[
-      (id: 1, label: '信用卡', icon: Icons.credit_card_outlined),
-      (id: 2, label: 'LINE Pay', icon: Icons.chat_bubble_outline),
-      (id: 3, label: 'Apple Pay', icon: Icons.apple),
-      (id: 4, label: '貨到付款', icon: Icons.account_balance_wallet_outlined),
+    final appTheme = context.appTheme;
+    const methods = <({int id, String label})>[
+      (id: 1, label: '線上信用卡'),
+      (id: 2, label: 'Apple Pay'),
+      (id: 3, label: 'ATM 繳費帳號'),
+      (id: 4, label: '超商代碼繳費'),
+      (id: 5, label: '轉帳匯款'),
+      (id: 6, label: 'LINE Pay'),
+      (id: 7, label: 'iPASS MONEY'),
+      (id: 8, label: '貨到付款'),
+      (id: 9, label: '現金付款（限自取）'),
     ];
+    // 只顯示所有結帳購物車都支援的付款方式（交集）。
+    final visible =
+        methods.where((m) => availableIds.contains(m.id)).toList();
+
+    if (visible.isEmpty) {
+      return _Card(
+        child: Text(
+          '目前結帳的購物車沒有共同支援的付款方式',
+          style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
+        ),
+      );
+    }
 
     return _Card(
-      padding: EdgeInsets.zero,
-      child: Column(
-        children: methods
-            .map((m) => _RadioTile(
-                  value: m.id,
-                  groupValue: selectedId,
-                  title: m.label,
-                  icon: m.icon,
-                  onChanged: onChanged,
-                ))
-            .toList(),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          const spacing = 12.0;
+          final itemWidth = (c.maxWidth - spacing) / 2;
+          return Wrap(
+            spacing: spacing,
+            runSpacing: 4,
+            children: [
+              for (final m in visible)
+                SizedBox(
+                  width: itemWidth,
+                  child: _PayTile(
+                    label: m.label,
+                    selected: selectedId == m.id,
+                    onTap: () => onChanged(m.id),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Shared radio tile.
+// 付款方式格狀項目：單選圓鈕（radio）+ 名稱。
 // ─────────────────────────────────────────────────────────────────────────
-class _RadioTile<T> extends StatelessWidget {
-  const _RadioTile({
-    required this.value,
-    required this.groupValue,
-    required this.title,
-    required this.icon,
-    required this.onChanged,
-    this.subtitle,
+class _PayTile extends StatelessWidget {
+  const _PayTile({
+    required this.label,
+    required this.selected,
+    required this.onTap,
   });
 
-  final T value;
-  final T groupValue;
-  final String title;
-  final String? subtitle;
-  final IconData icon;
-  final ValueChanged<T> onChanged;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
-    final selected = value == groupValue;
-    final hasSubtitle = subtitle != null && subtitle!.isNotEmpty;
+    final labelWidget = Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(fontSize: 13, color: appTheme.fg),
+    );
     return InkWell(
-      onTap: () => onChanged(value),
-      borderRadius: BorderRadius.circular(appTheme.cardRadius),
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(appTheme.radiusSm),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
-            Icon(icon,
-                size: 22,
-                color: selected ? accent : appTheme.fgMuted),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: selected ? appTheme.fg : appTheme.fgMuted,
-                    ),
-                  ),
-                  if (hasSubtitle) ...[
-                    const SizedBox(height: 2),
-                    Text(subtitle!,
-                        style: TextStyle(
-                            fontSize: 11, color: appTheme.fgMuted)),
-                  ],
-                ],
-              ),
-            ),
-            // Custom-painted radio dot to avoid the deprecated
-            // `Radio.groupValue/onChanged` API.
+            // 單選圓鈕（radio）：外圈 + 選中時主色實心圓點
             Container(
-              width: 18,
-              height: 18,
+              width: 20,
+              height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: selected ? accent : Colors.transparent,
                 border: Border.all(
                   color: selected ? accent : appTheme.divider,
                   width: 1.5,
@@ -2218,15 +2477,17 @@ class _RadioTile<T> extends StatelessWidget {
               alignment: Alignment.center,
               child: selected
                   ? Container(
-                      width: 7,
-                      height: 7,
-                      decoration: const BoxDecoration(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: accent,
                       ),
                     )
                   : null,
             ),
+            const SizedBox(width: 8),
+            Expanded(child: labelWidget),
           ],
         ),
       ),

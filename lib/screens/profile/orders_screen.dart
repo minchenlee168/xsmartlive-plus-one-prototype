@@ -322,7 +322,8 @@ class _OrderCardState extends ConsumerState<_OrderCard> {
   void _handleAction(_OrderAction action) {
     switch (action) {
       case _OrderAction.detail:
-        setState(() => _expanded = !_expanded);
+        // 選「配送進度/明細」＝直接展開查看商品與貨態，不做收合。
+        setState(() => _expanded = true);
       case _OrderAction.inquiry:
         _openSheet(const _OrderInquirySheet());
       case _OrderAction.changeAddress:
@@ -370,6 +371,7 @@ class _OrderCardState extends ConsumerState<_OrderCard> {
             canChangeAddress:
                 order.status == 'pending' || order.status == 'paid',
             onSelected: _handleAction,
+            onToggle: () => setState(() => _expanded = !_expanded),
           ),
           AnimatedSize(
             duration: const Duration(milliseconds: 220),
@@ -528,6 +530,7 @@ class _DetailToggleRow extends StatelessWidget {
     required this.expanded,
     required this.canChangeAddress,
     required this.onSelected,
+    required this.onToggle,
   });
 
   final bool expanded;
@@ -535,6 +538,9 @@ class _DetailToggleRow extends StatelessWidget {
   /// 待出貨前（待付款 / 待出貨）才可更換地址；備貨中 / 出貨後停用。
   final bool canChangeAddress;
   final ValueChanged<_OrderAction> onSelected;
+
+  /// 右側箭頭：手動展開 / 收合明細。
+  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -612,7 +618,7 @@ class _DetailToggleRow extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         InkWell(
-          onTap: () => onSelected(_OrderAction.detail),
+          onTap: onToggle,
           borderRadius: BorderRadius.circular(28),
           child: Container(
             width: 25,

@@ -480,14 +480,26 @@ List<PreviewCartGroup> _seed() => const [
         mode: PreviewCheckoutMode.abandon,
         tempTag: '常溫',
         items: [
+          // 單一商品、多規格（容量 / 香味）已選定：同一列顯示各規格 ×數量。
           PreviewCartItem(
             id: 'm1',
-            name: '白麝香淡香精 50ml',
+            name: '白麝香淡香精',
             cardTypeLabel: '（直播卡）',
-            spec: '規格 50ml',
-            qty: 1,
+            spec: '',
+            qty: 3,
             price: 2180,
             checked: true,
+            specOptions: [
+              SpecOption('50ml / 玫瑰香', stock: 10),
+              SpecOption('50ml / 茉莉香', stock: 8),
+              SpecOption('100ml / 玫瑰香', stock: 5),
+              SpecOption('100ml / 茉莉香', stock: 4),
+            ],
+            specAllocation: {
+              '50ml / 玫瑰香': 1,
+              '50ml / 茉莉香': 1,
+              '100ml / 玫瑰香': 1,
+            },
           ),
           PreviewCartItem(
             id: 'm2',

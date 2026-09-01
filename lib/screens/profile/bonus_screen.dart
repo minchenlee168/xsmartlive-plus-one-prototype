@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../providers/bonus_provider.dart';
@@ -142,13 +143,8 @@ class _AvailableCard extends StatelessWidget {
           ),
           SizedBox(width: appTheme.spacingMd),
           FilledButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  const SnackBar(content: Text('紅利點數可於結帳時折抵')),
-                );
-            },
+            // 立即使用 → 導向購物車頁（紅利點數於結帳時折抵）。
+            onPressed: () => context.go('/cart'),
             style: FilledButton.styleFrom(
               backgroundColor: appTheme.brandPalette.tone500,
               foregroundColor: Colors.white,

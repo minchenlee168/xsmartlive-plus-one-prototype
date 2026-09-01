@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import '../utils/platform_preview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/cart_api.dart';
@@ -382,7 +382,7 @@ class CartApiNotifier extends AsyncNotifier<CartApi?> {
       authNotifierProvider.select((auth) => auth.valueOrNull?.memberId),
     );
     // Web 預覽（未登入）回傳假購物車，方便查看「已有商品」的畫面。
-    if (kIsWeb && memberId == null) return _previewCart();
+    if (isWebPreview && memberId == null) return _previewCart();
     if (memberId == null) return null;
     return ref.read(cartRepositoryProvider).fetchCart();
   }

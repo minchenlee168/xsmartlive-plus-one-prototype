@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import '../utils/platform_preview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/address.dart';
@@ -11,12 +11,12 @@ class HomeDeliveryAddressesNotifier
   @override
   Future<List<HomeDeliveryAddress>> build() async {
     // Web 預覽無法登入取真實地址簿，回退範例宅配地址。
-    if (kIsWeb) return _sampleHomeAddresses;
+    if (isWebPreview) return _sampleHomeAddresses;
     return ref.read(addressRepositoryProvider).listHomeDelivery();
   }
 
   Future<void> refresh() async {
-    if (kIsWeb) {
+    if (isWebPreview) {
       state = const AsyncData(_sampleHomeAddresses);
       return;
     }
@@ -90,12 +90,12 @@ class StorePickupAddressesNotifier
     extends AsyncNotifier<List<StorePickupAddress>> {
   @override
   Future<List<StorePickupAddress>> build() async {
-    if (kIsWeb) return _sampleStorePickups;
+    if (isWebPreview) return _sampleStorePickups;
     return ref.read(addressRepositoryProvider).listStorePickup();
   }
 
   Future<void> refresh() async {
-    if (kIsWeb) {
+    if (isWebPreview) {
       state = const AsyncData(_sampleStorePickups);
       return;
     }

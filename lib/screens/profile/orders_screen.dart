@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import '../../utils/platform_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -213,7 +213,7 @@ class _StatusFilter extends StatelessWidget {
       for (final o in kOrderStatusOptions)
         (
           status: o.code,
-          label: kIsWeb
+          label: isWebPreview
               ? '${o.label} (${sampleOrderCount(o.code)})'
               : o.label,
         ),

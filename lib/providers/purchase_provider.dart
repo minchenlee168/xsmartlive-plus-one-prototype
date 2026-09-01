@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import '../utils/platform_preview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/purchase.dart';
@@ -18,7 +18,7 @@ final purchasesProvider =
         (ref, filter) async {
   // Web 預覽打不到需授權的訂單 API（無 session），改用範例訂單，並在此
   // 依狀態 / 關鍵字（訂單編號）/ 日期區間過濾，讓下拉篩選與搜尋可實際運作。
-  if (kIsWeb) return _sampleOrderCollection(filter);
+  if (isWebPreview) return _sampleOrderCollection(filter);
   return ref.read(purchaseRepositoryProvider).fetchPurchases(
         status: filter.status,
         page: filter.page,
@@ -31,7 +31,7 @@ final purchasesProvider =
 
 final purchaseDetailProvider =
     FutureProvider.family<PurchaseDetail, int>((ref, id) async {
-  if (kIsWeb) return _sampleOrderDetail(id);
+  if (isWebPreview) return _sampleOrderDetail(id);
   return ref.read(purchaseRepositoryProvider).fetchPurchaseDetail(id);
 });
 
@@ -57,7 +57,7 @@ int _countFromCollection(PurchaseCollection c) {
 }
 
 final purchaseCountsProvider = FutureProvider<PurchaseCounts>((ref) async {
-  if (kIsWeb) {
+  if (isWebPreview) {
     return PurchaseCounts(
       pending: sampleOrderCount('pending'),
       paid: sampleOrderCount('paid'),

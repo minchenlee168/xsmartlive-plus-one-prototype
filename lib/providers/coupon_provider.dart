@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import '../utils/platform_preview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/claimable_coupon.dart';
@@ -41,7 +41,7 @@ final memberCouponsProvider = FutureProvider.family<List<MemberCoupon>,
   // Web 預覽無法登入（後端以 200 + code 40000 表示 session 失效，不會丟例外，
   // 會回空清單），因此直接用範例資料。依 filter（used / expired）先過濾，
   // 讓「未使用」等分頁數量（含「我的」頁的未使用張數）正確反映。
-  if (kIsWeb) {
+  if (isWebPreview) {
     return _sampleMemberCoupons.where((c) {
       if (filter.used != null && c.used != filter.used) return false;
       if (filter.expired != null &&
@@ -64,7 +64,7 @@ final memberCouponsProvider = FutureProvider.family<List<MemberCoupon>,
 /// Fetches coupons that the member can claim. 同上，失敗時回退範例資料。
 final claimableCouponsProvider =
     FutureProvider<List<ClaimableCoupon>>((ref) async {
-  if (kIsWeb) return _sampleClaimableCoupons;
+  if (isWebPreview) return _sampleClaimableCoupons;
   try {
     return await ref.read(couponRepositoryProvider).fetchClaimableCoupons();
   } catch (_) {

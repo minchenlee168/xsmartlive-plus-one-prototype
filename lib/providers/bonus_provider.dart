@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/bonus.dart';
+import '../utils/platform_preview.dart';
 import 'repository_providers.dart';
 
 /// 紅利點數畫面用的顯示型別 —— 把後端的 [BonusBalance] / [BonusHistory]
@@ -56,6 +57,9 @@ class BonusOverview {
 /// 先嘗試真實 API；任何失敗（含 web 預覽未登入的 401）或空資料，
 /// 都回退到設計稿範例資料，確保畫面永遠可預覽。
 final bonusOverviewProvider = FutureProvider<BonusOverview>((ref) async {
+  // Web 預覽（無登入 / 打不到 /bonus）直接用範例資料，避免在 release build
+  // 因請求 pending 而卡在載入。
+  if (isWebPreview) return _sampleOverview;
   try {
     final repo = ref.watch(bonusRepositoryProvider);
     final balance = await repo.fetchBalance();

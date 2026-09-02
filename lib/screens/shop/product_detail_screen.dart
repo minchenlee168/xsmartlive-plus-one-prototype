@@ -315,8 +315,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           ],
                           Divider(height: 28, color: appTheme.divider),
                           _QuantityRow(
+                            // 售完（stock 0）時上限需 ≥ 下限，否則 clamp(1,0) 會丟
+                            // ArgumentError（Invalid argument: 1）。
                             quantity: _quantity
-                                .clamp(1, variant?.stock ?? 1)
+                                .clamp(
+                                    1,
+                                    (variant?.stock ?? 1) < 1
+                                        ? 1
+                                        : (variant?.stock ?? 1))
                                 .toInt(),
                             stock: variant?.stock ?? 0,
                             enabled: inStock && variant != null,
@@ -435,7 +441,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           marketId: detail.marketId,
           cardType: detail.type,
           variantId: variant?.id,
-          quantity: _quantity.clamp(1, variant?.stock ?? 1).toInt(),
+          quantity: _quantity
+              .clamp(1,
+                  (variant?.stock ?? 1) < 1 ? 1 : (variant?.stock ?? 1))
+              .toInt(),
           allSpecsSelected: !detail.hasSpec ||
               _selectedSpecValues.length == detail.specs.length,
           hasSpec: detail.hasSpec,

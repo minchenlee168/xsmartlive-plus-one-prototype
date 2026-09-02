@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import '../models/product.dart';
 import '../screens/shop/combo_data.dart';
-import '../screens/shop/combo_picker.dart';
 import '../theme/app_theme_extension.dart';
 
 /// prototype：標準商品卡需要庫存數，這裡以商品 id 衍生穩定的庫存
@@ -177,9 +176,9 @@ class _StandardProductCardState extends State<StandardProductCard> {
                         ? null
                         : () {
                             // 任選組合 → 挑選彈窗；有規格 → 選規格彈窗；否則直接加入。
-                            final combo = comboForId(p.id);
-                            if (combo != null) {
-                              showComboSheet(context, combo);
+                            // 任選組合 → 開商品內頁（內含挑選組合區）。
+                            if (comboForId(p.id) != null) {
+                              context.push('/product/${p.id}');
                               return;
                             }
                             final specs = productSpecOptions(p);

@@ -7,7 +7,6 @@ import '../models/product.dart';
 import '../providers/product_provider.dart';
 import '../providers/repository_providers.dart';
 import '../screens/shop/combo_data.dart';
-import '../screens/shop/combo_picker.dart';
 import '../theme/app_theme_extension.dart';
 import 'cart_fly_animation.dart';
 
@@ -80,10 +79,9 @@ class _ShopProductCardState extends ConsumerState<ShopProductCard>
   Future<void> _onAddTap() async {
     if (_adding) return;
 
-    // 任選組合商品 → 跳出組合挑選彈窗（不走一般加入購物車流程）。
-    final combo = comboForId(widget.product.id);
-    if (combo != null) {
-      showComboSheet(context, combo);
+    // 任選組合商品 → 開商品內頁（內含挑選組合區），不走一般加入購物車流程。
+    if (comboForId(widget.product.id) != null) {
+      GoRouter.of(context).push('/product/${widget.product.id}');
       return;
     }
 

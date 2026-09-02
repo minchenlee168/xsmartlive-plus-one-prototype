@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../models/product.dart';
 import '../../theme/app_theme_extension.dart';
-import '../../widgets/shop_product_card.dart';
+import '../../widgets/standard_product_card.dart';
 
 /// 商城分類頁（B）：由商城分類 tab 進入，含子分類篩選 + 商品卡。
 ///
@@ -92,11 +92,13 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
-                      childAspectRatio: 0.62,
+                      childAspectRatio: 0.8,
                     ),
                     itemCount: products.length,
-                    itemBuilder: (context, i) =>
-                        ShopProductCard(product: products[i].product),
+                    itemBuilder: (context, i) => StandardProductCard(
+                      product: products[i].product,
+                      stock: _stockFor(products[i].product),
+                    ),
                   ),
           ),
         ],
@@ -142,6 +144,13 @@ class _SubChip extends StatelessWidget {
       ),
     );
   }
+}
+
+/// prototype：標準商品卡需要庫存數，這裡以商品 id 衍生穩定的庫存
+/// （少數為 0 呈現「已售完」情境）。
+int _stockFor(Product p) {
+  final n = p.id.hashCode.abs() % 60;
+  return n < 3 ? 0 : n;
 }
 
 // ── 範例資料（分類 → 子分類 + 商品）────────────────────────────────────────

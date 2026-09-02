@@ -492,7 +492,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      // 用主題色，夜間直播等深色主題才不會是白底導致文字對比不足。
+      backgroundColor: context.appTheme.bgElev,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),

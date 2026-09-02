@@ -86,6 +86,19 @@ const List<ThemeHall> themeHalls = [
             rating: 4.6,
             sales: 90)
       ),
+      // 任選組合商品（加入購物車會跳出挑選彈窗，點名稱進組合內頁）。
+      (
+        stock: 99,
+        product: Product(
+            id: 'combo1',
+            name: '任選 4 件 寶寶配件超值組合',
+            price: 599,
+            image: '',
+            category: 'g_apparel',
+            rating: 4.8,
+            sales: 260,
+            isHot: true)
+      ),
     ],
   ),
   (

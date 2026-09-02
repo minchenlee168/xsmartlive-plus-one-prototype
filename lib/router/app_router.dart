@@ -37,6 +37,8 @@ import '../screens/shop/checkout_screen.dart';
 import '../screens/shop/shop_screen.dart';
 import '../screens/shop/category_screen.dart';
 import '../screens/shop/theme_hall_screen.dart';
+import '../screens/shop/combo_data.dart';
+import '../screens/shop/combo_detail_screen.dart';
 import '../screens/support/support_screen.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -181,14 +183,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/product/:id',
-        builder: (context, state) => ScreenViewLogger(
-          onView: (ref) => ref
-              .read(analyticsServiceProvider)
-              .logViewItem(itemId: state.pathParameters['id']!),
-          child: ProductDetailScreen(
-            productCardId: state.pathParameters['id']!,
-          ),
-        ),
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          // 任選組合商品 → 組合挑選內頁；其餘 → 一般商品內頁。
+          final combo = comboForId(id);
+          if (combo != null) return ComboDetailScreen(config: combo);
+          return ScreenViewLogger(
+            onView: (ref) =>
+                ref.read(analyticsServiceProvider).logViewItem(itemId: id),
+            child: ProductDetailScreen(productCardId: id),
+          );
+        },
       ),
       GoRoute(
         path: '/checkout',

@@ -3,9 +3,26 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../theme/app_theme_extension.dart';
 
+/// prototype：依商品分類回傳可選規格；回傳空清單代表「無規格」，可直接加入購物車。
+List<String> productSpecOptions(Product p) {
+  switch (p.category) {
+    case 'g_apparel':
+      return const ['S', 'M', 'L', 'XL'];
+    case 'g_beauty':
+    case 'h_makeup':
+      return const ['#01 裸粉', '#02 蜜桃', '#03 玫瑰'];
+    case 'h_skincare':
+    case 'h_body':
+      return const ['30ml', '50ml', '100ml'];
+    default:
+      return const [];
+  }
+}
+
 /// 標準商品卡：圖 + 名稱 + 售價 + 庫存 + 數量選擇 + 加入購物車。
 ///
 /// 用於主題館與主題館頁；加入購物車按鈕為白色 ＋ + 購物車 icon。
+/// 若商品有規格（[productSpecOptions] 非空），按加入購物車會先跳出選規格彈窗。
 class StandardProductCard extends StatefulWidget {
   const StandardProductCard({
     super.key,
@@ -142,11 +159,12 @@ class _StandardProductCardState extends State<StandardProductCard> {
                     onPressed: soldOut
                         ? null
                         : () {
-                            ScaffoldMessenger.of(context)
-                              ..hideCurrentSnackBar()
-                              ..showSnackBar(SnackBar(
-                                  content:
-                                      Text('已加入購物車：${p.name} ×$_qty')));
+                            final specs = productSpecOptions(p);
+                            if (specs.isEmpty) {
+                              _addToCart(null);
+                            } else {
+                              _showSpecSheet(specs);
+                            }
                           },
                     style: FilledButton.styleFrom(
                       backgroundColor: accent,
@@ -171,6 +189,204 @@ class _StandardProductCardState extends State<StandardProductCard> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _addToCart(String? spec) {
+    final name = widget.product.name;
+    final label = spec == null ? '$name ×$_qty' : '$name（$spec）×$_qty';
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('已加入購物車：$label')));
+  }
+
+  /// 有規格的商品：跳出彈窗選規格，選完才能加入購物車。
+  Future<void> _showSpecSheet(List<String> specs) async {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final p = widget.product;
+
+    final chosen = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: appTheme.bgElev,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        String? selected;
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                12,
+                20,
+                20 + MediaQuery.of(context).viewPadding.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 拖曳握把
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: appTheme.divider,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // 商品資訊
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: appTheme.bgSubtle,
+                          borderRadius:
+                              BorderRadius.circular(appTheme.radiusSm),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(Icons.image_outlined,
+                            size: 22, color: appTheme.fgMuted),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              p.name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: appTheme.fg,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'NT\$${p.price.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: accent,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    '選擇規格',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: appTheme.fg,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final s in specs)
+                        _SpecChip(
+                          label: s,
+                          selected: selected == s,
+                          onTap: () => setSheetState(() => selected = s),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: FilledButton(
+                      onPressed: selected == null
+                          ? null
+                          : () => Navigator.of(sheetContext).pop(selected),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: accent,
+                        disabledBackgroundColor:
+                            accent.withValues(alpha: 0.4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(appTheme.buttonRadius),
+                        ),
+                      ),
+                      child: const Text(
+                        '加入購物車',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (chosen != null && mounted) _addToCart(chosen);
+  }
+}
+
+/// 規格選項 chip（單選）。
+class _SpecChip extends StatelessWidget {
+  const _SpecChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    return Material(
+      color: selected ? accent.withValues(alpha: 0.12) : appTheme.bgSubtle,
+      borderRadius: BorderRadius.circular(appTheme.radiusSm),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(appTheme.radiusSm),
+            border: Border.all(
+              color: selected ? accent : appTheme.divider,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected ? accent : appTheme.fg,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -746,11 +746,11 @@ class _QuantityRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final appTheme = context.appTheme;
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     final labelStyle = textTheme.bodyLarge?.copyWith(
-      color: colorScheme.onSurface,
+      color: appTheme.fg,
+      fontWeight: FontWeight.w500,
     );
     final canDecrement = enabled && quantity > 1;
     final canIncrement = enabled && quantity < stock;
@@ -1176,7 +1176,7 @@ class _CouponSheet extends ConsumerWidget {
                     l10n.couponUsableTitle,
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: colorScheme.onSurface,
+                      color: appTheme.fg,
                     ),
                   ),
                 ),
@@ -1253,11 +1253,10 @@ class _CouponCard extends StatelessWidget {
 
     final isActive = coupon.enable == 1;
     final leftBg =
-        isActive ? palette.tone50 : colorScheme.surfaceContainerHighest;
+        isActive ? palette.tone100 : colorScheme.surfaceContainerHighest;
     final discountFg =
         isActive ? palette.tone500 : colorScheme.onSurfaceVariant;
-    final titleFg =
-        isActive ? colorScheme.onSurface : colorScheme.onSurfaceVariant;
+    final titleFg = isActive ? appTheme.fg : appTheme.fgMuted;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -1274,7 +1273,7 @@ class _CouponCard extends StatelessWidget {
               Container(
                 width: 136,
                 padding:
-                    EdgeInsets.symmetric(horizontal: appTheme.spacingLg),
+                    EdgeInsets.symmetric(horizontal: appTheme.spacingSm),
                 decoration: BoxDecoration(
                   color: leftBg,
                   borderRadius: const BorderRadius.horizontal(
@@ -1284,15 +1283,15 @@ class _CouponCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _CouponDiscountIcon(size: 42, dimmed: !isActive),
-                    SizedBox(width: appTheme.spacingSm),
+                    _CouponDiscountIcon(size: 26, dimmed: !isActive),
+                    SizedBox(width: appTheme.spacingXs),
                     Flexible(
                       child: Text(
                         coupon.discountLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w800,
                           color: discountFg,
                         ),
                       ),
@@ -1325,7 +1324,7 @@ class _CouponCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           color: titleFg,
                         ),
                       ),
@@ -1337,7 +1336,7 @@ class _CouponCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                            color: appTheme.fgMuted,
                           ),
                         ),
                       ],
@@ -1352,7 +1351,7 @@ class _CouponCard extends StatelessWidget {
                           l10n.couponValidUntil(
                               _formatCouponExpiry(coupon.expiresAt!)),
                           style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                            color: appTheme.fgMuted,
                           ),
                         ),
                       ],

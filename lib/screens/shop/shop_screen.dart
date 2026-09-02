@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/banner.dart';
-import '../../models/product.dart';
 import '../../utils/platform_preview.dart';
 import '../../models/product_group.dart';
 import '../../models/store_collection.dart';
@@ -17,6 +16,8 @@ import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/shop_product_card.dart';
+import '../../widgets/standard_product_card.dart';
+import 'theme_hall_data.dart';
 
 /// Shop screen — corresponds to prototype `src/screens/catalog.jsx` plus
 /// the carousel + live announcement sections that the merchant requires
@@ -52,127 +53,6 @@ class ShopScreen extends ConsumerWidget {
   }
 }
 
-
-/// 主題館範例資料（web 預覽）：每館一標題 + 副標 + 該館商品卡。
-/// [standard] = true 用標準商品卡（可選數量 + 庫存）；false 用精簡商品卡。
-typedef _ThemeHallItem = ({Product product, int stock});
-typedef _ThemeHall = ({
-  String title,
-  String subtitle,
-  bool standard,
-  List<_ThemeHallItem> items,
-});
-
-const List<_ThemeHall> _themeHalls = [
-  (
-    title: '秋冬童裝主題館',
-    subtitle: '換季新品 5 折起（精簡商品卡）',
-    standard: false,
-    items: [
-      (
-        stock: 30,
-        product: Product(
-            id: 'th1',
-            name: '秋冬童裝連帽外套',
-            price: 590,
-            originalPrice: 890,
-            image: '',
-            category: 'g_apparel',
-            rating: 4.7,
-            sales: 320,
-            isHot: true)
-      ),
-      (
-        stock: 12,
-        product: Product(
-            id: 'th2',
-            name: '鋪棉防風夾克',
-            price: 780,
-            image: '',
-            category: 'g_apparel',
-            rating: 4.5,
-            sales: 140)
-      ),
-      (
-        stock: 45,
-        product: Product(
-            id: 'th3',
-            name: '柔軟針織毛衣',
-            price: 480,
-            image: '',
-            category: 'g_apparel',
-            rating: 4.6,
-            sales: 210)
-      ),
-      (
-        stock: 88,
-        product: Product(
-            id: 'th4',
-            name: '保暖童襪 3 雙組',
-            price: 129,
-            originalPrice: 199,
-            image: '',
-            category: 'g_apparel',
-            rating: 4.8,
-            sales: 540)
-      ),
-    ],
-  ),
-  (
-    title: '美妝新品主題館',
-    subtitle: '人氣熱銷精選（標準商品卡）',
-    standard: true,
-    items: [
-      (
-        stock: 25,
-        product: Product(
-            id: 'th5',
-            name: '玫瑰保濕精華液 30ml',
-            price: 1280,
-            originalPrice: 1580,
-            image: '',
-            category: 'g_beauty',
-            rating: 4.9,
-            sales: 880,
-            isHot: true)
-      ),
-      (
-        stock: 8,
-        product: Product(
-            id: 'th6',
-            name: '絲絨霧面唇釉 #05',
-            price: 590,
-            originalPrice: 720,
-            image: '',
-            category: 'g_beauty',
-            rating: 4.6,
-            sales: 430)
-      ),
-      (
-        stock: 60,
-        product: Product(
-            id: 'th7',
-            name: '亮白面膜 5 片組',
-            price: 480,
-            image: '',
-            category: 'g_beauty',
-            rating: 4.4,
-            sales: 260)
-      ),
-      (
-        stock: 3,
-        product: Product(
-            id: 'th8',
-            name: '溫和保濕化妝水',
-            price: 690,
-            image: '',
-            category: 'g_beauty',
-            rating: 4.6,
-            sales: 300)
-      ),
-    ],
-  ),
-];
 
 class _ShopBody extends ConsumerStatefulWidget {
   const _ShopBody({required this.groups});
@@ -763,8 +643,8 @@ class _ThemeHallSections extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final hall in _themeHalls) ...[
-          // 標題
+        for (final (hi, hall) in themeHalls.indexed) ...[
+          // 標題（最右邊有「查看更多」導向該主題館頁）
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
             child: Row(
@@ -778,12 +658,39 @@ class _ThemeHallSections extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  hall.title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: appTheme.fg,
+                Expanded(
+                  child: Text(
+                    hall.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: appTheme.fg,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: () => context.push('/shop/theme-hall/$hi'),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '查看更多',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: appTheme.fgMuted,
+                          ),
+                        ),
+                        Icon(Icons.chevron_right,
+                            size: 16, color: appTheme.fgMuted),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -845,7 +752,7 @@ class _ThemeHallSections extends StatelessWidget {
               itemBuilder: (context, i) => SizedBox(
                 width: hall.standard ? 176 : 150,
                 child: hall.standard
-                    ? _StandardProductCard(
+                    ? StandardProductCard(
                         product: hall.items[i].product,
                         stock: hall.items[i].stock,
                       )
@@ -855,172 +762,6 @@ class _ThemeHallSections extends StatelessWidget {
           ),
         ],
       ],
-    );
-  }
-}
-
-// 標準商品卡：圖 + 名稱 + 售價 + 庫存 + 數量選擇 + 加入購物車。
-class _StandardProductCard extends StatefulWidget {
-  const _StandardProductCard({required this.product, required this.stock});
-
-  final Product product;
-  final int stock;
-
-  @override
-  State<_StandardProductCard> createState() => _StandardProductCardState();
-}
-
-class _StandardProductCardState extends State<_StandardProductCard> {
-  int _qty = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    final accent = appTheme.brandPalette.tone500;
-    final p = widget.product;
-    final soldOut = widget.stock <= 0;
-
-    Widget stepBtn(IconData icon, {required bool enabled, required VoidCallback onTap}) {
-      return InkWell(
-        onTap: enabled ? onTap : null,
-        borderRadius: BorderRadius.circular(appTheme.radiusSm),
-        child: Container(
-          width: 26,
-          height: 26,
-          decoration: BoxDecoration(
-            color: appTheme.bgSubtle,
-            borderRadius: BorderRadius.circular(appTheme.radiusSm),
-            border: Border.all(color: appTheme.divider),
-          ),
-          alignment: Alignment.center,
-          child: Icon(icon,
-              size: 15, color: enabled ? appTheme.fg : appTheme.muted),
-        ),
-      );
-    }
-
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: appTheme.bgElev,
-        borderRadius: BorderRadius.circular(appTheme.cardRadius),
-        border: Border.all(color: appTheme.divider),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 圖片（prototype 佔位）
-          Container(
-            height: 104,
-            width: double.infinity,
-            color: appTheme.bgSubtle,
-            alignment: Alignment.center,
-            child: Icon(Icons.image_outlined,
-                size: 26, color: appTheme.fgMuted),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  p.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: appTheme.fg),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'NT\$${p.price.toStringAsFixed(0)}',
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          color: accent),
-                    ),
-                    if (p.originalPrice != null) ...[
-                      const SizedBox(width: 4),
-                      Text(
-                        'NT\$${p.originalPrice!.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: appTheme.fgMuted,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  soldOut ? '已售完' : '庫存 ${widget.stock}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: soldOut ? appTheme.danger : appTheme.fgMuted,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // 數量選擇
-                Row(
-                  children: [
-                    stepBtn(Icons.remove,
-                        enabled: !soldOut && _qty > 1,
-                        onTap: () => setState(() => _qty--)),
-                    Expanded(
-                      child: Text(
-                        '$_qty',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13, color: appTheme.fg),
-                      ),
-                    ),
-                    stepBtn(Icons.add,
-                        enabled: !soldOut && _qty < widget.stock,
-                        onTap: () => setState(() => _qty++)),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  height: 32,
-                  child: FilledButton(
-                    onPressed: soldOut
-                        ? null
-                        : () {
-                            ScaffoldMessenger.of(context)
-                              ..hideCurrentSnackBar()
-                              ..showSnackBar(SnackBar(
-                                  content:
-                                      Text('已加入購物車：${p.name} ×$_qty')));
-                          },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: accent,
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(appTheme.buttonRadius),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add, size: 16, color: Colors.white),
-                        SizedBox(width: 6),
-                        Icon(Icons.shopping_cart_outlined,
-                            size: 16, color: Colors.white),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

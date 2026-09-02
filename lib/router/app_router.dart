@@ -36,6 +36,7 @@ import '../screens/shop/product_detail_screen.dart';
 import '../screens/shop/checkout_screen.dart';
 import '../screens/shop/shop_screen.dart';
 import '../screens/shop/category_screen.dart';
+import '../screens/shop/theme_hall_screen.dart';
 import '../screens/support/support_screen.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -167,6 +168,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/shop/category/:id',
         builder: (context, state) =>
             CategoryScreen(groupId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/shop/theme-hall/:index',
+        builder: (context, state) => ThemeHallScreen(
+          index: int.tryParse(state.pathParameters['index'] ?? '') ?? -1,
+        ),
       ),
       GoRoute(
         path: '/search',

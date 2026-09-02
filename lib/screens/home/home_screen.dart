@@ -11,6 +11,7 @@ import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/shop_product_card.dart';
+import '../../widgets/standard_product_card.dart';
 
 /// Home screen — corresponds to the React prototype `src/screens/home.jsx`.
 ///
@@ -155,10 +156,45 @@ class _FlashSaleSection extends ConsumerWidget {
           ),
           if (products.isNotEmpty) ...[
             const SizedBox(height: 14),
-            _HomeProductGrid(products: products),
+            // 限時搶購商品卡比照主題館：標準商品卡（庫存 + 數量 + ＋購物車）。
+            _StandardCardWrap(products: products),
           ],
         ],
       ),
+    );
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// 標準商品卡的自適應排版（固定卡寬、依內容收合高度），比照主題館頁。
+// ───────────────────────────────────────────────────────────────────────────
+class _StandardCardWrap extends StatelessWidget {
+  const _StandardCardWrap({required this.products});
+  final List<Product> products;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 12.0;
+        final avail = constraints.maxWidth;
+        final cols = (avail / 190).floor().clamp(2, 6);
+        final cardW = (avail - spacing * (cols - 1)) / cols;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (final p in products)
+              SizedBox(
+                width: cardW,
+                child: StandardProductCard(
+                  product: p,
+                  stock: previewStockFor(p),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

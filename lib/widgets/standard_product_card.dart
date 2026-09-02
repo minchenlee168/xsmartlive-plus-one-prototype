@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../theme/app_theme_extension.dart';
 
+/// prototype：標準商品卡需要庫存數，這裡以商品 id 衍生穩定的庫存
+/// （少數為 0 呈現「已售完」情境）。
+int previewStockFor(Product p) {
+  final n = p.id.hashCode.abs() % 60;
+  return n < 3 ? 0 : n;
+}
+
 /// prototype：依商品分類回傳可選規格；回傳空清單代表「無規格」，可直接加入購物車。
 List<String> productSpecOptions(Product p) {
   switch (p.category) {

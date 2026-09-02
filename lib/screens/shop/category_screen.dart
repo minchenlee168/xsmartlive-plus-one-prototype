@@ -105,7 +105,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                                 width: cardW,
                                 child: StandardProductCard(
                                   product: p.product,
-                                  stock: _stockFor(p.product),
+                                  stock: previewStockFor(p.product),
                                 ),
                               ),
                           ],
@@ -157,13 +157,6 @@ class _SubChip extends StatelessWidget {
       ),
     );
   }
-}
-
-/// prototype：標準商品卡需要庫存數，這裡以商品 id 衍生穩定的庫存
-/// （少數為 0 呈現「已售完」情境）。
-int _stockFor(Product p) {
-  final n = p.id.hashCode.abs() % 60;
-  return n < 3 ? 0 : n;
 }
 
 // ── 範例資料（分類 → 子分類 + 商品）────────────────────────────────────────

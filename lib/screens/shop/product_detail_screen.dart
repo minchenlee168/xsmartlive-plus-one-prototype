@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -407,7 +408,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   children: [
                     _GlassHeaderButton(
                       icon: Icons.arrow_back_ios_new,
-                      onTap: () => Navigator.of(context).maybePop(),
+                      // 有上一頁就返回；若無（例如直接開啟商品網址、無返回堆疊）
+                      // 則導回商城，避免按返回沒有反應。用 go_router 的 canPop
+                      // 才能正確反映路由堆疊。
+                      onTap: () {
+                        final router = GoRouter.of(context);
+                        if (router.canPop()) {
+                          router.pop();
+                        } else {
+                          context.go('/shop');
+                        }
+                      },
                     ),
                     Row(
                       children: [
@@ -1290,7 +1301,7 @@ class _CouponCard extends StatelessWidget {
                         coupon.discountLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: textTheme.titleLarge?.copyWith(
+                        style: textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           color: discountFg,
                         ),
@@ -1302,8 +1313,11 @@ class _CouponCard extends StatelessWidget {
               SizedBox(
                 width: 1,
                 child: CustomPaint(
+                  // 虛線比左側折扣色塊（tone100）再深一階，做出區隔。
                   painter: _DashedVerticalDividerPainter(
-                    color: colorScheme.outlineVariant,
+                    color: isActive
+                        ? palette.tone200
+                        : colorScheme.outlineVariant,
                   ),
                 ),
               ),

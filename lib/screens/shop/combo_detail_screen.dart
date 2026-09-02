@@ -22,6 +22,18 @@ class ComboDetailScreen extends StatelessWidget {
         foregroundColor: appTheme.fg,
         elevation: 0,
         scrolledUnderElevation: 0.5,
+        // 有上一頁就返回；否則導回商城，避免按返回沒有反應。
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            final router = GoRouter.of(context);
+            if (router.canPop()) {
+              router.pop();
+            } else {
+              context.go('/shop');
+            }
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.shopping_cart_outlined, color: appTheme.fg),

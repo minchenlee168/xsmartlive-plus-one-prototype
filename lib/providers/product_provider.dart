@@ -352,9 +352,12 @@ ProductCardDetail _previewDetailFor(Product p) {
 /// Specs are parsed directly from the product card API response.
 final productCardDetailProvider =
     FutureProvider.family<ProductCardDetail?, String>((ref, id) async {
+  // web 預覽一律回範例內頁，找不到對應商品也給通用 fallback，
+  // 避免打真實 API 造成「載入失敗」。
   if (isWebPreview) {
-    final p = previewProductById(id);
-    if (p != null) return _previewDetailFor(p);
+    final p = previewProductById(id) ??
+        Product(id: id, name: '範例商品', price: 0, image: '', category: '');
+    return _previewDetailFor(p);
   }
   return ref.read(productRepositoryProvider).fetchProductCardDetail(id);
 });

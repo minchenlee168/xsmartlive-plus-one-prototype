@@ -2143,22 +2143,15 @@ class _AddonCard extends ConsumerWidget {
                     ),
                   );
               },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
+              child: const SizedBox(
+                height: 32,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.shopping_cart_outlined,
-                        size: 14, color: Colors.white),
+                    Icon(Icons.add, size: 16, color: Colors.white),
                     SizedBox(width: 6),
-                    Text(
-                      '加入購物車',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    Icon(Icons.shopping_cart_outlined,
+                        size: 16, color: Colors.white),
                   ],
                 ),
               ),

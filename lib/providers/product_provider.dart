@@ -21,6 +21,16 @@ const _sampleGroups = <ProductGroup>[
   ProductGroup(id: 'g_life', name: '生活'),
 ];
 
+/// Web 預覽用的首頁「分類逛逛」分類。id 對應 `category_screen.dart`
+/// 的 `_categoryData`，點按分類卡即可導向對應分類頁。
+const _sampleCategories = <ProductGroup>[
+  ProductGroup(id: 'h_skincare', name: '臉部保養'),
+  ProductGroup(id: 'h_makeup', name: '彩妝'),
+  ProductGroup(id: 'h_fragrance', name: '香氛'),
+  ProductGroup(id: 'h_body', name: '身體護理'),
+  ProductGroup(id: 'h_men', name: '男士'),
+];
+
 const _sampleShopProducts = <Product>[
   // 服飾
   Product(
@@ -115,6 +125,7 @@ final productGroupsProvider = FutureProvider<List<ProductGroup>>((ref) async {
 
 /// Fetches categories from GET /store/{store}/category.
 final categoriesProvider = FutureProvider<List<ProductGroup>>((ref) async {
+  if (isWebPreview) return _sampleCategories;
   return ref.read(productRepositoryProvider).fetchCategories();
 });
 

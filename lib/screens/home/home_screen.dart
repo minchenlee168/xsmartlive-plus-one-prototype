@@ -671,11 +671,27 @@ class _CategoriesGrid extends StatelessWidget {
   // UI looking right even when `categoriesProvider` returns nothing /
   // before the merchant has uploaded their own category artwork.
   static const _fallback = [
-    (label: '臉部保養', asset: 'assets/prototype/categories/01_skincare.png'),
-    (label: '彩妝', asset: 'assets/prototype/categories/02_makeup.png'),
-    (label: '香氛', asset: 'assets/prototype/categories/03_fragrance.png'),
-    (label: '身體護理', asset: 'assets/prototype/categories/04_body.png'),
-    (label: '男士', asset: 'assets/prototype/categories/05_men.png'),
+    (
+      label: '臉部保養',
+      asset: 'assets/prototype/categories/01_skincare.png',
+      id: 'h_skincare'
+    ),
+    (
+      label: '彩妝',
+      asset: 'assets/prototype/categories/02_makeup.png',
+      id: 'h_makeup'
+    ),
+    (
+      label: '香氛',
+      asset: 'assets/prototype/categories/03_fragrance.png',
+      id: 'h_fragrance'
+    ),
+    (
+      label: '身體護理',
+      asset: 'assets/prototype/categories/04_body.png',
+      id: 'h_body'
+    ),
+    (label: '男士', asset: 'assets/prototype/categories/05_men.png', id: 'h_men'),
   ];
 
   @override
@@ -692,6 +708,7 @@ class _CategoriesGrid extends StatelessWidget {
             (i) => (
               label: (categories[i].name as String?) ?? _fallback[i].label,
               asset: _fallback[i % _fallback.length].asset,
+              id: (categories[i].id as String?) ?? _fallback[i].id,
             ),
           )
         : _fallback;
@@ -705,40 +722,44 @@ class _CategoriesGrid extends StatelessWidget {
           return Expanded(
             child: Padding(
               padding: EdgeInsets.only(right: i == items.length - 1 ? 0 : 10),
-              child: Column(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(appTheme.cardRadius),
-                      child: Container(
-                        color: appTheme.bgSubtle,
-                        child: Image.asset(
-                          c.asset,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Icon(
-                            Icons.image_outlined,
-                            color: appTheme.fgMuted,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(appTheme.cardRadius),
+                onTap: () => context.push('/shop/category/${c.id}'),
+                child: Column(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 1,
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.circular(appTheme.cardRadius),
+                        child: Container(
+                          color: appTheme.bgSubtle,
+                          child: Image.asset(
+                            c.asset,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Icon(
+                              Icons.image_outlined,
+                              color: appTheme.fgMuted,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    c.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: appTheme.fg,
-                      height: 1.2,
+                    const SizedBox(height: 6),
+                    Text(
+                      c.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: appTheme.fg,
+                        height: 1.2,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

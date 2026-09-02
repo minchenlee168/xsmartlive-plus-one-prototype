@@ -319,6 +319,10 @@ ProductCardDetail _previewDetailFor(Product p) {
                 originalPrice: p.originalPrice,
                 stock: stock,
                 keyword: specNames[i],
+                // 綁定規格值 id（= i+1），詳情頁才判定該規格可選。
+                specs: [
+                  {'id': i + 1, 'name': specNames[i]},
+                ],
               ),
           ]
         : [

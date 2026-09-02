@@ -9,6 +9,10 @@ import '../models/product_card_detail.dart';
 import '../models/product_group.dart';
 import '../models/product_spec.dart';
 import '../models/product_variant.dart';
+import '../screens/shop/category_screen.dart' show categoryPreviewProducts;
+import '../screens/shop/theme_hall_data.dart';
+import '../widgets/standard_product_card.dart'
+    show productSpecOptions, previewStockFor;
 import 'analytics_provider.dart';
 import 'auth_provider.dart';
 import 'repository_providers.dart';
@@ -274,10 +278,84 @@ final productCardProvider = FutureProvider.family<Product?, String>(
 
 
 
+/// web 預覽用：跨所有範例來源以 id 查找 Product（商城/主題館/分類頁）。
+Product? previewProductById(String id) {
+  for (final p in _sampleShopProducts) {
+    if (p.id == id) return p;
+  }
+  for (final hall in themeHalls) {
+    for (final item in hall.items) {
+      if (item.product.id == id) return item.product;
+    }
+  }
+  for (final p in categoryPreviewProducts()) {
+    if (p.id == id) return p;
+  }
+  return null;
+}
+
+/// web 預覽用：由範例 Product 組出 ProductCardDetail，讓商品內頁可正常呈現。
+ProductCardDetail _previewDetailFor(Product p) {
+  final specNames = productSpecOptions(p);
+  final hasSpec = specNames.isNotEmpty;
+  final stock = previewStockFor(p);
+  final pid = p.id.hashCode.abs();
+  return ProductCardDetail(
+    id: pid,
+    productId: pid,
+    storeId: 1,
+    marketId: 1,
+    type: 2,
+    name: p.name,
+    hasSpec: hasSpec,
+    allowOversell: false,
+    images: const [],
+    variants: hasSpec
+        ? [
+            for (var i = 0; i < specNames.length; i++)
+              ProductVariant(
+                id: i + 1,
+                salePrice: p.price,
+                originalPrice: p.originalPrice,
+                stock: stock,
+                keyword: specNames[i],
+              ),
+          ]
+        : [
+            ProductVariant(
+              id: 1,
+              salePrice: p.price,
+              originalPrice: p.originalPrice,
+              stock: stock,
+            ),
+          ],
+    specs: hasSpec
+        ? [
+            ProductSpec(
+              id: 1,
+              name: '規格',
+              values: [
+                for (var i = 0; i < specNames.length; i++)
+                  ProductSpecValue(id: i + 1, name: specNames[i]),
+              ],
+            ),
+          ]
+        : const [],
+    intro: '這是「${p.name}」的商品介紹（web 預覽範例內容）。',
+    tags: p.isHot ? const ['熱銷'] : const [],
+    isOrderable: stock > 0,
+    soldAmount: p.sales,
+  );
+}
+
 /// Fetches the full ProductCardDetail for the detail screen.
 /// Specs are parsed directly from the product card API response.
 final productCardDetailProvider =
     FutureProvider.family<ProductCardDetail?, String>((ref, id) async {
+  if (isWebPreview) {
+    final p = previewProductById(id);
+    if (p != null) return _previewDetailFor(p);
+  }
   return ref.read(productRepositoryProvider).fetchProductCardDetail(id);
 });
 

@@ -159,6 +159,12 @@ class _SubChip extends StatelessWidget {
   }
 }
 
+/// 供 web 預覽的商品內頁 fallback 查找：所有分類頁範例商品（去重）。
+List<Product> categoryPreviewProducts() => [
+      for (final data in _categoryData.values)
+        for (final item in data.products) item.product,
+    ];
+
 // ── 範例資料（分類 → 子分類 + 商品）────────────────────────────────────────
 typedef _CatProduct = ({String sub, Product product});
 typedef _CatData = ({String name, List<String> subs, List<_CatProduct> products});

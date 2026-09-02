@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../models/product.dart';
 import '../theme/app_theme_extension.dart';
@@ -100,14 +101,19 @@ class _StandardProductCardState extends State<StandardProductCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  p.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: appTheme.fg),
+                // 點名稱導向商品內頁。
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => context.push('/product/${p.id}'),
+                  child: Text(
+                    p.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: appTheme.fg),
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Row(

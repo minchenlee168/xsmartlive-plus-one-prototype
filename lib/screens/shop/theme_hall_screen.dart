@@ -121,26 +121,33 @@ class ThemeHallScreen extends StatelessWidget {
               ),
             ),
           ),
-          // 該主題館的所有商品卡（格狀）。
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: hall.standard ? 0.66 : 0.72,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, i) {
-                  final item = hall.items[i];
-                  return hall.standard
-                      ? StandardProductCard(
-                          product: item.product, stock: item.stock)
-                      : ShopProductCard(product: item.product);
-                },
-                childCount: hall.items.length,
-              ),
+          // 該主題館的所有商品卡：固定寬度、依內容收合高度，按鈕下方不留白。
+          SliverToBoxAdapter(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const spacing = 12.0;
+                const hPad = 16.0;
+                final avail = constraints.maxWidth - hPad * 2;
+                final cols = (avail / 190).floor().clamp(2, 6);
+                final cardW = (avail - spacing * (cols - 1)) / cols;
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(hPad, 16, hPad, 24),
+                  child: Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: [
+                      for (final item in hall.items)
+                        SizedBox(
+                          width: cardW,
+                          child: hall.standard
+                              ? StandardProductCard(
+                                  product: item.product, stock: item.stock)
+                              : ShopProductCard(product: item.product),
+                        ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],

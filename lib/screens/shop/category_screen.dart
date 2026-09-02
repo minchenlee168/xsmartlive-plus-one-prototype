@@ -85,20 +85,33 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                     child: Text('此子分類目前沒有商品',
                         style: TextStyle(color: appTheme.fgMuted)),
                   )
-                : GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.8,
-                    ),
-                    itemCount: products.length,
-                    itemBuilder: (context, i) => StandardProductCard(
-                      product: products[i].product,
-                      stock: _stockFor(products[i].product),
-                    ),
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      const spacing = 12.0;
+                      const hPad = 16.0;
+                      final avail = constraints.maxWidth - hPad * 2;
+                      // 依可用寬度決定欄數（手機 2 欄、寬螢幕更多），
+                      // 卡片為固定寬度並依內容收合高度，故按鈕下方不留白。
+                      final cols = (avail / 190).floor().clamp(2, 6);
+                      final cardW = (avail - spacing * (cols - 1)) / cols;
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(hPad, 12, hPad, 24),
+                        child: Wrap(
+                          spacing: spacing,
+                          runSpacing: spacing,
+                          children: [
+                            for (final p in products)
+                              SizedBox(
+                                width: cardW,
+                                child: StandardProductCard(
+                                  product: p.product,
+                                  stock: _stockFor(p.product),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
           ),
         ],

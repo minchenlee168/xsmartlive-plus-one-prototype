@@ -76,6 +76,8 @@ class _StandardProductCardState extends State<StandardProductCard> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        // 卡片依內容高度收合，避免在等比 grid 中被撐高留白。
+        mainAxisSize: MainAxisSize.min,
         children: [
           // 圖片（prototype 佔位）
           Container(

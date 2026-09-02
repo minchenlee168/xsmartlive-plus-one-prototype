@@ -743,7 +743,7 @@ class _ThemeHallSections extends StatelessWidget {
           const SizedBox(height: 12),
           // 該主題館的商品卡（橫向捲動）：標準卡有數量選擇 + 庫存；精簡卡較簡潔。
           SizedBox(
-            height: hall.standard ? 292 : 256,
+            height: hall.standard ? 266 : 256,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),

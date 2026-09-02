@@ -16,6 +16,8 @@ import '../../providers/coupon_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../cart/cart_screen.dart';
+import 'combo_data.dart';
+import 'combo_picker.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   const ProductDetailScreen({super.key, required this.productCardId});
@@ -120,6 +122,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   ) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
+    // 任選組合商品：中間區改顯示組合挑選，並隱藏一般底部加入購物車列。
+    final combo = comboForId(widget.productCardId);
     final price = variant?.salePrice ?? detail.minSalePrice;
     final originalPrice = variant?.originalPrice ?? detail.minOriginalPrice;
     final inStock = variant != null
@@ -223,7 +227,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   ),
                                 ],
                                 const Spacer(),
-                                _StockBadge(inStock: inStock),
+                                // 任選組合以中間挑選區為準，不顯示單一庫存徽章。
+                                if (combo == null)
+                                  _StockBadge(inStock: inStock),
                               ],
                             ),
                             const SizedBox(height: 8),
@@ -298,38 +304,46 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           _CouponRow(
                             onTap: () => _showCouponSheet(context),
                           ),
-                          if (detail.hasSpec && detail.specs.isNotEmpty) ...[
+                          // 任選組合商品：中間顯示組合挑選（含加入購物車）。
+                          if (combo != null) ...[
                             Divider(height: 28, color: appTheme.divider),
-                            _SpecSelector(
-                              specs: detail.specs,
-                              selected:
-                                  Map.unmodifiable(_selectedSpecValues),
-                              onSelect: (specId, valueId) => setState(() =>
-                                  _selectedSpecValues[specId] = valueId),
-                              priceFor: (groupId, valueId) =>
-                                  _priceForSpecValue(
-                                      detail.variants, groupId, valueId),
-                              isEnabled: (groupId, valueId) =>
-                                  _isSpecValueAvailable(
-                                      detail.variants, groupId, valueId),
+                            ComboPicker(
+                                config: combo, mode: ComboMode.page),
+                          ] else ...[
+                            if (detail.hasSpec &&
+                                detail.specs.isNotEmpty) ...[
+                              Divider(height: 28, color: appTheme.divider),
+                              _SpecSelector(
+                                specs: detail.specs,
+                                selected:
+                                    Map.unmodifiable(_selectedSpecValues),
+                                onSelect: (specId, valueId) => setState(() =>
+                                    _selectedSpecValues[specId] = valueId),
+                                priceFor: (groupId, valueId) =>
+                                    _priceForSpecValue(
+                                        detail.variants, groupId, valueId),
+                                isEnabled: (groupId, valueId) =>
+                                    _isSpecValueAvailable(
+                                        detail.variants, groupId, valueId),
+                              ),
+                            ],
+                            Divider(height: 28, color: appTheme.divider),
+                            _QuantityRow(
+                              // 售完（stock 0）時上限需 ≥ 下限，否則 clamp(1,0)
+                              // 會丟 ArgumentError（Invalid argument: 1）。
+                              quantity: _quantity
+                                  .clamp(
+                                      1,
+                                      (variant?.stock ?? 1) < 1
+                                          ? 1
+                                          : (variant?.stock ?? 1))
+                                  .toInt(),
+                              stock: variant?.stock ?? 0,
+                              enabled: inStock && variant != null,
+                              onChanged: (q) =>
+                                  setState(() => _quantity = q),
                             ),
                           ],
-                          Divider(height: 28, color: appTheme.divider),
-                          _QuantityRow(
-                            // 售完（stock 0）時上限需 ≥ 下限，否則 clamp(1,0) 會丟
-                            // ArgumentError（Invalid argument: 1）。
-                            quantity: _quantity
-                                .clamp(
-                                    1,
-                                    (variant?.stock ?? 1) < 1
-                                        ? 1
-                                        : (variant?.stock ?? 1))
-                                .toInt(),
-                            stock: variant?.stock ?? 0,
-                            enabled: inStock && variant != null,
-                            onChanged: (q) =>
-                                setState(() => _quantity = q),
-                          ),
                         ],
                       ),
                     ),
@@ -446,29 +460,30 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             ],
           ),
         ),
-        // Bottom add-to-cart bar
-        _BottomBar(
-          inStock: inStock,
-          marketId: detail.marketId,
-          cardType: detail.type,
-          variantId: variant?.id,
-          quantity: _quantity
-              .clamp(1,
-                  (variant?.stock ?? 1) < 1 ? 1 : (variant?.stock ?? 1))
-              .toInt(),
-          allSpecsSelected: !detail.hasSpec ||
-              _selectedSpecValues.length == detail.specs.length,
-          hasSpec: detail.hasSpec,
-          product: Product(
-            id: detail.id.toString(),
-            name: detail.name,
-            price: price,
-            originalPrice: originalPrice,
-            image: detail.images.isNotEmpty ? detail.images.first : '',
-            category: detail.category,
+        // Bottom add-to-cart bar（任選組合改由中間挑選區的加入購物車，故隱藏）
+        if (combo == null)
+          _BottomBar(
             inStock: inStock,
+            marketId: detail.marketId,
+            cardType: detail.type,
+            variantId: variant?.id,
+            quantity: _quantity
+                .clamp(1,
+                    (variant?.stock ?? 1) < 1 ? 1 : (variant?.stock ?? 1))
+                .toInt(),
+            allSpecsSelected: !detail.hasSpec ||
+                _selectedSpecValues.length == detail.specs.length,
+            hasSpec: detail.hasSpec,
+            product: Product(
+              id: detail.id.toString(),
+              name: detail.name,
+              price: price,
+              originalPrice: originalPrice,
+              image: detail.images.isNotEmpty ? detail.images.first : '',
+              category: detail.category,
+              inStock: inStock,
+            ),
           ),
-        ),
       ],
     );
   }

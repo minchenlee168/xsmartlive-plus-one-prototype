@@ -326,6 +326,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                               const SizedBox(height: 8),
                               // 購物車頁最下方的「加購區」。
                               const _AddonSection(),
+                              const SizedBox(height: 12),
+                              // Livebuy 直播回放加購區。
+                              const _LivebuyReplaySection(),
                             ],
                           ),
           ),
@@ -2161,6 +2164,291 @@ class _AddonCard extends ConsumerWidget {
               ),
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Livebuy 直播回放加購區：直式影片卡橫向捲動；點按影片圖跳轉直播回放介紹。
+// ─────────────────────────────────────────────────────────────────────────
+class _ReplayVideo {
+  const _ReplayVideo({
+    required this.title,
+    this.pinned = false,
+    this.overlayText,
+    this.productName,
+    this.productPrice,
+  });
+  final String title;
+  final bool pinned;
+
+  /// 影片縮圖上的文字（如「00:34:43 TEST LIVE」）；null 則不顯示。
+  final String? overlayText;
+
+  /// 影片底部的商品標籤（有商品才顯示）。
+  final String? productName;
+  final int? productPrice;
+}
+
+const List<_ReplayVideo> _kReplayVideos = [
+  _ReplayVideo(
+    title: '影片123',
+    pinned: true,
+    productName: '「師園」蒜味鹽酥雞餅乾',
+    productPrice: 290,
+  ),
+  _ReplayVideo(title: 'sdfbsfb'),
+  _ReplayVideo(title: '0731test', overlayText: '00:34:43\nTEST LIVE'),
+  _ReplayVideo(
+    title: '晚間直播回放',
+    productName: '玫瑰保濕精華液 30ml',
+    productPrice: 1280,
+  ),
+];
+
+class _LivebuyReplaySection extends StatefulWidget {
+  const _LivebuyReplaySection();
+
+  @override
+  State<_LivebuyReplaySection> createState() => _LivebuyReplaySectionState();
+}
+
+class _LivebuyReplaySectionState extends State<_LivebuyReplaySection> {
+  final _scrollCtrl = ScrollController();
+  static const _cardWidth = 150.0;
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
+  void _scrollBy(double delta) {
+    final target = (_scrollCtrl.offset + delta).clamp(
+      0.0,
+      _scrollCtrl.position.maxScrollExtent,
+    );
+    _scrollCtrl.animateTo(target,
+        duration: const Duration(milliseconds: 260), curve: Curves.easeOut);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+
+    Widget arrow(IconData icon, VoidCallback onTap) => Material(
+          color: appTheme.bgElev,
+          shape: const CircleBorder(),
+          elevation: 2,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onTap,
+            child: Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              child: Icon(icon, size: 18, color: appTheme.fg),
+            ),
+          ),
+        );
+
+    return Container(
+      decoration: BoxDecoration(
+        color: appTheme.bgElev,
+        borderRadius: BorderRadius.circular(appTheme.cardRadius),
+        border: Border.all(color: appTheme.divider),
+      ),
+      clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Text(
+              'Livebuy 直播回放加購區',
+              style: GoogleFonts.getFont(
+                appTheme.fontDisplay,
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: appTheme.fg,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Center(
+            child: Text(
+              '只要點選商品的圖片，就會跳轉到直播回放介紹',
+              style: TextStyle(fontSize: 12, color: accent),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 300,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                ListView.separated(
+                  controller: _scrollCtrl,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _kReplayVideos.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 12),
+                  itemBuilder: (context, i) => SizedBox(
+                    width: _cardWidth,
+                    child: _ReplayVideoCard(video: _kReplayVideos[i]),
+                  ),
+                ),
+                // 左右箭頭
+                Positioned(
+                  left: -4,
+                  child: arrow(Icons.chevron_left,
+                      () => _scrollBy(-(_cardWidth + 12) * 2)),
+                ),
+                Positioned(
+                  right: -4,
+                  child: arrow(Icons.chevron_right,
+                      () => _scrollBy((_cardWidth + 12) * 2)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReplayVideoCard extends StatelessWidget {
+  const _ReplayVideoCard({required this.video});
+
+  final _ReplayVideo video;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 直式影片縮圖（點按跳轉直播回放介紹）
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(
+                    content: Text('跳轉到直播回放介紹：${video.title}')));
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // 縮圖佔位（prototype）
+                  Container(
+                    color: const Color(0xFF1E1E24),
+                    alignment: Alignment.center,
+                    child: video.overlayText != null
+                        ? Text(
+                            video.overlayText!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              height: 1.3,
+                            ),
+                          )
+                        : Icon(Icons.play_circle_outline,
+                            size: 36,
+                            color: Colors.white.withValues(alpha: 0.7)),
+                  ),
+                  // 置頂 pin
+                  if (video.pinned)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(Icons.push_pin, size: 14, color: accent),
+                      ),
+                    ),
+                  // 底部商品標籤
+                  if (video.productName != null)
+                    Positioned(
+                      left: 6,
+                      right: 6,
+                      bottom: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.circular(appTheme.radiusSm),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: appTheme.bgSubtle,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              alignment: Alignment.center,
+                              child: Icon(Icons.image_outlined,
+                                  size: 16, color: appTheme.fgMuted),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    video.productName!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 10, color: appTheme.fg),
+                                  ),
+                                  Text(
+                                    'NT\$ ${video.productPrice}',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                        color: accent),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          video.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 12, color: appTheme.fg),
         ),
       ],
     );

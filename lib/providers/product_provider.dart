@@ -13,8 +13,103 @@ import 'analytics_provider.dart';
 import 'auth_provider.dart';
 import 'repository_providers.dart';
 
+/// Web 預覽用的商城分類與商品範例。分類 tab 與商品皆為前端範例，
+/// 商品的 [Product.category] 存所屬分類 id，供切換分類時篩選。
+const _sampleGroups = <ProductGroup>[
+  ProductGroup(id: 'g_apparel', name: '服飾'),
+  ProductGroup(id: 'g_beauty', name: '美妝'),
+  ProductGroup(id: 'g_life', name: '生活'),
+];
+
+const _sampleShopProducts = <Product>[
+  // 服飾
+  Product(
+      id: 'sp1',
+      name: '秋冬童裝連帽外套',
+      price: 590,
+      originalPrice: 890,
+      image: '',
+      category: 'g_apparel',
+      rating: 4.7,
+      sales: 320,
+      isHot: true),
+  Product(
+      id: 'sp2',
+      name: '柔軟針織毛衣',
+      price: 480,
+      image: '',
+      category: 'g_apparel',
+      rating: 4.5,
+      sales: 210),
+  Product(
+      id: 'sp3',
+      name: '保暖童襪 3 雙組',
+      price: 129,
+      originalPrice: 199,
+      image: '',
+      category: 'g_apparel',
+      rating: 4.8,
+      sales: 540),
+  // 美妝
+  Product(
+      id: 'sp4',
+      name: '玫瑰保濕精華液 30ml',
+      price: 1280,
+      originalPrice: 1580,
+      image: '',
+      category: 'g_beauty',
+      rating: 4.9,
+      sales: 880,
+      isHot: true),
+  Product(
+      id: 'sp5',
+      name: '絲絨霧面唇釉 #05',
+      price: 590,
+      originalPrice: 720,
+      image: '',
+      category: 'g_beauty',
+      rating: 4.6,
+      sales: 430),
+  Product(
+      id: 'sp6',
+      name: '亮白面膜 5 片組',
+      price: 480,
+      image: '',
+      category: 'g_beauty',
+      rating: 4.4,
+      sales: 260),
+  // 生活
+  Product(
+      id: 'sp7',
+      name: '手工香氛蠟燭 200g',
+      price: 890,
+      image: '',
+      category: 'g_life',
+      rating: 4.7,
+      sales: 150),
+  Product(
+      id: 'sp8',
+      name: '不鏽鋼保溫瓶 500ml',
+      price: 690,
+      originalPrice: 990,
+      image: '',
+      category: 'g_life',
+      rating: 4.8,
+      sales: 620,
+      isHot: true),
+  Product(
+      id: 'sp9',
+      name: '多功能收納整理箱',
+      price: 350,
+      image: '',
+      category: 'g_life',
+      rating: 4.3,
+      sales: 190),
+];
+
 /// Fetches all product groups for the store.
 final productGroupsProvider = FutureProvider<List<ProductGroup>>((ref) async {
+  if (isWebPreview) return _sampleGroups;
   return ref.read(productRepositoryProvider).fetchProductGroups();
 });
 
@@ -81,6 +176,17 @@ class ProductListNotifier
 
   @override
   Future<ProductListState> build(ProductFilter filter) async {
+    // Web 預覽：用範例商品，並依所選分類（storeCategoryId）篩選，
+    // 讓切換分類 tab 看得到商品清單變化。
+    if (isWebPreview) {
+      final id = filter.storeCategoryId;
+      final products = id == null
+          ? _sampleShopProducts
+          : _sampleShopProducts
+              .where((p) => p.category == id)
+              .toList(growable: false);
+      return ProductListState(products: products, hasMore: false);
+    }
     final result = await ref.read(productRepositoryProvider).fetchProductsPage(
           storeCategoryId: filter.storeCategoryId,
           categoryId: filter.categoryId,

@@ -553,7 +553,12 @@ class _DiscountPanel extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _CouponIcon(size: 42, dimmed: variant != _CouponVariant.active),
+          _CouponIcon(
+            size: 42,
+            dimmed: variant != _CouponVariant.active,
+            // 領取更多優惠卡（實心品牌底）→ icon 反轉為白色。
+            inverted: emphasized,
+          ),
           SizedBox(height: appTheme.spacingSm),
           Text(
             label,
@@ -831,9 +836,16 @@ class _ErrorView extends StatelessWidget {
 // signals "used / expired" regardless of brand color.
 
 class _CouponIcon extends StatelessWidget {
-  const _CouponIcon({required this.size, this.dimmed = false});
+  const _CouponIcon({
+    required this.size,
+    this.dimmed = false,
+    this.inverted = false,
+  });
   final double size;
   final bool dimmed;
+
+  /// `true` 時把 icon 反轉為白色剪影，用於實心品牌底的「領取更多優惠」卡。
+  final bool inverted;
 
   @override
   Widget build(BuildContext context) {
@@ -842,6 +854,15 @@ class _CouponIcon extends StatelessWidget {
         'assets/icons/coupon_gray.svg',
         width: size,
         height: size,
+      );
+    }
+    if (inverted) {
+      return SvgPicture.asset(
+        'assets/icons/coupon.svg',
+        width: size,
+        height: size,
+        colorFilter:
+            const ColorFilter.mode(Colors.white, BlendMode.srcIn),
       );
     }
     return SvgPicture.asset(

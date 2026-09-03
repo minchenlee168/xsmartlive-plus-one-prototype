@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../theme/app_theme_extension.dart';
 import '../../widgets/back_leading_button.dart';
-import '../../widgets/shop_product_card.dart';
 import '../../widgets/standard_product_card.dart';
 import 'theme_hall_data.dart';
 
@@ -141,13 +140,12 @@ class ThemeHallScreen extends StatelessWidget {
                     spacing: spacing,
                     runSpacing: spacing,
                     children: [
+                      // 查看更多頁一律使用標準商品卡。
                       for (final item in hall.items)
                         SizedBox(
                           width: cardW,
-                          child: hall.standard
-                              ? StandardProductCard(
-                                  product: item.product, stock: item.stock)
-                              : ShopProductCard(product: item.product),
+                          child: StandardProductCard(
+                              product: item.product, stock: item.stock),
                         ),
                     ],
                   ),

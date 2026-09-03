@@ -62,6 +62,8 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
         ],
       ),
       body: Column(
+        // 讓內容區撐滿寬度，否則只有一張商品卡時 Wrap 會縮成卡寬並被置中。
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 子分類篩選
           SizedBox(

@@ -347,6 +347,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         ],
                       ),
                     ),
+                    // ── 商品備註 card：買家可留言給賣家（組合商品不顯示）──
+                    if (combo == null) const _ProductNoteSection(),
                     // ── 商品詳情 card: title + attribute grid + intro ──
                     _SectionCard(
                       child: Column(
@@ -1695,6 +1697,74 @@ class _SectionCard extends StatelessWidget {
       width: double.infinity,
       color: appTheme.bgElev,
       child: child,
+    );
+  }
+}
+
+// ── 商品備註：買家可留言給賣家（選填）──────────────────────────────────────
+class _ProductNoteSection extends StatefulWidget {
+  const _ProductNoteSection();
+
+  @override
+  State<_ProductNoteSection> createState() => _ProductNoteSectionState();
+}
+
+class _ProductNoteSectionState extends State<_ProductNoteSection> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return _SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '商品備註',
+            style: GoogleFonts.getFont(
+              appTheme.fontDisplay,
+              textStyle: TextStyle(
+                fontSize: 15,
+                fontWeight: appTheme.fontWeightDisplay,
+                color: appTheme.fg,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _controller,
+            maxLines: 3,
+            maxLength: 100,
+            style: TextStyle(fontSize: 14, color: appTheme.fg),
+            decoration: InputDecoration(
+              hintText: '選填，可留言給賣家（例如顏色、尺寸偏好）',
+              hintStyle: TextStyle(fontSize: 14, color: appTheme.fgMuted),
+              filled: true,
+              fillColor: appTheme.bgSubtle,
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 10),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(appTheme.radiusSm),
+                borderSide: BorderSide(color: appTheme.divider),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(appTheme.radiusSm),
+                borderSide: BorderSide(color: appTheme.divider),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(appTheme.radiusSm),
+                borderSide: BorderSide(color: appTheme.brandPalette.tone500),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

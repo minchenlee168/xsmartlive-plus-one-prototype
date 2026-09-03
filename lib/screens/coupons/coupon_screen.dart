@@ -486,6 +486,8 @@ class _CouponShell extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(appTheme.cardRadius),
+        // 每張優惠券的外框：用較淡的分隔線色，不要太重。
+        border: Border.all(color: appTheme.divider),
         boxShadow: appTheme.elevation2,
       ),
       child: ClipRRect(

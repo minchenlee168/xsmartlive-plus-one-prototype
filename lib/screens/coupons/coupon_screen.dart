@@ -858,11 +858,9 @@ class _CouponIcon extends StatelessWidget {
     }
     if (inverted) {
       return SvgPicture.asset(
-        'assets/icons/coupon.svg',
+        'assets/icons/coupon_white.svg',
         width: size,
         height: size,
-        colorFilter:
-            const ColorFilter.mode(Colors.white, BlendMode.srcIn),
       );
     }
     return SvgPicture.asset(

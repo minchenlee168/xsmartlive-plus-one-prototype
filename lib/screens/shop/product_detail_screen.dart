@@ -840,8 +840,8 @@ class _QuantityStepper extends StatelessWidget {
       height: _stepperHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          // 用較淡的底色，避免數量框變成高對比的黑框。
-          color: appTheme.bgSubtle,
+          // 與卡片底色一致，只靠邊框與品牌色 ＋/− 呈現，不像 disabled 灰框。
+          color: appTheme.bgElev,
           border: Border.all(color: borderColor),
           borderRadius: radius,
         ),

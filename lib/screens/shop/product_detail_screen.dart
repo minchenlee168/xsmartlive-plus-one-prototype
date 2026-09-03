@@ -830,17 +830,18 @@ class _QuantityStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final borderColor = colorScheme.outline;
+    // 用較淡的分隔線色，避免數量選擇框的邊框/分隔線對比過高。
+    final borderColor = appTheme.divider;
     final radius = BorderRadius.circular(appTheme.buttonRadius);
 
     return SizedBox(
       height: _stepperHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colorScheme.surface,
+          // 用較淡的底色，避免數量框變成高對比的黑框。
+          color: appTheme.bgSubtle,
           border: Border.all(color: borderColor),
           borderRadius: radius,
         ),
@@ -866,7 +867,7 @@ class _QuantityStepper extends StatelessWidget {
                     child: Text(
                       '$quantity',
                       style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface,
+                        color: appTheme.fg,
                       ),
                     ),
                   ),
@@ -902,9 +903,8 @@ class _StepperButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final iconColor =
-        enabled ? colorScheme.onSurfaceVariant : colorScheme.outline;
+    final appTheme = context.appTheme;
+    final iconColor = enabled ? appTheme.fg : appTheme.muted;
     return SizedBox(
       width: width,
       child: InkWell(

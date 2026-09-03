@@ -7,6 +7,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/purchase.dart';
 import '../../providers/purchase_provider.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 
 /// 訂單卡的獨立動作按鈕（配送進度/明細改為切換列，不在此列舉）。
 enum _OrderAction { inquiry, changeAddress, payInfo }
@@ -95,6 +96,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/profile'),
         title: Text(l10n.ordersTitle,
             style: TextStyle(color: appTheme.fg)),
         backgroundColor: appTheme.bgElev,

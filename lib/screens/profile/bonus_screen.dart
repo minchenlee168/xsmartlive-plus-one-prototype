@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../providers/bonus_provider.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 
 /// 紅利點數畫面 —— 由「我的」頁點按「紅利」進入。
 ///
@@ -35,6 +36,10 @@ class _BonusScreenState extends ConsumerState<BonusScreen> {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(
+          fallbackLocation: '/profile',
+          color: Colors.white,
+        ),
         title: const Text('紅利點數'),
         flexibleSpace: Container(
           decoration: BoxDecoration(gradient: appTheme.primaryGradient),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/address.dart';
 import '../../providers/address_provider.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 import 'address_form_sheet.dart';
 
 /// 收件地址簿 — 宅配 / 超商取貨雙分頁管理。
@@ -24,6 +25,7 @@ class AddressBookScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: appTheme.bg,
         appBar: AppBar(
+          leading: const BackLeadingButton(fallbackLocation: '/settings'),
           title: const Text('收件地址'),
           backgroundColor: appTheme.bgElev,
           foregroundColor: appTheme.fg,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../providers/repository_providers.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 
 /// 修改密碼 — single-step form.
 ///
@@ -92,6 +93,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/settings'),
         title: const Text('修改密碼'),
         backgroundColor: appTheme.bgElev,
         foregroundColor: appTheme.fg,

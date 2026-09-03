@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../models/product.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 import '../../widgets/standard_product_card.dart';
 
 /// 商城分類頁（B）：由商城分類 tab 進入，含子分類篩選 + 商品卡。
@@ -29,7 +30,10 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
 
     if (data == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('分類')),
+        appBar: AppBar(
+          leading: const BackLeadingButton(fallbackLocation: '/shop'),
+          title: const Text('分類'),
+        ),
         body: Center(
           child: Text('找不到此分類',
               style: TextStyle(color: appTheme.fgMuted)),
@@ -44,6 +48,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/shop'),
         title: Text(data.name),
         backgroundColor: appTheme.bgElev,
         foregroundColor: appTheme.fg,

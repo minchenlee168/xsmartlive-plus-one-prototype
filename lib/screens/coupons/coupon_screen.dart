@@ -8,6 +8,7 @@ import '../../models/member_coupon.dart';
 import '../../providers/coupon_provider.dart';
 import '../../providers/repository_providers.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 
 // All-coupons family key — re-used by both the All tab and the post-claim
 // refresh path so they always hit the same provider instance.
@@ -50,6 +51,10 @@ class _CouponScreenState extends ConsumerState<CouponScreen>
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
+        leading: const BackLeadingButton(
+          fallbackLocation: '/profile',
+          color: Colors.white,
+        ),
         title: Text(l10n.couponTitle),
         flexibleSpace: Container(
           decoration: BoxDecoration(gradient: appTheme.primaryGradient),

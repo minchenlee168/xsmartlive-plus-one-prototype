@@ -5,6 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/preset_theme_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 import '../../theme/preset_themes.dart';
 
 /// Lets the user choose between the 6 built-in preset themes (warm /
@@ -22,6 +23,7 @@ class ThemePickerScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/settings'),
         title: Text(l10n.themePickerTitle),
       ),
       body: ListView(

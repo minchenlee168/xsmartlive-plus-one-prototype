@@ -6,6 +6,7 @@ import '../../providers/content_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../theme/app_icons.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 
 /// Search screen — corresponds to prototype `src/screens/search.jsx`.
 ///
@@ -50,6 +51,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/home'),
         backgroundColor: appTheme.bgElev,
         foregroundColor: appTheme.fg,
         elevation: 0,

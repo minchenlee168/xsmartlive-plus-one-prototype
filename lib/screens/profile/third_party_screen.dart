@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 
 /// 第三方帳號 — 綁定 / 解除綁定各社群登入來源。
 ///
@@ -33,6 +34,7 @@ class _ThirdPartyScreenState extends ConsumerState<ThirdPartyScreen> {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/settings'),
         title: const Text('第三方帳號'),
         backgroundColor: appTheme.bgElev,
         foregroundColor: appTheme.fg,

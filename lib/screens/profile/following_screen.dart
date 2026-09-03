@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 
 /// 我的追蹤 —— 列出會員追蹤的直播主。與「我的最愛（收藏商品）」區隔：
 /// 這裡追蹤的是「直播主 / 直播場次」，不是商品。
@@ -90,6 +91,10 @@ class _FollowingScreenState extends State<FollowingScreen> {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(
+          fallbackLocation: '/profile',
+          color: Colors.white,
+        ),
         title: const Text('我的追蹤'),
         flexibleSpace: Container(
           decoration: BoxDecoration(gradient: appTheme.primaryGradient),

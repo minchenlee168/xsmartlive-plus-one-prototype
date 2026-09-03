@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 import '../../widgets/shop_product_card.dart';
 import '../../widgets/standard_product_card.dart';
 import 'theme_hall_data.dart';
@@ -20,7 +21,10 @@ class ThemeHallScreen extends StatelessWidget {
 
     if (index < 0 || index >= themeHalls.length) {
       return Scaffold(
-        appBar: AppBar(title: const Text('主題館')),
+        appBar: AppBar(
+          leading: const BackLeadingButton(fallbackLocation: '/shop'),
+          title: const Text('主題館'),
+        ),
         body: Center(
           child: Text('找不到此主題館',
               style: TextStyle(color: appTheme.fgMuted)),
@@ -33,6 +37,7 @@ class ThemeHallScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/shop'),
         title: Text(hall.title),
         backgroundColor: appTheme.bgElev,
         foregroundColor: appTheme.fg,

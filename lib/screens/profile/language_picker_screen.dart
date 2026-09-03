@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/locale_provider.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 
 /// Language picker — lists every supported locale as a tappable card.
 /// Selection is persisted via [LocaleNotifier] and the app re-localizes
@@ -22,6 +23,7 @@ class LanguagePickerScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/settings'),
         backgroundColor: appTheme.bgElev,
         elevation: 0,
         scrolledUnderElevation: 0.5,

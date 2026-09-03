@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../providers/profile_provider.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 import '../../utils/platform_preview.dart';
 
 /// 編輯個人資料 — 姓名 / 性別 / 生日 / Email。
@@ -122,6 +123,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/settings'),
         title: const Text('編輯個人資料'),
         backgroundColor: appTheme.bgElev,
         foregroundColor: appTheme.fg,

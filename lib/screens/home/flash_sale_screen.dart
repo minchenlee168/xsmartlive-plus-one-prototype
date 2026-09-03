@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/back_leading_button.dart';
 import '../../widgets/standard_product_card.dart';
 
 /// 限時搶購頁：由首頁「限時搶購」標題右側「查看更多」進入。
@@ -23,6 +24,7 @@ class FlashSaleScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: appTheme.bg,
       appBar: AppBar(
+        leading: const BackLeadingButton(fallbackLocation: '/home'),
         title: const Text('限時搶購'),
         backgroundColor: appTheme.bgElev,
         foregroundColor: appTheme.fg,

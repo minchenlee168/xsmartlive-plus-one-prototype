@@ -904,13 +904,15 @@ class _StepperButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
-    final iconColor = enabled ? appTheme.fg : appTheme.muted;
+    // 可用時用品牌色，讓數量框看起來是可操作的，而非 disabled。
+    final iconColor =
+        enabled ? appTheme.brandPalette.tone500 : appTheme.muted;
     return SizedBox(
       width: width,
       child: InkWell(
         onTap: enabled ? onTap : null,
         child: Center(
-          child: Icon(icon, size: 14, color: iconColor),
+          child: Icon(icon, size: 16, color: iconColor),
         ),
       ),
     );

@@ -1051,9 +1051,10 @@ class _DetailItemBlock extends StatelessWidget {
                       name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      // 與上方 label 後方內容一致（同字級、同一般字重）。
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w400,
                         color: Color(0xFF334155),
                         height: 1.1,
                       ),
@@ -1081,7 +1082,7 @@ class _DetailItemBlock extends StatelessWidget {
                       '\$$unitPrice',
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w400,
                         color: Color(0xFF334155),
                       ),
                     ),
@@ -1090,7 +1091,7 @@ class _DetailItemBlock extends StatelessWidget {
                     l10n.ordersItemQtySuffix(item.quantity),
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                       color: Color(0xFF334155),
                     ),
                   ),

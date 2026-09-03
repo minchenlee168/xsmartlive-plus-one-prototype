@@ -11,6 +11,7 @@ import '../screens/cart/cart_screen.dart';
 import '../screens/coupons/coupon_screen.dart';
 import '../screens/favorites/favorites_screen.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/home/flash_sale_screen.dart';
 import '../screens/live/live_room_screen.dart';
 import '../screens/live/live_screen.dart';
 import '../screens/login/login_screen.dart';
@@ -174,6 +175,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => ThemeHallScreen(
           index: int.tryParse(state.pathParameters['index'] ?? '') ?? -1,
         ),
+      ),
+      GoRoute(
+        path: '/flash-sale',
+        builder: (context, state) => const FlashSaleScreen(),
       ),
       GoRoute(
         path: '/search',

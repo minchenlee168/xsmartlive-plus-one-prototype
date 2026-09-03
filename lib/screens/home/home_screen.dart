@@ -70,8 +70,9 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             _SectionHeader(
               title: '⚡ 限時搶購',
-              actionLabel: l10n.homeViewAll,
-              onAction: () => context.go('/shop'),
+              // 與主題館一致：顯示「查看更多」並導向限時搶購頁。
+              actionLabel: '查看更多',
+              onAction: () => context.push('/flash-sale'),
             ),
             const SizedBox(height: 12),
             const _FlashSaleSection(),

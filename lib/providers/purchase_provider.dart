@@ -101,6 +101,9 @@ String orderStatusLabel(String? code) {
   return code ?? '';
 }
 
+/// prototype：拆成多個包裹、含多個貨態的訂單 id。這類訂單的顯示狀態為「處理中」。
+const Set<int> kMultiFulfillmentOrderIds = {100006};
+
 /// 12 筆範例訂單，分布於各狀態（待付款 2 / 待出貨 2 / 備貨中 2 / 已出貨 1 /
 /// 已送達 2 / 已完成 3）。日期落在近 3 個月，預設查詢區間即可看到。
 const List<Purchase> kSampleOrders = [

@@ -483,7 +483,10 @@ class _OrderInfoList extends StatelessWidget {
           _InvoiceInfoRow(order: order, scenario: invoice),
         _InfoRow(
           label: l10n.ordersFieldStatus,
-          value: _statusLabel(context, order.status) ?? missing,
+          // 狀態依現在貨態；若有多個貨態（多包裹）則顯示「處理中」。
+          value: kMultiFulfillmentOrderIds.contains(order.id)
+              ? '處理中'
+              : (_statusLabel(context, order.status) ?? missing),
           emphasised: false,
         ),
       ],

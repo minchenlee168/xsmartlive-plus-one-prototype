@@ -1281,8 +1281,8 @@ class _Timeline extends StatelessWidget {
               // 進入本格（左線）／離開本格（右線）的區段是否已完成。
               leftActive: i <= activeIndex,
               rightActive: (i + 1) <= activeIndex,
-              // 只有「已出貨」為目前階段時，才顯示（查看配送進度）。
-              showTrackLink: _stages[i].trackLink && i == activeIndex,
+              // 「已出貨」只要已達成（含已送達／已完成）都可查看配送進度紀錄。
+              showTrackLink: _stages[i].trackLink && i <= activeIndex,
               onTrackTap: onTrackTap,
             ),
           ),

@@ -450,22 +450,24 @@ class _OrderInfoList extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final missing = l10n.ordersFieldMissing;
-    final rows = <({String label, String value, bool emphasised})>[
+    final rows = <({String label, String value, bool emphasised, Widget? trailing})>[
       (label: l10n.ordersFieldDate, value: _formatDate(order.createdAt),
-          emphasised: false),
+          emphasised: false, trailing: null),
       (label: l10n.ordersFieldNumber, value: order.id.toString(),
-          emphasised: false),
+          emphasised: false, trailing: null),
       (label: l10n.ordersFieldItemCount, value: order.itemCount.toString(),
-          emphasised: false),
+          emphasised: false, trailing: null),
       (
         label: l10n.ordersFieldTotal,
         value: '\$${order.amount}',
         emphasised: true,
+        // 訂單總額後方的「明細」按鈕 → 開金額明細。
+        trailing: _AmountDetailButton(order: order),
       ),
       (label: l10n.ordersFieldPayment, value: order.paymentMethod ?? missing,
-          emphasised: false),
+          emphasised: false, trailing: null),
       (label: l10n.ordersFieldShipping, value: order.shippingMethod ?? missing,
-          emphasised: false),
+          emphasised: false, trailing: null),
     ];
     // 發票欄改到訂單資訊列：不開立 → 不顯示；已開立 → 狀態；線上列印 → 按鈕。
     final invoice = _invoiceScenarioFor(order.status);
@@ -478,6 +480,7 @@ class _OrderInfoList extends StatelessWidget {
             label: row.label,
             value: row.value,
             emphasised: row.emphasised,
+            trailing: row.trailing,
           ),
         if (invoice != _InvoiceScenario.none)
           _InvoiceInfoRow(order: order, scenario: invoice),
@@ -570,15 +573,28 @@ class _InfoRow extends StatelessWidget {
     required this.label,
     required this.value,
     required this.emphasised,
+    this.trailing,
   });
 
   final String label;
   final String value;
   final bool emphasised;
 
+  /// 選填：內容右側附加元件（例如訂單總額後的「明細」按鈕）。
+  final Widget? trailing;
+
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
+    final valueText = Text(
+      value,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: emphasised ? FontWeight.w700 : FontWeight.w400,
+        color: emphasised ? appTheme.danger : appTheme.fg,
+        height: 1.5,
+      ),
+    );
     return Row(
       // label 與內容以文字基線對齊，讓不同字級的兩段文字看起來在同一行置中。
       crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -593,18 +609,168 @@ class _InfoRow extends StatelessWidget {
             height: 1.5,
           ),
         ),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: emphasised ? FontWeight.w700 : FontWeight.w400,
-              color: emphasised ? appTheme.danger : appTheme.fg,
-              height: 1.5,
-            ),
+        if (trailing == null)
+          Expanded(child: valueText)
+        else ...[
+          Flexible(child: valueText),
+          const SizedBox(width: 10),
+          trailing!,
+          const Spacer(),
+        ],
+      ],
+    );
+  }
+}
+
+// ── 金額明細 ────────────────────────────────────────────────────────────────
+
+/// 訂單總額後方的「明細」按鈕。
+class _AmountDetailButton extends StatelessWidget {
+  const _AmountDetailButton({required this.order});
+  final Purchase order;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
+        onTap: () => _showAmountBreakdown(context, order),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(appTheme.radiusSm),
+            border: Border.all(color: appTheme.divider),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('明細',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: accent)),
+              const SizedBox(width: 4),
+              Icon(Icons.open_in_new, size: 13, color: accent),
+            ],
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+/// prototype：由訂單總額推出金額明細（商品小計 / 優惠券 / 運費 / 運費折抵）。
+({int subtotal, int coupon, int shipping, int rebate, int total})
+    _amountBreakdown(num amount) {
+  final total = amount.round();
+  // 商品小計滿千折 300（運費與運費折抵相抵）。
+  final coupon = total >= 700 ? 300 : 0;
+  return (
+    subtotal: total + coupon,
+    coupon: coupon,
+    shipping: 80,
+    rebate: 80,
+    total: total,
+  );
+}
+
+void _showAmountBreakdown(BuildContext context, Purchase order) {
+  final appTheme = context.appTheme;
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: appTheme.bgElev,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (_) => _AmountBreakdownSheet(order: order),
+  );
+}
+
+class _AmountBreakdownSheet extends StatelessWidget {
+  const _AmountBreakdownSheet({required this.order});
+  final Purchase order;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final accent = appTheme.brandPalette.tone500;
+    final b = _amountBreakdown(order.amount);
+    final bottom = MediaQuery.of(context).padding.bottom;
+
+    Widget line(String label, String value, {bool discount = false}) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 7),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(label,
+                    style: TextStyle(fontSize: 14, color: appTheme.fg)),
+              ),
+              Text(value,
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: discount ? appTheme.danger : appTheme.fg)),
+            ],
+          ),
+        );
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 12, 20, 20 + bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text('金額明細',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: appTheme.fg)),
+              ),
+              InkWell(
+                onTap: () => Navigator.of(context).maybePop(),
+                borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: Icon(Icons.close, size: 20, color: appTheme.fgMuted),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          line('商品小計', 'NT\$${b.subtotal}'),
+          if (b.coupon > 0)
+            line('優惠券（滿千折${b.coupon}）', '-NT\$${b.coupon}',
+                discount: true),
+          line('運費', 'NT\$${b.shipping}'),
+          line('運費折抵', '-NT\$${b.rebate}', discount: true),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Divider(height: 1, color: appTheme.divider),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text('實付金額',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: appTheme.fg)),
+              ),
+              Text('NT\$${b.total}',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: accent)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1218,12 +1384,14 @@ class _TimelineEvent extends StatelessWidget {
                   Text(
                     label,
                     maxLines: 1,
+                    // 與其他狀態同字色，只多加底線與斜體以示可點。
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: accent,
+                      color: labelColor,
+                      fontStyle: FontStyle.italic,
                       decoration: TextDecoration.underline,
-                      decorationColor: accent,
+                      decorationColor: labelColor,
                     ),
                   ),
                   Text(

@@ -1289,42 +1289,40 @@ class _CouponCard extends StatelessWidget {
         isActive ? palette.tone500 : colorScheme.onSurfaceVariant;
     final titleFg = isActive ? appTheme.fg : appTheme.fgMuted;
 
-    return DecoratedBox(
+    // 每張優惠券獨立外框（不再用底線分隔），內部左側 icon 在上、折扣在下。
+    return Container(
+      margin: EdgeInsets.only(bottom: appTheme.spacingMd),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: colorScheme.outlineVariant),
-        ),
+        color: appTheme.bgElev,
+        borderRadius: BorderRadius.circular(appTheme.cardRadius),
+        border: Border.all(color: appTheme.divider),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(appTheme.spacingXs),
-        child: IntrinsicHeight(
+      child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                width: 136,
-                padding:
-                    EdgeInsets.symmetric(horizontal: appTheme.spacingSm),
-                decoration: BoxDecoration(
-                  color: leftBg,
-                  borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(6),
-                  ),
+                width: 108,
+                padding: EdgeInsets.symmetric(
+                  horizontal: appTheme.spacingSm,
+                  vertical: appTheme.spacingLg,
                 ),
-                child: Row(
+                decoration: BoxDecoration(color: leftBg),
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _CouponDiscountIcon(size: 26, dimmed: !isActive),
-                    SizedBox(width: appTheme.spacingXs),
-                    Flexible(
-                      child: Text(
-                        coupon.discountLabel,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: discountFg,
-                        ),
+                    _CouponDiscountIcon(size: 30, dimmed: !isActive),
+                    SizedBox(height: appTheme.spacingXs),
+                    Text(
+                      coupon.discountLabel,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: discountFg,
                       ),
                     ),
                   ],
@@ -1396,7 +1394,6 @@ class _CouponCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

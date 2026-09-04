@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../models/product.dart';
 import '../screens/shop/combo_data.dart';
+import '../screens/shop/combo_picker.dart';
 import '../theme/app_theme_extension.dart';
 
 /// prototype：標準商品卡需要庫存數，這裡以商品 id 衍生穩定的庫存
@@ -55,6 +56,8 @@ class _StandardProductCardState extends State<StandardProductCard> {
     final accent = appTheme.brandPalette.tone500;
     final p = widget.product;
     final soldOut = widget.stock <= 0;
+    // 任選組合商品：不顯示庫存與數量選擇（改由挑選彈窗決定），按鈕開挑選彈窗。
+    final combo = comboForId(p.id);
 
     Widget stepBtn(IconData icon,
         {required bool enabled, required VoidCallback onTap}) {
@@ -140,33 +143,35 @@ class _StandardProductCardState extends State<StandardProductCard> {
                     ],
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  soldOut ? '已售完' : '庫存 ${widget.stock}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: soldOut ? appTheme.danger : appTheme.fgMuted,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // 數量選擇
-                Row(
-                  children: [
-                    stepBtn(Icons.remove,
-                        enabled: !soldOut && _qty > 1,
-                        onTap: () => setState(() => _qty--)),
-                    Expanded(
-                      child: Text(
-                        '$_qty',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13, color: appTheme.fg),
-                      ),
+                if (combo == null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    soldOut ? '已售完' : '庫存 ${widget.stock}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: soldOut ? appTheme.danger : appTheme.fgMuted,
                     ),
-                    stepBtn(Icons.add,
-                        enabled: !soldOut && _qty < widget.stock,
-                        onTap: () => setState(() => _qty++)),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 8),
+                  // 數量選擇
+                  Row(
+                    children: [
+                      stepBtn(Icons.remove,
+                          enabled: !soldOut && _qty > 1,
+                          onTap: () => setState(() => _qty--)),
+                      Expanded(
+                        child: Text(
+                          '$_qty',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 13, color: appTheme.fg),
+                        ),
+                      ),
+                      stepBtn(Icons.add,
+                          enabled: !soldOut && _qty < widget.stock,
+                          onTap: () => setState(() => _qty++)),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
@@ -175,10 +180,10 @@ class _StandardProductCardState extends State<StandardProductCard> {
                     onPressed: soldOut
                         ? null
                         : () {
-                            // 任選組合 → 挑選彈窗；有規格 → 選規格彈窗；否則直接加入。
-                            // 任選組合 → 開商品內頁（內含挑選組合區）。
-                            if (comboForId(p.id) != null) {
-                              context.push('/product/${p.id}');
+                            // 任選組合 → 開挑選組合彈窗；有規格 → 選規格彈窗；
+                            // 否則直接加入。
+                            if (combo != null) {
+                              showComboSheet(context, combo);
                               return;
                             }
                             final specs = productSpecOptions(p);

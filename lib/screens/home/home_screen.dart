@@ -10,7 +10,6 @@ import '../../providers/live_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../utils/responsive.dart';
-import '../../widgets/shop_product_card.dart';
 import '../../widgets/standard_product_card.dart';
 
 /// Home screen — corresponds to the React prototype `src/screens/home.jsx`.
@@ -61,7 +60,7 @@ class HomeScreen extends ConsumerWidget {
             _CategoriesGrid(categoriesAsync: categoriesAsync),
             const SizedBox(height: 24),
             _SectionHeader(
-              title: l10n.homeSectionLiveAnnouncement,
+              title: '公告',
               actionLabel: l10n.homeViewAll,
               onAction: () => context.go('/live'),
             ),
@@ -215,9 +214,10 @@ class _RecommendedSection extends ConsumerWidget {
         ? all.skip(4).take(4).toList(growable: false)
         : all.take(4).toList(growable: false);
     if (products.isEmpty) return const SizedBox.shrink();
+    // 為你推薦比照限時搶購：標準商品卡。
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: _HomeProductGrid(products: products),
+      child: _StandardCardWrap(products: products),
     );
   }
 }
@@ -314,30 +314,6 @@ class _CountdownColon extends StatelessWidget {
           color: appTheme.fg,
         ),
       ),
-    );
-  }
-}
-
-// ───────────────────────────────────────────────────────────────────────────
-// Compact 2×2 product grid used by Flash Sale + Recommended sections.
-// ───────────────────────────────────────────────────────────────────────────
-class _HomeProductGrid extends StatelessWidget {
-  const _HomeProductGrid({required this.products});
-  final List<Product> products;
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: Responsive.productGridColumns(context),
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.58,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, i) => ShopProductCard(product: products[i]),
     );
   }
 }
@@ -836,7 +812,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
           children: [
             // Card header
             Container(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
               decoration: BoxDecoration(
                 gradient: appTheme.primaryGradient,
                 borderRadius: BorderRadius.only(
@@ -874,7 +850,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
               final s = entry.value;
               return Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 18, vertical: 14),
+                    horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: i < _mockSchedule.length - 1

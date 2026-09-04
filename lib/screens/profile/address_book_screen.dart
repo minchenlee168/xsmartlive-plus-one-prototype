@@ -139,11 +139,13 @@ class _StorePickupTab extends ConsumerWidget {
           return _EmptyState(
             icon: Icons.storefront_outlined,
             label: '尚未新增超商取貨門市',
+            addLabel: '新增門市',
             onAdd: () => _openPickupForm(context),
           );
         }
         return _ListScaffold(
           onAdd: () => _openPickupForm(context),
+          addLabel: '新增門市',
           children: [
             for (final a in list)
               _StorePickupCard(
@@ -181,10 +183,17 @@ class _StorePickupTab extends ConsumerWidget {
 // 共用：列表外框（含底部「新增」按鈕）
 // ─────────────────────────────────────────────────────────────────────────
 class _ListScaffold extends StatelessWidget {
-  const _ListScaffold({required this.children, required this.onAdd});
+  const _ListScaffold({
+    required this.children,
+    required this.onAdd,
+    this.addLabel = '新增地址',
+  });
 
   final List<Widget> children;
   final VoidCallback onAdd;
+
+  /// 新增按鈕文字（宅配用「新增地址」、超商取貨用「新增門市」）。
+  final String addLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -207,8 +216,8 @@ class _ListScaffold extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add, size: 20),
-              label: const Text('新增地址',
-                  style: TextStyle(fontWeight: FontWeight.w700)),
+              label: Text(addLabel,
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: accent,
                 foregroundColor: Colors.white,
@@ -501,11 +510,15 @@ class _EmptyState extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onAdd,
+    this.addLabel = '新增地址',
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onAdd;
+
+  /// 新增按鈕文字（宅配用「新增地址」、超商取貨用「新增門市」）。
+  final String addLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -524,8 +537,8 @@ class _EmptyState extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add, size: 20),
-              label: const Text('新增地址',
-                  style: TextStyle(fontWeight: FontWeight.w700)),
+              label: Text(addLabel,
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: accent,
                 foregroundColor: Colors.white,

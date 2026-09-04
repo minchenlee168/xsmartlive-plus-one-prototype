@@ -81,16 +81,19 @@ final purchaseCountsProvider = FutureProvider<PurchaseCounts>((ref) async {
 });
 
 // ── 訂單狀態選項 + 範例資料（web 預覽 / 未登入 fallback）─────────────────
-/// 對照設計稿的 7 種狀態；`code == null` = 所有訂單。真機的狀態代碼以後端為準，
-/// 這裡的 `preparing`（備貨中）/ `delivered`（已送達）為 prototype 範例用途。
+/// 對照設計稿的 10 種狀態；`code == null` = 全部。真機的狀態代碼以後端為準，
+/// 退貨中 / 已退貨 / 已換貨 / 已取消等為 prototype 範例用途。
 const List<({String? code, String label})> kOrderStatusOptions = [
-  (code: null, label: '所有訂單'),
-  (code: 'pending', label: '待付款'),
+  (code: null, label: '全部'),
   (code: 'paid', label: '待出貨'),
   (code: 'preparing', label: '備貨中'),
   (code: 'shipped', label: '已出貨'),
   (code: 'delivered', label: '已送達'),
   (code: 'completed', label: '已完成'),
+  (code: 'returning', label: '退貨中'),
+  (code: 'returned', label: '已退貨'),
+  (code: 'exchanged', label: '已換貨'),
+  (code: 'cancelled', label: '已取消'),
 ];
 
 /// 範例訂單狀態的顯示文字。
@@ -104,21 +107,39 @@ String orderStatusLabel(String? code) {
 /// prototype：拆成多個包裹、含多個貨態的訂單 id。這類訂單的顯示狀態為「處理中」。
 const Set<int> kMultiFulfillmentOrderIds = {100006};
 
-/// 12 筆範例訂單，分布於各狀態（待付款 2 / 待出貨 2 / 備貨中 2 / 已出貨 1 /
-/// 已送達 2 / 已完成 3）。日期落在近 3 個月，預設查詢區間即可看到。
+/// 20 筆範例訂單，分布於各狀態（待出貨 5 / 備貨中 2 / 已出貨 1 / 已送達 3 /
+/// 已完成 3 / 退貨中 1 / 已退貨 1 / 已換貨 1 / 已取消 3）。日期落在近 3 個月，
+/// 預設查詢區間即可看到。
 const List<Purchase> kSampleOrders = [
-  Purchase(id: 100012, createdAt: '2026-08-28T20:14:00', itemCount: 2, amount: 1690, paymentMethod: '信用卡', shippingMethod: '超商取貨', status: 'pending'),
-  Purchase(id: 100011, createdAt: '2026-08-25T13:02:00', itemCount: 1, amount: 890, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'pending'),
-  Purchase(id: 100010, createdAt: '2026-08-20T09:47:00', itemCount: 3, amount: 3280, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'paid'),
-  Purchase(id: 100009, createdAt: '2026-08-18T21:30:00', itemCount: 2, amount: 1180, paymentMethod: 'Apple Pay', shippingMethod: '超商取貨', status: 'paid'),
-  Purchase(id: 100008, createdAt: '2026-08-12T15:20:00', itemCount: 4, amount: 4560, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'preparing'),
-  Purchase(id: 100007, createdAt: '2026-08-08T11:05:00', itemCount: 1, amount: 599, paymentMethod: '貨到付款', shippingMethod: '超商取貨', status: 'preparing'),
-  Purchase(id: 100006, createdAt: '2026-07-30T18:41:00', itemCount: 2, amount: 2050, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'shipped'),
-  Purchase(id: 100005, createdAt: '2026-07-22T10:12:00', itemCount: 3, amount: 1780, paymentMethod: 'LINE Pay', shippingMethod: '超商取貨', status: 'delivered'),
-  Purchase(id: 100004, createdAt: '2026-07-15T14:33:00', itemCount: 1, amount: 990, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'delivered'),
-  Purchase(id: 100003, createdAt: '2026-07-05T20:00:00', itemCount: 5, amount: 5320, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'completed'),
-  Purchase(id: 100002, createdAt: '2026-06-28T09:15:00', itemCount: 2, amount: 1440, paymentMethod: 'Apple Pay', shippingMethod: '超商取貨', status: 'completed'),
-  Purchase(id: 100001, createdAt: '2026-06-18T16:50:00', itemCount: 1, amount: 760, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'completed'),
+  // 待出貨 x5
+  Purchase(id: 100020, createdAt: '2026-08-30T20:14:00', itemCount: 2, amount: 1690, paymentMethod: '信用卡', shippingMethod: '超商取貨', status: 'paid'),
+  Purchase(id: 100019, createdAt: '2026-08-28T13:02:00', itemCount: 1, amount: 890, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'paid'),
+  Purchase(id: 100018, createdAt: '2026-08-26T09:47:00', itemCount: 3, amount: 3280, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'paid'),
+  Purchase(id: 100017, createdAt: '2026-08-24T21:30:00', itemCount: 2, amount: 1180, paymentMethod: 'Apple Pay', shippingMethod: '超商取貨', status: 'paid'),
+  Purchase(id: 100016, createdAt: '2026-08-22T17:08:00', itemCount: 1, amount: 760, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'paid'),
+  // 備貨中 x2
+  Purchase(id: 100015, createdAt: '2026-08-18T15:20:00', itemCount: 4, amount: 4560, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'preparing'),
+  Purchase(id: 100014, createdAt: '2026-08-15T11:05:00', itemCount: 1, amount: 599, paymentMethod: '貨到付款', shippingMethod: '超商取貨', status: 'preparing'),
+  // 已出貨 x1（多包裹範例訂單）
+  Purchase(id: 100006, createdAt: '2026-08-10T18:41:00', itemCount: 2, amount: 2050, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'shipped'),
+  // 已送達 x3
+  Purchase(id: 100013, createdAt: '2026-08-05T10:12:00', itemCount: 3, amount: 1780, paymentMethod: 'LINE Pay', shippingMethod: '超商取貨', status: 'delivered'),
+  Purchase(id: 100012, createdAt: '2026-08-01T14:33:00', itemCount: 1, amount: 990, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'delivered'),
+  Purchase(id: 100011, createdAt: '2026-07-28T19:22:00', itemCount: 2, amount: 1360, paymentMethod: 'Apple Pay', shippingMethod: '宅配', status: 'delivered'),
+  // 已完成 x3
+  Purchase(id: 100010, createdAt: '2026-07-22T20:00:00', itemCount: 5, amount: 5320, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'completed'),
+  Purchase(id: 100009, createdAt: '2026-07-15T09:15:00', itemCount: 2, amount: 1440, paymentMethod: 'Apple Pay', shippingMethod: '超商取貨', status: 'completed'),
+  Purchase(id: 100008, createdAt: '2026-07-08T16:50:00', itemCount: 1, amount: 760, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'completed'),
+  // 退貨中 x1
+  Purchase(id: 100007, createdAt: '2026-07-02T12:30:00', itemCount: 1, amount: 1280, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'returning'),
+  // 已退貨 x1
+  Purchase(id: 100005, createdAt: '2026-06-26T11:40:00', itemCount: 2, amount: 2180, paymentMethod: 'LINE Pay', shippingMethod: '超商取貨', status: 'returned'),
+  // 已換貨 x1
+  Purchase(id: 100004, createdAt: '2026-06-20T15:05:00', itemCount: 1, amount: 990, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'exchanged'),
+  // 已取消 x3
+  Purchase(id: 100003, createdAt: '2026-06-14T20:18:00', itemCount: 3, amount: 3050, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'cancelled'),
+  Purchase(id: 100002, createdAt: '2026-06-10T09:33:00', itemCount: 2, amount: 1440, paymentMethod: 'Apple Pay', shippingMethod: '超商取貨', status: 'cancelled'),
+  Purchase(id: 100001, createdAt: '2026-06-05T16:50:00', itemCount: 1, amount: 680, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'cancelled'),
 ];
 
 int sampleOrderCount(String? status) => status == null

@@ -209,8 +209,8 @@ class _StatusFilter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
-    // 對照設計稿的 7 種狀態（所有訂單 / 待付款 / 待出貨 / 備貨中 / 已出貨 /
-    // 已送達 / 已完成）。web 預覽附上各狀態筆數。
+    // 對照設計稿的 10 種狀態（全部 / 待出貨 / 備貨中 / 已出貨 / 已送達 /
+    // 已完成 / 退貨中 / 已退貨 / 已換貨 / 已取消）。web 預覽附上各狀態筆數。
     final items = [
       for (final o in kOrderStatusOptions)
         (
@@ -441,6 +441,14 @@ class _OrderInfoList extends StatelessWidget {
         return l10n.ordersTimelineDelivered;
       case 'completed':
         return l10n.ordersTimelineCompleted;
+      case 'returning':
+        return '退貨中';
+      case 'returned':
+        return '已退貨';
+      case 'exchanged':
+        return '已換貨';
+      case 'cancelled':
+        return '已取消';
       default:
         return status;
     }
@@ -501,6 +509,11 @@ class _OrderInfoList extends StatelessWidget {
 _InvoiceScenario _invoiceScenarioFor(String? status) {
   switch (status) {
     case 'pending':
+    // 退貨 / 換貨 / 取消類訂單不顯示發票列。
+    case 'returning':
+    case 'returned':
+    case 'exchanged':
+    case 'cancelled':
       return _InvoiceScenario.none;
     case 'completed':
       return _InvoiceScenario.issued;

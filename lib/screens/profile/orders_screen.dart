@@ -443,6 +443,13 @@ class _OrderInfoList extends StatelessWidget {
       ),
       (label: l10n.ordersFieldPayment, value: order.paymentMethod ?? missing,
           emphasised: false, trailing: null),
+      // 付款狀態：放在付款方式下面。
+      (
+        label: '付款狀態',
+        value: _paymentStatusLabel(order.status),
+        emphasised: false,
+        trailing: null,
+      ),
       (label: l10n.ordersFieldShipping, value: order.shippingMethod ?? missing,
           emphasised: false, trailing: null),
       // 配送狀態：與下拉選項一致的貨態文字；多包裹訂單顯示「處理中」。
@@ -451,13 +458,6 @@ class _OrderInfoList extends StatelessWidget {
         value: kMultiFulfillmentOrderIds.contains(order.id)
             ? '處理中'
             : orderStatusLabel(order.status),
-        emphasised: false,
-        trailing: null,
-      ),
-      // 付款狀態：放在配送方式 / 配送狀態下面。
-      (
-        label: '付款狀態',
-        value: _paymentStatusLabel(order.status),
         emphasised: false,
         trailing: null,
       ),

@@ -129,6 +129,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   specAllocation: it.specAllocation ?? const {},
                   onConfirmAlloc: (alloc) =>
                       notifier.setAllocation(g.id, it.id, alloc),
+                  bulkOffer: (it.bulkMinQty != null &&
+                          it.bulkUnitPrice != null)
+                      ? (
+                          minQty: it.bulkMinQty!,
+                          unitDiscount: it.price - it.bulkUnitPrice!,
+                        )
+                      : null,
                   onToggle: () => notifier.toggle(g.id, it.id),
                   onIncrement: () => notifier.increment(g.id, it.id),
                   onDecrement: () => notifier.decrement(g.id, it.id),
@@ -509,6 +516,7 @@ class _ItemVM {
     this.specOptions,
     this.specAllocation = const {},
     this.onConfirmAlloc,
+    this.bulkOffer,
     required this.onToggle,
     required this.onIncrement,
     required this.onDecrement,
@@ -543,6 +551,9 @@ class _ItemVM {
 
   /// 挑選規格彈窗按「確定」後套用分配。
   final void Function(Map<String, int> allocation)? onConfirmAlloc;
+
+  /// 買多優惠：達 [minQty] 件後每件折 [unitDiscount] 元（null 代表無此優惠）。
+  final ({int minQty, int unitDiscount})? bulkOffer;
 
   int get committedTotal => specAllocation.values.fold(0, (a, b) => a + b);
 
@@ -853,6 +864,11 @@ class _CartItemRow extends StatelessWidget {
                     ),
                   ],
                 ),
+                // 買多優惠提示（達標前顯示還差幾件，達標後顯示已折抵）
+                if (vm.bulkOffer != null) ...[
+                  const SizedBox(height: 6),
+                  _BulkOfferLine(offer: vm.bulkOffer!, qty: vm.qty),
+                ],
                 // 直播下標：待挑選提示 + 挑選 / 修改規格按鈕
                 if (vm.specOptions != null) ...[
                   const SizedBox(height: 8),
@@ -1005,6 +1021,47 @@ class _TempTag extends StatelessWidget {
           color: color,
         ),
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 買多優惠提示：達標前顯示「再買 N 件即享」，達標後顯示「已折抵 -NT$X」。
+// ─────────────────────────────────────────────────────────────────────────
+class _BulkOfferLine extends StatelessWidget {
+  const _BulkOfferLine({required this.offer, required this.qty});
+
+  final ({int minQty, int unitDiscount}) offer;
+  final int qty;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    final color = appTheme.success;
+    final headline = offer.unitDiscount * offer.minQty;
+    final qualified = qty >= offer.minQty;
+    final text = qualified
+        ? '買 ${offer.minQty} 件以上折扣 NT\$$headline'
+            ' · 已折抵 -NT\$${offer.unitDiscount * qty}'
+        : '買 ${offer.minQty} 件以上折扣 NT\$$headline'
+            '，再買 ${offer.minQty - qty} 件即享';
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.local_offer_outlined, size: 13, color: color),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: color,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -1521,8 +1578,12 @@ class _QtyStepper extends StatelessWidget {
             child: Text(
               '$qty',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.w600),
+              // 明確用主題前景色，夜間直播等深色主題數字才看得到。
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: appTheme.fg,
+              ),
             ),
           ),
           _StepperButton(

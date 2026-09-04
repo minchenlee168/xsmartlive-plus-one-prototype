@@ -111,7 +111,7 @@ class _StandardProductCardState extends State<StandardProductCard> {
                   onTap: () => context.push('/product/${p.id}'),
                   child: Text(
                     p.name,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         fontSize: 13,

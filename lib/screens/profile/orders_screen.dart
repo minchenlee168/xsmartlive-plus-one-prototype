@@ -1037,7 +1037,8 @@ class _FulfillmentPackage extends StatelessWidget {
   final String orderCreatedAt;
   final String? orderStatus;
 
-  /// 貨態階段索引：待出貨(0)/備貨中(1)/已出貨(2)/已送達(3)/已完成(4)。
+  /// 貨態階段索引：待出貨(0)/備貨中(1)/已出貨(2)/已送達(3)/第五格(4)。
+  /// 退貨中/已退貨/已換貨/已取消：第五格改標籤，前四格皆已達成 → 回傳 4。
   /// 尚未付款 / 尚未配箱回傳 -1（整條時間軸呈灰色、header 顯示「尚未配箱」）。
   int _activeIndex() {
     switch (orderStatus) {
@@ -1050,9 +1051,34 @@ class _FulfillmentPackage extends StatelessWidget {
       case 'delivered':
         return 3;
       case 'completed':
+      case 'returning':
+      case 'returned':
+      case 'exchanged':
+      case 'cancelled':
         return 4;
       default:
         return -1; // pending / 其他
+    }
+  }
+
+  /// 第五格的標籤與圖示依訂單狀態調整（與下拉配送狀態選項一致）。
+  /// 一般貨態為「已完成」（check）；退貨/換貨/取消則換成對應狀態文字與圖示。
+  ({String label, String? svgIcon, IconData? iconData}) _lastStage() {
+    switch (orderStatus) {
+      case 'returning':
+        return (label: '退貨中', svgIcon: null, iconData: Icons.autorenew);
+      case 'returned':
+        return (label: '已退貨', svgIcon: null, iconData: Icons.autorenew);
+      case 'exchanged':
+        return (label: '已換貨', svgIcon: null, iconData: Icons.swap_horiz);
+      case 'cancelled':
+        return (label: '已取消', svgIcon: null, iconData: Icons.close);
+      default:
+        return (
+          label: '已完成',
+          svgIcon: 'assets/icons/orders/check.svg',
+          iconData: null,
+        );
     }
   }
 
@@ -1135,6 +1161,7 @@ class _FulfillmentPackage extends StatelessWidget {
             child: _Timeline(
               activeIndex: activeIndex,
               timestamps: _stageTimestamps(),
+              lastStage: _lastStage(),
               onTrackTap: () => showDialog<void>(
                 context: context,
                 builder: (_) =>
@@ -1152,49 +1179,71 @@ class _Timeline extends StatelessWidget {
   const _Timeline({
     required this.activeIndex,
     required this.timestamps,
+    required this.lastStage,
     required this.onTrackTap,
   });
 
   /// 已到達的最後階段索引；-1 表示尚未配箱（整條灰色）。
   final int activeIndex;
 
-  /// 5 個階段的時間文字（依序：待出貨/備貨中/已出貨/已送達/已完成）。
+  /// 5 個階段的時間文字（依序：待出貨/備貨中/已出貨/已送達/第五格）。
   final List<String> timestamps;
+
+  /// 第五格內容（依訂單狀態：已完成 / 退貨中 / 已退貨 / 已換貨 / 已取消）。
+  final ({String label, String? svgIcon, IconData? iconData}) lastStage;
 
   /// 點「已出貨（查看配送進度）」時開啟物流配送進度彈窗。
   final VoidCallback onTrackTap;
 
-  static const _stages = <({String label, String icon, bool trackLink})>[
-    (label: '待出貨', icon: 'assets/icons/orders/box.svg', trackLink: false),
+  // 前四格固定；第五格由 [lastStage] 決定標籤與圖示。
+  static const _baseStages =
+      <({String label, String svgIcon, bool trackLink})>[
+    (label: '待出貨', svgIcon: 'assets/icons/orders/box.svg', trackLink: false),
     (
       label: '備貨中',
-      icon: 'assets/icons/orders/package-outline.svg',
+      svgIcon: 'assets/icons/orders/package-outline.svg',
       trackLink: false
     ),
-    (label: '已出貨', icon: 'assets/icons/orders/truck.svg', trackLink: true),
-    (label: '已送達', icon: 'assets/icons/orders/check.svg', trackLink: false),
-    (label: '已完成', icon: 'assets/icons/orders/check.svg', trackLink: false),
+    (label: '已出貨', svgIcon: 'assets/icons/orders/truck.svg', trackLink: true),
+    (label: '已送達', svgIcon: 'assets/icons/orders/check.svg', trackLink: false),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final stages =
+        <({String label, String? svgIcon, IconData? iconData, bool trackLink})>[
+      for (final s in _baseStages)
+        (
+          label: s.label,
+          svgIcon: s.svgIcon,
+          iconData: null,
+          trackLink: s.trackLink
+        ),
+      (
+        label: lastStage.label,
+        svgIcon: lastStage.svgIcon,
+        iconData: lastStage.iconData,
+        trackLink: false,
+      ),
+    ];
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var i = 0; i < _stages.length; i++)
+        for (var i = 0; i < stages.length; i++)
           Expanded(
             child: _TimelineEvent(
-              label: _stages[i].label,
-              icon: _stages[i].icon,
+              label: stages[i].label,
+              svgIcon: stages[i].svgIcon,
+              iconData: stages[i].iconData,
               timestamp: i < timestamps.length ? timestamps[i] : '',
               reached: i <= activeIndex,
               isFirst: i == 0,
-              isLast: i == _stages.length - 1,
+              isLast: i == stages.length - 1,
               // 進入本格（左線）／離開本格（右線）的區段是否已完成。
               leftActive: i <= activeIndex,
               rightActive: (i + 1) <= activeIndex,
-              // 「已出貨」只要已達成（含已送達／已完成）都可查看配送進度紀錄。
-              showTrackLink: _stages[i].trackLink && i <= activeIndex,
+              // 「已出貨」只要已達成（含已送達之後）都可查看配送進度紀錄。
+              showTrackLink: stages[i].trackLink && i <= activeIndex,
               onTrackTap: onTrackTap,
             ),
           ),
@@ -1206,7 +1255,8 @@ class _Timeline extends StatelessWidget {
 class _TimelineEvent extends StatelessWidget {
   const _TimelineEvent({
     required this.label,
-    required this.icon,
+    required this.svgIcon,
+    required this.iconData,
     required this.timestamp,
     required this.reached,
     required this.isFirst,
@@ -1218,7 +1268,9 @@ class _TimelineEvent extends StatelessWidget {
   });
 
   final String label;
-  final String icon;
+  // 圓點內圖示：svgIcon（一般貨態）或 iconData（退貨/換貨/取消用 Material icon）。
+  final String? svgIcon;
+  final IconData? iconData;
   final String timestamp;
   final bool reached;
   final bool isFirst;
@@ -1273,13 +1325,16 @@ class _TimelineEvent extends StatelessWidget {
                 ),
               ),
               alignment: Alignment.center,
-              child: SvgPicture.asset(
-                icon,
-                width: 14,
-                height: 14,
-                colorFilter: ColorFilter.mode(
-                    reached ? Colors.white : grey, BlendMode.srcIn),
-              ),
+              child: iconData != null
+                  ? Icon(iconData,
+                      size: 15, color: reached ? Colors.white : grey)
+                  : SvgPicture.asset(
+                      svgIcon!,
+                      width: 14,
+                      height: 14,
+                      colorFilter: ColorFilter.mode(
+                          reached ? Colors.white : grey, BlendMode.srcIn),
+                    ),
             ),
             line(!isLast, rightActive),
           ],

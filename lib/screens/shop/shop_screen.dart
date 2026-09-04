@@ -452,7 +452,6 @@ class _LiveAnnouncementSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appTheme = context.appTheme;
-    final l10n = AppLocalizations.of(context)!;
     final boardsAsync = ref.watch(streamBoardListProvider);
 
     Widget header() => Padding(
@@ -467,7 +466,7 @@ class _LiveAnnouncementSection extends ConsumerWidget {
                   horizontal: appTheme.spacingLg,
                 ),
                 child: Text(
-                  l10n.shopLiveAnnouncementTitle,
+                  '公告',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -530,8 +529,8 @@ class _LiveAnnouncementCard extends StatelessWidget {
         border: Border.all(color: appTheme.divider),
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: appTheme.spacingXxxl,
-        vertical: appTheme.spacingXxl + 4,
+        horizontal: appTheme.spacingXl,
+        vertical: appTheme.spacingLg,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

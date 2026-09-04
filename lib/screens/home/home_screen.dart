@@ -60,7 +60,7 @@ class HomeScreen extends ConsumerWidget {
             _CategoriesGrid(categoriesAsync: categoriesAsync),
             const SizedBox(height: 24),
             _SectionHeader(
-              title: '公告',
+              title: l10n.homeSectionLiveAnnouncement,
               actionLabel: l10n.homeViewAll,
               onAction: () => context.go('/live'),
             ),
@@ -812,7 +812,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
           children: [
             // Card header
             Container(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
               decoration: BoxDecoration(
                 gradient: appTheme.primaryGradient,
                 borderRadius: BorderRadius.only(
@@ -850,7 +850,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
               final s = entry.value;
               return Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 10),
+                    horizontal: 18, vertical: 14),
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: i < _mockSchedule.length - 1

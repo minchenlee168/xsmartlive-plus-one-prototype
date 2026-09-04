@@ -560,27 +560,13 @@ class _AmountDetailButton extends StatelessWidget {
     final accent = appTheme.brandPalette.tone500;
     return Material(
       color: Colors.transparent,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        borderRadius: BorderRadius.circular(appTheme.radiusSm),
         onTap: () => _showAmountBreakdown(context, order),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(appTheme.radiusSm),
-            border: Border.all(color: appTheme.divider),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('明細',
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: accent)),
-              const SizedBox(width: 4),
-              Icon(Icons.open_in_new, size: 13, color: accent),
-            ],
-          ),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Icon(Icons.visibility_outlined, size: 18, color: accent),
         ),
       ),
     );

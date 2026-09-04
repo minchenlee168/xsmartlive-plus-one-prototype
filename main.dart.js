@@ -162715,7 +162715,7 @@ if(i>0){i=""+i
 j.push(m.$3$discount("\u512a\u60e0\u5238\uff08\u6eff\u5343\u6298"+i+"\uff09","-NT$"+i,!0))}j.push(m.$2("\u904b\u8cbb","NT$"+o[2]))
 j.push(m.$3$discount("\u904b\u8cbb\u6298\u62b5","-NT$"+o[1],!0))
 j.push(new A.a6(B.fP,A.IG(r.fy,1,s,s),s))
-j.push(A.a7(A.f([A.av(A.n("\u5be6\u4ed8\u91d1\u984d",s,s,s,s,A.u(s,s,l,s,s,s,s,s,s,s,s,15,s,s,B.aF,s,s,!0,s,s,s,s,s,s,s,s),s,s,s),1),A.n("NT$"+o[4],s,s,s,s,A.u(s,s,r.as.f,s,s,s,s,s,s,s,s,18,s,s,B.ch,s,s,!0,s,s,s,s,s,s,s,s),s,s,s)],k),B.w,B.l,B.n,0,s))
+j.push(A.a7(A.f([A.av(A.n("\u8a02\u55ae\u7e3d\u984d",s,s,s,s,A.u(s,s,l,s,s,s,s,s,s,s,s,15,s,s,B.aF,s,s,!0,s,s,s,s,s,s,s,s),s,s,s),1),A.n("NT$"+o[4],s,s,s,s,A.u(s,s,r.as.f,s,s,s,s,s,s,s,s,18,s,s,B.ch,s,s,!0,s,s,s,s,s,s,s,s),s,s,s)],k),B.w,B.l,B.n,0,s))
 return new A.a6(new A.W(20,12,20,20+n.r.d),A.af(j,B.b2,B.l,B.a5),s)}}
 A.blc.prototype={
 $3$discount(a,b,c){var s=null,r=this.a,q=r.ch,p=A.av(A.n(a,s,s,s,s,A.u(s,s,q,s,s,s,s,s,s,s,s,14,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s,s),1)

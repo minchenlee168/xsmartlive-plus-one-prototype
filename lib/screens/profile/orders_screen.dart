@@ -667,7 +667,7 @@ class _AmountBreakdownSheet extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text('實付金額',
+                child: Text('訂單總額',
                     style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,

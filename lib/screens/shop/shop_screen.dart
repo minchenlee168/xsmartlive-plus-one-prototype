@@ -742,8 +742,9 @@ class _ThemeHallSections extends StatelessWidget {
           const SizedBox(height: 12),
           // 該主題館的商品卡（橫向捲動）：標準卡有數量選擇 + 庫存；精簡卡較簡潔。
           SizedBox(
-            // 兩行商品名（如任選組合）較高，加大高度避免底部溢位。
-            height: hall.standard ? 284 : 276,
+            // 卡片名稱固定保留兩行高度後所有卡等高，列高貼齊卡片內容，
+            // 既不會底部溢位、也不留多餘空白。
+            height: hall.standard ? 284 : 264,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),

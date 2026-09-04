@@ -109,14 +109,20 @@ class _StandardProductCardState extends State<StandardProductCard> {
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => context.push('/product/${p.id}'),
-                  child: Text(
-                    p.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: appTheme.fg),
+                  // 固定保留兩行高度，讓一行 / 兩行名稱的卡片等高，
+                  // 橫向列不會因短名稱在底部留下多餘空白。
+                  child: SizedBox(
+                    height: 13 * 1.3 * 2,
+                    child: Text(
+                      p.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: 13,
+                          height: 1.3,
+                          fontWeight: FontWeight.w600,
+                          color: appTheme.fg),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 4),

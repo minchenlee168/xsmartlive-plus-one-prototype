@@ -262,15 +262,20 @@ class _ShopProductCardState extends ConsumerState<ShopProductCard>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      product.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        height: 1.3,
-                        color: appTheme.fg,
+                    // 固定保留兩行高度，讓一行 / 兩行名稱的卡片等高，
+                    // 橫向列不會因短名稱在底部留下多餘空白。
+                    SizedBox(
+                      height: 12 * 1.3 * 2,
+                      child: Text(
+                        product.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          height: 1.3,
+                          color: appTheme.fg,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 6),

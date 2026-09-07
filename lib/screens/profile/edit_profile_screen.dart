@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../providers/profile_provider.dart';
 import '../../theme/app_theme_extension.dart';
@@ -99,13 +98,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             );
       }
       if (!mounted) return;
+      // 儲存後停留在原頁面，只跳出「個人資料已更新」提示（不返回）。
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(const SnackBar(
           content: Text('個人資料已更新'),
           duration: Duration(seconds: 2),
         ));
-      context.pop();
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = '$e');

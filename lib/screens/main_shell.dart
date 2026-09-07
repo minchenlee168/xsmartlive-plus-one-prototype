@@ -161,6 +161,15 @@ class _FloatingDockState extends ConsumerState<_FloatingDock> {
                 setState(() => _livePreviewDismissed = true),
           ),
           const SizedBox(height: 10),
+        ]
+        // Dismissed → show a compact LIVE recall button so the user can
+        // bring the preview thumbnail back.
+        else if (currentLive != null && _livePreviewDismissed) ...[
+          _LiveRecallButton(
+            onTap: () =>
+                setState(() => _livePreviewDismissed = false),
+          ),
+          const SizedBox(height: 10),
         ],
         _CSBubble(
           label: l10n.homeFloatingCS,
@@ -321,26 +330,76 @@ class _LivePreviewThumb extends StatelessWidget {
         // it's tappable without crowding the LIVE / viewer pills inside.
         if (onClose != null)
           Positioned(
-            top: -6,
-            right: -6,
+            top: -8,
+            right: -8,
             child: Material(
-              color: Colors.black.withValues(alpha: 0.7),
+              color: Colors.black.withValues(alpha: 0.75),
               shape: const CircleBorder(
-                side: BorderSide(color: Colors.white, width: 1.2),
+                side: BorderSide(color: Colors.white, width: 1.5),
               ),
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: onClose,
                 child: const SizedBox(
-                  width: 20,
-                  height: 20,
+                  width: 28,
+                  height: 28,
                   child: Icon(Icons.close,
-                      color: Colors.white, size: 12),
+                      color: Colors.white, size: 18),
                 ),
               ),
             ),
           ),
       ],
+    );
+  }
+}
+
+/// 縮小/關閉直播小視窗後的「召回」按鈕：點一下即把直播預覽縮圖叫回來，
+/// 不需要重新進入直播再縮小。
+class _LiveRecallButton extends StatelessWidget {
+  const _LiveRecallButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return Semantics(
+      label: '展開直播小視窗',
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: appTheme.danger,
+            shape: BoxShape.circle,
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x40000000),
+                blurRadius: 22,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.live_tv, color: Colors.white, size: 20),
+              SizedBox(height: 1),
+              Text(
+                'LIVE',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 7,
+                  fontWeight: FontWeight.w800,
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

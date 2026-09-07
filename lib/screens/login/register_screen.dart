@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../config/flavor_config.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/repository_providers.dart';
@@ -211,14 +210,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             }
           },
         ),
-        title: Text(
-          FlavorConfig.instance.appName,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: cs.onSurface,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: false,
         actions: [
           TextButton.icon(
             onPressed: () {

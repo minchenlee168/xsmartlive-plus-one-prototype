@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../config/flavor_config.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/repository_providers.dart';
 import '../../theme/app_theme_extension.dart';
@@ -245,14 +244,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     size: 18, color: cs.onSurface),
                 onPressed: _goBack,
               ),
-        title: Text(
-          FlavorConfig.instance.appName,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: cs.onSurface,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: false,
       ),
       body: Stack(
         // StackFit.expand forces the Stack to fill the Scaffold body

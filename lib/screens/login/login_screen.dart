@@ -343,12 +343,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  FlavorConfig.instance.appName,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: appTheme.fgMuted, fontSize: 13),
-                ),
                 const SizedBox(height: 28),
 
                 // ── Country code + Phone ───────────────────────────────────

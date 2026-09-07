@@ -133,22 +133,19 @@ class _FloatingDock extends ConsumerStatefulWidget {
 }
 
 class _FloatingDockState extends ConsumerState<_FloatingDock> {
-  // User-dismissed flag for the live-preview PiP. Resets on next app launch
-  // (per-session). If the user wants persistence, swap this for a
-  // SharedPreferences-backed Riverpod provider.
-  bool _livePreviewDismissed = false;
-
   @override
   Widget build(BuildContext context) {
     final livePageAsync = ref.watch(livePageProvider);
     final currentLive = livePageAsync.valueOrNull?.currentLive;
+    // 關閉狀態改用共享 provider：直播間「最小化」可把小視窗重新叫回來。
+    final dismissed = ref.watch(livePreviewDismissedProvider);
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if (currentLive != null && !_livePreviewDismissed) ...[
+        if (currentLive != null && !dismissed) ...[
           _LivePreviewThumb(
             title: currentLive.title,
             thumbnail: currentLive.thumbnail,
@@ -157,17 +154,9 @@ class _FloatingDockState extends ConsumerState<_FloatingDock> {
             // session (not just the /live tab).
             onTap: () =>
                 context.push('/live/room/${currentLive.id}'),
-            onClose: () =>
-                setState(() => _livePreviewDismissed = true),
-          ),
-          const SizedBox(height: 10),
-        ]
-        // Dismissed → show a compact LIVE recall button so the user can
-        // bring the preview thumbnail back.
-        else if (currentLive != null && _livePreviewDismissed) ...[
-          _LiveRecallButton(
-            onTap: () =>
-                setState(() => _livePreviewDismissed = false),
+            onClose: () => ref
+                .read(livePreviewDismissedProvider.notifier)
+                .state = true,
           ),
           const SizedBox(height: 10),
         ],
@@ -350,56 +339,6 @@ class _LivePreviewThumb extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-/// 縮小/關閉直播小視窗後的「召回」按鈕：點一下即把直播預覽縮圖叫回來，
-/// 不需要重新進入直播再縮小。
-class _LiveRecallButton extends StatelessWidget {
-  const _LiveRecallButton({required this.onTap});
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    return Semantics(
-      label: '展開直播小視窗',
-      button: true,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: appTheme.danger,
-            shape: BoxShape.circle,
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x40000000),
-                blurRadius: 22,
-                offset: Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.live_tv, color: Colors.white, size: 20),
-              SizedBox(height: 1),
-              Text(
-                'LIVE',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 7,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

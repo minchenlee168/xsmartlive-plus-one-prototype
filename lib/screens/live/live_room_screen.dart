@@ -120,6 +120,17 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
     });
   }
 
+  /// 最小化：把直播收合成首頁的預覽小視窗（PiP）。
+  /// 先把 PiP 的關閉狀態設回 false 讓小視窗重新出現，再退回上一頁（首頁）。
+  void _minimize() {
+    ref.read(livePreviewDismissedProvider.notifier).state = false;
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/home');
+    }
+  }
+
   void _sendChat() {
     final text = _chatCtrl.text.trim();
     if (text.isEmpty) return;
@@ -254,6 +265,12 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
                       width: media.size.width * 0.62,
                       child: _ChatOverlay(comments: _mockChat),
                     ),
+                    // 最小化按鈕：置於愛心按鈕正上方（收合成首頁小視窗）。
+                    Positioned(
+                      bottom: 66,
+                      right: 16,
+                      child: _MinimizeButton(onTap: _minimize),
+                    ),
                     Positioned(
                       bottom: 14,
                       right: 14,
@@ -289,9 +306,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
               ),
             ],
           ),
-          // Single layout-toggle icon, stacked 10px above the heart button.
-          // Heart is 44px tall at `bottom: 14` (ends at bottom 58); toggle
-          // (40px) sits at bottom 68 → clear gap above the heart.
+          // Single layout-toggle icon at the bottom-right of the screen.
           Positioned(
             right: 16,
             bottom: 68,
@@ -393,6 +408,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
             child: _SideActionColumn(
               heartCount: _heartCount,
               onHeartTap: _emitHeart,
+              onMinimize: _minimize,
               isImmersive: true,
               onLayoutToggle: () => setState(() {
                 _layout = _LiveLayout.split;
@@ -1294,6 +1310,38 @@ class _ViewerPill extends StatelessWidget {
 // split and immersive layouts. The icon shows the layout you'll switch TO
 // (so users can predict the action).
 // ───────────────────────────────────────────────────────────────────────────
+/// 半屏式版面用的「最小化」按鈕（收合成首頁預覽小視窗），置於愛心按鈕上方。
+class _MinimizeButton extends StatelessWidget {
+  const _MinimizeButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black.withValues(alpha: 0.45),
+      shape: const CircleBorder(
+        side: BorderSide(color: Color(0x33FFFFFF)),
+      ),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: const Tooltip(
+          message: '最小化',
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Icon(
+              Icons.picture_in_picture_alt,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LayoutToggleButton extends StatelessWidget {
   const _LayoutToggleButton({
     required this.isImmersive,
@@ -1338,12 +1386,16 @@ class _SideActionColumn extends StatelessWidget {
   const _SideActionColumn({
     required this.heartCount,
     required this.onHeartTap,
+    this.onMinimize,
     this.isImmersive = false,
     this.onLayoutToggle,
   });
 
   final int heartCount;
   final VoidCallback onHeartTap;
+
+  /// 最小化（收合成首頁小視窗）；置於愛心按鈕上方。
+  final VoidCallback? onMinimize;
 
   /// When true, the column appends a layout-toggle button at the bottom.
   final bool isImmersive;
@@ -1355,6 +1407,15 @@ class _SideActionColumn extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (onMinimize != null) ...[
+          _SideActionButton(
+            icon: Icons.picture_in_picture_alt,
+            label: '最小化',
+            bg: Colors.black.withValues(alpha: 0.5),
+            onTap: onMinimize!,
+          ),
+          const SizedBox(height: 14),
+        ],
         _SideActionButton(
           icon: Icons.favorite,
           label: '$heartCount',

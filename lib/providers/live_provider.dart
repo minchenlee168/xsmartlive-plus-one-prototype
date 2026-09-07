@@ -74,6 +74,10 @@ final livePageProvider =
   LivePageNotifier.new,
 );
 
+/// 首頁直播預覽小視窗（PiP）是否被使用者關閉。
+/// 直播間「最小化」會設回 false，讓小視窗重新出現在首頁。
+final livePreviewDismissedProvider = StateProvider<bool>((ref) => false);
+
 /// 社團貼文賣場 (B11) — empty list when backend returns nothing.
 final groupPostMarketsProvider =
     FutureProvider<List<SocialPostMarket>>((ref) {

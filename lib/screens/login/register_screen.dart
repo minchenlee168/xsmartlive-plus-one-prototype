@@ -201,7 +201,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new,
               size: 18, color: cs.onSurface),
-          onPressed: () => context.pop(),
+          // 直接進入註冊頁（無上一頁可 pop）時，返回鍵改導向登入頁，
+          // 避免按了沒反應。
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/login');
+            }
+          },
         ),
         title: Text(
           FlavorConfig.instance.appName,

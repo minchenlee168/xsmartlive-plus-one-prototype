@@ -511,19 +511,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Widget _sendOtpButton(BuildContext ctx, AppLocalizations l10n) {
     final theme = Theme.of(ctx);
-    final cs = theme.colorScheme;
     final appTheme = ctx.appTheme;
+    final accent = appTheme.brandPalette.tone500;
     final canSend = _otpCountdown == 0 && !_otpSending;
     return SizedBox(
       height: 36,
       child: OutlinedButton(
         onPressed: canSend ? _sendOtp : null,
         style: OutlinedButton.styleFrom(
-          foregroundColor:
-              canSend ? cs.onSurface : cs.onSurfaceVariant,
-          side: BorderSide(
-              color: canSend ? cs.outline : cs.outlineVariant),
-          backgroundColor: cs.surface,
+          // 實色填底 + 白字，提高與背景的對比；倒數/送出中維持可讀的深灰底。
+          foregroundColor: Colors.white,
+          disabledForegroundColor: Colors.white,
+          backgroundColor: accent,
+          disabledBackgroundColor: appTheme.fgMuted,
+          side: BorderSide.none,
           shape: RoundedRectangleBorder(
               borderRadius:
                   BorderRadius.circular(appTheme.buttonRadius)),
@@ -534,12 +535,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: _otpSending
-            ? SizedBox(
+            ? const SizedBox(
                 width: 14,
                 height: 14,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: cs.onSurfaceVariant,
+                  color: Colors.white,
                 ),
               )
             : Text(

@@ -400,8 +400,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         : () => context.push('/checkout'),
                     style: FilledButton.styleFrom(
                       backgroundColor: appTheme.brandPalette.tone500,
-                      disabledBackgroundColor:
-                          appTheme.muted.withValues(alpha: 0.4),
+                      // disabled 用實色深灰底 + 白字，維持足夠對比看得到文字。
+                      disabledBackgroundColor: appTheme.fgMuted,
+                      disabledForegroundColor: Colors.white,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 22, vertical: 13),
@@ -1522,8 +1523,9 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                         },
                   style: FilledButton.styleFrom(
                     backgroundColor: appTheme.brandPalette.tone500,
-                    disabledBackgroundColor:
-                        appTheme.muted.withValues(alpha: 0.4),
+                    // disabled 用實色深灰底 + 白字，維持足夠對比看得到文字。
+                    disabledBackgroundColor: appTheme.fgMuted,
+                    disabledForegroundColor: Colors.white,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(

@@ -154,9 +154,20 @@ class _FloatingDockState extends ConsumerState<_FloatingDock> {
             // session (not just the /live tab).
             onTap: () =>
                 context.push('/live/room/${currentLive.id}'),
+            // 關閉 → 收合成小 icon 按鈕（非完全關閉），點 icon 可再展開。
             onClose: () => ref
                 .read(livePreviewDismissedProvider.notifier)
                 .state = true,
+          ),
+          const SizedBox(height: 10),
+        ]
+        // 已收合：顯示小 icon 按鈕，點一下重新展開直播預覽小視窗。
+        else if (currentLive != null && dismissed) ...[
+          _LiveMiniButton(
+            thumbnail: currentLive.thumbnail,
+            onTap: () => ref
+                .read(livePreviewDismissedProvider.notifier)
+                .state = false,
           ),
           const SizedBox(height: 10),
         ],
@@ -339,6 +350,73 @@ class _LivePreviewThumb extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// 直播預覽小視窗收合後的小 icon 按鈕：圓形縮圖 + 播放/LIVE 標記，
+/// 點一下重新展開成完整的預覽小視窗。
+class _LiveMiniButton extends StatelessWidget {
+  const _LiveMiniButton({required this.thumbnail, required this.onTap});
+
+  final String thumbnail;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return Semantics(
+      label: '展開直播小視窗',
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: appTheme.danger, width: 2),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x40000000),
+                blurRadius: 22,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                thumbnail.isNotEmpty
+                    ? Image.network(
+                        thumbnail,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => Image.asset(
+                          'assets/prototype/live_host.jpg',
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.asset(
+                        'assets/prototype/live_host.jpg',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: appTheme.primaryGradient,
+                          ),
+                        ),
+                      ),
+                // 暗色遮罩 + 播放三角，讓它一眼看出是可展開的影片。
+                Container(color: Colors.black.withValues(alpha: 0.28)),
+                const Center(
+                  child: Icon(Icons.play_arrow_rounded,
+                      color: Colors.white, size: 22),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

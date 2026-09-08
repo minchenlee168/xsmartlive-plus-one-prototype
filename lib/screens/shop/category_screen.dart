@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../models/product.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../widgets/back_leading_button.dart';
-import '../../widgets/standard_product_card.dart';
+import '../../widgets/shop_product_card.dart';
 
 /// 商城分類頁（B）：由商城分類 tab 進入，含子分類篩選 + 商品卡。
 ///
@@ -94,11 +94,11 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                   )
                 : LayoutBuilder(
                     builder: (context, constraints) {
-                      const spacing = 12.0;
-                      const hPad = 16.0;
+                      // 對照設計稿（Image #50）的 2 欄精簡卡網格 + 方形圖片。
+                      const spacing = 10.0;
+                      const hPad = 14.0;
                       final avail = constraints.maxWidth - hPad * 2;
-                      // 依可用寬度決定欄數（手機 2 欄、寬螢幕更多），
-                      // 卡片為固定寬度並依內容收合高度，故按鈕下方不留白。
+                      // 依可用寬度決定欄數（手機 2 欄、寬螢幕更多）。
                       final cols = (avail / 190).floor().clamp(2, 6);
                       final cardW = (avail - spacing * (cols - 1)) / cols;
                       return SingleChildScrollView(
@@ -110,10 +110,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                             for (final p in products)
                               SizedBox(
                                 width: cardW,
-                                child: StandardProductCard(
-                                  product: p.product,
-                                  stock: previewStockFor(p.product),
-                                ),
+                                child: ShopProductCard(product: p.product),
                               ),
                           ],
                         ),

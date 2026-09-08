@@ -369,8 +369,9 @@ class _LiveMiniButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: 46,
-          height: 46,
+          // 與下方客服訊息泡泡同尺寸（52）。
+          width: 52,
+          height: 52,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -386,7 +387,7 @@ class _LiveMiniButton extends StatelessWidget {
             ],
           ),
           child: const Icon(Icons.play_arrow_rounded,
-              color: Colors.white, size: 24),
+              color: Colors.white, size: 26),
         ),
       ),
     );

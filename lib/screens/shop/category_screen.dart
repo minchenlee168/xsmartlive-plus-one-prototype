@@ -70,17 +70,21 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
             height: 44,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              // 只留左右內距；垂直方向讓 chip 依內容置中，避免壓縮到文字。
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: data.subs.length + 1,
               separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, i) {
                 final label = i == 0 ? '全部' : data.subs[i - 1];
                 final value = i == 0 ? null : data.subs[i - 1];
                 final selected = _sub == value;
-                return _SubChip(
-                  label: label,
-                  selected: selected,
-                  onTap: () => setState(() => _sub = value),
+                // Center：chip 依內容高度呈現並垂直置中，不被列高拉伸/裁切。
+                return Center(
+                  child: _SubChip(
+                    label: label,
+                    selected: selected,
+                    onTap: () => setState(() => _sub = value),
+                  ),
                 );
               },
             ),

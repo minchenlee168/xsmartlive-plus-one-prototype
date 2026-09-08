@@ -303,6 +303,18 @@ class _GradientHeader extends StatelessWidget {
     final appTheme = context.appTheme;
     final topPadding = MediaQuery.of(context).viewPadding.top;
 
+    // 依 header 漸層亮度自動選前景色：淺色漸層（如本商戶的粉桃）用深色字、
+    // 深色漸層用白字，確保紅利那排等文字都有足夠對比。
+    final gradColors = appTheme.primaryGradient.colors;
+    final gradLum = gradColors
+            .map((c) => c.computeLuminance())
+            .reduce((a, b) => a + b) /
+        gradColors.length;
+    final onGrad = gradLum > 0.5 ? appTheme.fg : Colors.white;
+    final onGradSoft = gradLum > 0.5
+        ? appTheme.fgMuted
+        : Colors.white.withValues(alpha: 0.85);
+
     return Container(
       padding: EdgeInsets.fromLTRB(20, topPadding + 20, 20, 30),
       decoration: BoxDecoration(
@@ -346,8 +358,8 @@ class _GradientHeader extends StatelessWidget {
                       name.isNotEmpty ? name : '—',
                       style: GoogleFonts.getFont(
                         appTheme.fontDisplay,
-                        textStyle: const TextStyle(
-                          color: Colors.white,
+                        textStyle: TextStyle(
+                          color: onGrad,
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                         ),
@@ -358,7 +370,7 @@ class _GradientHeader extends StatelessWidget {
                       Text(
                         email,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.85),
+                          color: onGradSoft,
                           fontSize: 12,
                         ),
                       ),
@@ -373,18 +385,15 @@ class _GradientHeader extends StatelessWidget {
                             Text(
                               unboundLabel,
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.85),
+                                color: onGradSoft,
                                 fontSize: 12,
                                 decoration: TextDecoration.underline,
-                                decorationColor:
-                                    Colors.white.withValues(alpha: 0.85),
+                                decorationColor: onGradSoft,
                               ),
                             ),
                             const SizedBox(width: 4),
                             Icon(Icons.chevron_right,
-                                size: 14,
-                                color: Colors.white
-                                    .withValues(alpha: 0.85)),
+                                size: 14, color: onGradSoft),
                           ],
                         ),
                       ),
@@ -393,18 +402,17 @@ class _GradientHeader extends StatelessWidget {
                 ),
               ),
               Material(
-                color: Colors.white.withValues(alpha: 0.22),
+                color: onGrad.withValues(alpha: 0.14),
                 shape: const CircleBorder(),
                 child: InkWell(
                   customBorder: const CircleBorder(),
                   onTap: onLogoutTap,
-                  child: const Tooltip(
+                  child: Tooltip(
                     message: '登出',
                     child: SizedBox(
                       width: 36,
                       height: 36,
-                      child: Icon(Icons.logout,
-                          color: Colors.white, size: 18),
+                      child: Icon(Icons.logout, color: onGrad, size: 18),
                     ),
                   ),
                 ),
@@ -422,18 +430,18 @@ class _GradientHeader extends StatelessWidget {
                           children: [
                             Text(
                               s.value,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
-                                color: Colors.white,
+                                color: onGrad,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               s.label,
                               style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 12,
+                                color: onGradSoft,
                               ),
                             ),
                           ],

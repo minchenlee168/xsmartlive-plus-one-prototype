@@ -50,10 +50,11 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
       appBar: AppBar(
         leading: const BackLeadingButton(fallbackLocation: '/shop'),
         title: Text(data.name),
-        backgroundColor: appTheme.bgElev,
+        // 與商城頁 header 一致：不用獨立底色、捲動時也不出現底線。
+        backgroundColor: appTheme.bg,
         foregroundColor: appTheme.fg,
         elevation: 0,
-        scrolledUnderElevation: 0.5,
+        scrolledUnderElevation: 0,
         actions: [
           IconButton(
             icon: Icon(Icons.shopping_cart_outlined, color: appTheme.fg),
@@ -89,7 +90,6 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
               },
             ),
           ),
-          Divider(height: 1, color: appTheme.divider),
           Expanded(
             child: products.isEmpty
                 ? Center(
@@ -148,22 +148,24 @@ class _SubChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
+    // 用 StadiumBorder + 邊框：未選取 chip 也有清楚外框（不會因低對比融進背景
+    // 而看起來比選取的小）。兩種狀態邊框寬度相同，尺寸一致。
     return Material(
       color: selected ? accent : appTheme.chip,
-      borderRadius: BorderRadius.circular(999),
+      shape: StadiumBorder(
+        side: BorderSide(color: selected ? accent : appTheme.divider),
+      ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(999),
+        customBorder: const StadiumBorder(),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: selected ? Colors.white : appTheme.chipFg,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.white : appTheme.chipFg,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),

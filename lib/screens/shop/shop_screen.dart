@@ -15,6 +15,7 @@ import '../../providers/content_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../utils/responsive.dart';
+import '../../widgets/app_chip.dart';
 import '../../widgets/shop_product_card.dart';
 import '../../widgets/standard_product_card.dart';
 import 'theme_hall_data.dart';
@@ -209,10 +210,7 @@ class _CategoryChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
     final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
-    final accent = appTheme.brandPalette.tone500;
 
     final all = <(String, String)>[
       ('', l10n.shopCategoryAll),
@@ -229,30 +227,13 @@ class _CategoryChips extends StatelessWidget {
         itemBuilder: (context, i) {
           final (id, label) = all[i];
           final selected = (selectedId ?? '') == id;
-          return Material(
-            color: selected ? accent : appTheme.chip,
-            borderRadius: BorderRadius.circular(999),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(999),
-              // 「全部」原地顯示；其餘分類跳到分類頁（含子分類篩選 + 商品）。
-              onTap: () => id.isEmpty
-                  ? onSelect(id)
-                  : context.push('/shop/category/$id'),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 8),
-                child: Center(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: selected ? cs.onPrimary : appTheme.chipFg,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          return AppChip(
+            label: label,
+            selected: selected,
+            // 「全部」原地顯示；其餘分類跳到分類頁（含子分類篩選 + 商品）。
+            onTap: () => id.isEmpty
+                ? onSelect(id)
+                : context.push('/shop/category/$id'),
           );
         },
       ),

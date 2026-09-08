@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../models/product.dart';
 import '../../theme/app_theme_extension.dart';
+import '../../widgets/app_chip.dart';
 import '../../widgets/back_leading_button.dart';
 import '../../widgets/standard_product_card.dart';
 
@@ -79,7 +80,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                 final label = i == 0 ? '全部' : data.subs[i - 1];
                 final value = i == 0 ? null : data.subs[i - 1];
                 final selected = _sub == value;
-                return _SubChip(
+                return AppChip(
                   label: label,
                   selected: selected,
                   onTap: () => setState(() => _sub = value),
@@ -125,47 +126,6 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                   ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SubChip extends StatelessWidget {
-  const _SubChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    final cs = Theme.of(context).colorScheme;
-    final accent = appTheme.brandPalette.tone500;
-    // 與商城頁頁籤（shop_screen 的 _CategoryChips）完全一致的樣式。
-    return Material(
-      color: selected ? accent : appTheme.chip,
-      borderRadius: BorderRadius.circular(999),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: selected ? cs.onPrimary : appTheme.chipFg,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

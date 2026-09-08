@@ -164,7 +164,6 @@ class _FloatingDockState extends ConsumerState<_FloatingDock> {
         // 已收合：顯示小 icon 按鈕，點一下重新展開直播預覽小視窗。
         else if (currentLive != null && dismissed) ...[
           _LiveMiniButton(
-            thumbnail: currentLive.thumbnail,
             onTap: () => ref
                 .read(livePreviewDismissedProvider.notifier)
                 .state = false,
@@ -354,12 +353,11 @@ class _LivePreviewThumb extends StatelessWidget {
   }
 }
 
-/// 直播預覽小視窗收合後的小 icon 按鈕：圓形縮圖 + 播放/LIVE 標記，
+/// 直播預覽小視窗收合後的小 icon 按鈕：半透明紅色底 + 播放三角，
 /// 點一下重新展開成完整的預覽小視窗。
 class _LiveMiniButton extends StatelessWidget {
-  const _LiveMiniButton({required this.thumbnail, required this.onTap});
+  const _LiveMiniButton({required this.onTap});
 
-  final String thumbnail;
   final VoidCallback onTap;
 
   @override
@@ -373,8 +371,11 @@ class _LiveMiniButton extends StatelessWidget {
         child: Container(
           width: 46,
           height: 46,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
+            // 半透明紅色底，不放影片縮圖。
+            color: appTheme.danger.withValues(alpha: 0.42),
             border: Border.all(color: appTheme.danger, width: 2),
             boxShadow: const [
               BoxShadow(
@@ -384,37 +385,8 @@ class _LiveMiniButton extends StatelessWidget {
               ),
             ],
           ),
-          child: ClipOval(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                thumbnail.isNotEmpty
-                    ? Image.network(
-                        thumbnail,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => Image.asset(
-                          'assets/prototype/live_host.jpg',
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Image.asset(
-                        'assets/prototype/live_host.jpg',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: appTheme.primaryGradient,
-                          ),
-                        ),
-                      ),
-                // 半透明紅色遮罩 + 播放三角，一眼看出是可展開的直播影片。
-                Container(color: appTheme.danger.withValues(alpha: 0.42)),
-                const Center(
-                  child: Icon(Icons.play_arrow_rounded,
-                      color: Colors.white, size: 22),
-                ),
-              ],
-            ),
-          ),
+          child: const Icon(Icons.play_arrow_rounded,
+              color: Colors.white, size: 24),
         ),
       ),
     );

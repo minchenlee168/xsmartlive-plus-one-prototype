@@ -239,7 +239,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: appTheme.bgElev,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(appTheme.dialogRadius)),
         title: Text(
           l10n.termsDialogTitle,
           style: TextStyle(
@@ -290,7 +290,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: appTheme.bgElev,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(appTheme.dialogRadius)),
         title: Text(l10n.loginFailedTitle,
             style: TextStyle(
                 color: appTheme.fg,
@@ -324,7 +324,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           context,
           maxWidth: Responsive.authMaxWidth,
           child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: Form(
             key: _formKey,
             child: Column(
@@ -338,16 +338,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: appTheme.fg,
-                    fontSize: 26,
+                    fontSize: 24,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
 
                 // ── Country code + Phone ───────────────────────────────────
                 _rowLabel(l10n.labelCountryCode, l10n.labelPhoneNumber),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     _codeDropdown(),
@@ -365,11 +365,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
 
                 // ── Password ───────────────────────────────────────────────
                 _colLabel(l10n.labelPassword),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 _field(
                   ctrl: _passwdCtrl,
                   hint: l10n.hintPassword,
@@ -403,33 +403,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: const TextStyle(fontSize: 12)),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
                 // ── Captcha ────────────────────────────────────────────────
                 _colLabel(l10n.labelCaptcha),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 _buildCaptchaBlock(l10n),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
 
                 // ── Terms ──────────────────────────────────────────────────
                 _termsRow(l10n),
-                const SizedBox(height: 22),
+                const SizedBox(height: 20),
 
                 // ── Login button ───────────────────────────────────────────
                 _loginButton(l10n, isLoading),
-                const SizedBox(height: 22),
+                const SizedBox(height: 20),
 
                 // ── Divider ────────────────────────────────────────────────
                 _orDivider(l10n),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
 
                 // ── Social buttons ─────────────────────────────────────────
                 _socialBtn(label: 'Facebook', icon: Image.asset('assets/facebook.png', width: 20, height: 20), onTap: isLoading ? null : _facebookLogin),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 _socialBtn(label: 'Google',   icon: Image.asset('assets/google.png', width: 20, height: 20),   onTap: isLoading ? null : _googleLogin),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 _socialBtn(label: 'LINE',     icon: Image.asset('assets/line.png', width: 20, height: 20),     onTap: isLoading ? null : _lineLogin),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 _socialBtn(label: 'Tiktok',   icon: Image.asset('assets/tiktok.png', width: 20, height: 20),   onTap: isLoading ? null : _tikTokLogin),
                 const SizedBox(height: 24),
 
@@ -437,7 +437,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Center(
                   child: RichText(
                     text: TextSpan(
-                      style: TextStyle(color: appTheme.fgMuted, fontSize: 13),
+                      style: TextStyle(color: appTheme.fgMuted, fontSize: 14),
                       children: [
                         TextSpan(text: l10n.noAccountText),
                         TextSpan(
@@ -493,7 +493,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: appTheme.bgElev,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(appTheme.buttonRadius),
         border: Border.all(color: appTheme.divider),
       ),
       child: DropdownButtonHideUnderline(
@@ -532,26 +532,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       style: TextStyle(color: appTheme.fg, fontSize: 14),
       decoration: InputDecoration(
         hintText:    hint,
-        hintStyle:   TextStyle(color: appTheme.muted, fontSize: 13),
+        hintStyle:   TextStyle(color: appTheme.muted, fontSize: 14),
         suffixIcon:  suffix,
         filled:      true,
         fillColor:   appTheme.bgElev,
         isDense:     true,
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         border:             _border(appTheme.divider),
         enabledBorder:      _border(appTheme.divider),
         focusedBorder:      _border(cs.primary),
         errorBorder:        _border(appTheme.danger),
         focusedErrorBorder: _border(appTheme.danger),
-        errorStyle: TextStyle(color: appTheme.danger, fontSize: 11),
+        errorStyle: TextStyle(color: appTheme.danger, fontSize: 12),
       ),
       validator: validator,
     );
   }
 
   OutlineInputBorder _border(Color c) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(context.appTheme.buttonRadius),
         borderSide: BorderSide(color: c),
       );
 
@@ -603,10 +603,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       height: 44,
       decoration: BoxDecoration(
         color: appTheme.bgSubtle,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(appTheme.buttonRadius),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(appTheme.buttonRadius),
         child: _captchaLoading
             ? Center(
                 child: SizedBox(
@@ -679,27 +679,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _loginButton(AppLocalizations l10n, bool loading) {
     final appTheme = context.appTheme;
+    // 依 primaryGradient 亮度自動選前景色（同 home / profile）：淺色漸層用深字，
+    // 深色漸層維持白字，確保按鈕文字對比足夠。
+    final gradColors = appTheme.primaryGradient.colors;
+    final gradLum = gradColors
+            .map((c) => c.computeLuminance())
+            .reduce((a, b) => a + b) /
+        gradColors.length;
+    final onGrad = gradLum > 0.5 ? appTheme.fg : Colors.white;
     return Container(
       height: 46,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(appTheme.buttonRadius),
         gradient: appTheme.primaryGradient,
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(appTheme.buttonRadius),
           onTap: loading ? null : _submit,
           child: Center(
             child: loading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 18, height: 18,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white))
+                        strokeWidth: 2, color: onGrad))
                 : Text(l10n.loginButton,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
+                    style: TextStyle(
+                        color: onGrad,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600)),
           ),
         ),
@@ -735,13 +743,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         backgroundColor: appTheme.bgElev,
         side: BorderSide(color: appTheme.divider),
         minimumSize: const Size.fromHeight(46),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(appTheme.buttonRadius)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           icon,
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           Text(label, style: TextStyle(color: appTheme.fg, fontSize: 14)),
         ],
       ),

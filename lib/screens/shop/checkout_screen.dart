@@ -231,7 +231,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         title: Text(
           '結帳',
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: appTheme.fg,
           ),
@@ -270,13 +270,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 8),
+                      horizontal: 16, vertical: 8),
                   color: appTheme.brandPalette.tone50,
                   child: Row(
                     children: [
                       Icon(Icons.access_time,
                           size: 14, color: appTheme.brandPalette.tone500),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           '請於 $checkoutLimit 分鐘內完成結帳',
@@ -325,7 +325,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       couponDiscount -
                       bonusDiscount;
                   return ListView(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                     children: [
                       // 配送資訊 —— 移到最上方，標題比照「優惠券」放在區塊外面。
                       const _SectionTitle(text: '配送資訊'),
@@ -336,7 +336,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         onApplyAll: _openApplyAllSheet,
                         onSelectCart: _openCartSheet,
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                       // 每張購物車一張「訂單明細」卡：商品列 + 收件人 / 運費 /
                       // 運費折抵 / 優惠券 / 紅利點數 / 小計。
                       for (final g in groups) ...[
@@ -360,7 +360,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             }
                           }),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 16),
                       ],
                       const _SectionTitle(text: '發票資訊'),
                       const SizedBox(height: 8),
@@ -377,7 +377,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         onDonateUnitChanged: (v) =>
                             setState(() => _donateUnit = v),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                       _SectionTitle(
                         text: '付款方式',
                         trailing: Row(
@@ -390,7 +390,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                 color: appTheme.fgMuted,
                               ),
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 4),
                             Image.asset(
                               'assets/icons/pay/linepay.png',
                               height: 18,
@@ -409,7 +409,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             .read(checkoutProvider.notifier)
                             .changePayment(id),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                       _FeeSummaryCard(
                         productTotal: productTotal,
                         shippingTotal: shippingTotal,
@@ -459,7 +459,7 @@ class _SectionTitle extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: FontWeight.w700,
               color: appTheme.fg,
             ),
@@ -478,7 +478,7 @@ class _SectionTitle extends StatelessWidget {
 // Reusable card shell — bgElev, rounded, divider border.
 // ─────────────────────────────────────────────────────────────────────────
 class _Card extends StatelessWidget {
-  const _Card({required this.child, this.padding = const EdgeInsets.all(14)});
+  const _Card({required this.child, this.padding = const EdgeInsets.all(16)});
 
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -534,7 +534,7 @@ class _InvoiceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _label(context, '發票類型'),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Container(
             padding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -580,7 +580,7 @@ class _InvoiceCard extends StatelessWidget {
         return [
           _gap,
           _label(context, 'Email'),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           _field(context, controller: emailCtrl, hint: 'abc@gmail.com',
               keyboardType: TextInputType.emailAddress),
         ];
@@ -588,18 +588,18 @@ class _InvoiceCard extends StatelessWidget {
         return [
           _gap,
           _label(context, '手機條碼'),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           _field(context, controller: phoneCarrierCtrl, hint: '/.12345'),
         ];
       case _InvoiceType.vat:
         return [
           _gap,
           _label(context, '公司名稱'),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           _field(context, controller: companyNameCtrl, hint: '請輸入公司名稱'),
           _gap,
           _label(context, '統一編號'),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           _field(context, controller: taxIdCtrl, hint: '請輸入統一編號',
               keyboardType: TextInputType.number),
         ];
@@ -607,11 +607,11 @@ class _InvoiceCard extends StatelessWidget {
         return [
           _gap,
           _label(context, '捐贈單位'),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           _donateUnitField(context),
           _gap,
           _label(context, '機構編號'),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           _field(context, controller: donateCodeCtrl, hint: '請輸入愛心捐贈碼',
               keyboardType: TextInputType.number),
         ];
@@ -622,7 +622,7 @@ class _InvoiceCard extends StatelessWidget {
 
   Widget _label(BuildContext context, String text) => Text(
         text,
-        style: TextStyle(fontSize: 11, color: context.appTheme.fgMuted),
+        style: TextStyle(fontSize: 12, color: context.appTheme.fgMuted),
       );
 
   Widget _field(
@@ -648,7 +648,7 @@ class _InvoiceCard extends StatelessWidget {
           hintText: hint,
           hintStyle: TextStyle(fontSize: 12, color: appTheme.fgMuted),
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         ),
       ),
     );
@@ -739,24 +739,24 @@ class _DeliveryInfoCard extends ConsumerWidget {
             onTap: () => onApplyAll(ids),
             child: Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   Text(
                     '配送方式',
-                    style: TextStyle(fontSize: 13, color: appTheme.fg),
+                    style: TextStyle(fontSize: 14, color: appTheme.fg),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
                       summary,
-                      style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+                      style: TextStyle(fontSize: 14, color: appTheme.fgMuted),
                     ),
                   ),
                   Text(
                     '套用全部',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: accent,
                     ),
@@ -773,7 +773,7 @@ class _DeliveryInfoCard extends ConsumerWidget {
               onTap: () => onSelectCart(groups[i].id),
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -784,7 +784,7 @@ class _DeliveryInfoCard extends ConsumerWidget {
                           Text(
                             groups[i].sellerName,
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: appTheme.fg,
                             ),
@@ -797,12 +797,12 @@ class _DeliveryInfoCard extends ConsumerWidget {
                               children: [
                                 Icon(Icons.place_outlined,
                                     size: 12, color: appTheme.fgMuted),
-                                const SizedBox(width: 3),
+                                const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     selectedLocation[groups[i].id]!,
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 12,
                                       color: appTheme.fgMuted,
                                     ),
                                     maxLines: 1,
@@ -815,7 +815,7 @@ class _DeliveryInfoCard extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     Text(
                       _deliveryMethodLabel(selected[groups[i].id]) ??
                           '尚未選擇配送方式',
@@ -833,7 +833,7 @@ class _DeliveryInfoCard extends ConsumerWidget {
               ),
             ),
             if (i < groups.length - 1)
-              Divider(height: 1, color: appTheme.divider, indent: 14),
+              Divider(height: 1, color: appTheme.divider, indent: 16),
           ],
         ],
       ),
@@ -988,7 +988,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
         children: [
           // 標題：「{購物車名稱} 訂單明細  [溫層]」
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: Row(
               children: [
                 Expanded(
@@ -1015,12 +1015,12 @@ class _CartOrderCardState extends State<_CartOrderCard> {
           for (var i = 0; i < g.items.length; i++) ...[
             _CartItemRow(item: g.items[i]),
             if (i < g.items.length - 1)
-              Divider(height: 1, color: appTheme.divider, indent: 14),
+              Divider(height: 1, color: appTheme.divider, indent: 16),
           ],
           Divider(height: 1, color: appTheme.divider),
           // 金額 / 配送 / 折抵 / 優惠券 / 紅利 摘要
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: Column(
               children: [
                 _kv(
@@ -1044,7 +1044,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                           color: hasMethod ? appTheme.fg : appTheme.fgMuted,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       _OutlineButton(
                         label: '變更',
                         onTap: widget.onChangeDelivery,
@@ -1073,7 +1073,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                           alignment: Alignment.centerLeft,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
+                                horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: accent.withValues(alpha: 0.12),
                               borderRadius:
@@ -1082,7 +1082,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                             child: Text(
                               '達免運門檻',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: accent,
                               ),
@@ -1161,7 +1161,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                             width: 56,
                             height: 32,
                             margin:
-                                const EdgeInsets.symmetric(horizontal: 6),
+                                const EdgeInsets.symmetric(horizontal: 4),
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               // 白底 + 明顯邊框，看起來可輸入。
@@ -1174,7 +1174,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                               controller: _bonusCtrl,
                               onChanged: _onBonusInput,
                               style:
-                                  TextStyle(fontSize: 13, color: appTheme.fg),
+                                  TextStyle(fontSize: 14, color: appTheme.fg),
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
                               cursorColor: accent,
@@ -1182,7 +1182,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                                 border: InputBorder.none,
                                 isDense: true,
                                 contentPadding:
-                                    EdgeInsets.symmetric(vertical: 6),
+                                    EdgeInsets.symmetric(vertical: 4),
                               ),
                             ),
                           ),
@@ -1198,7 +1198,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                       Text(
                         '尚有 $remainingBonus 點',
                         style:
-                            TextStyle(fontSize: 11, color: appTheme.fgMuted),
+                            TextStyle(fontSize: 12, color: appTheme.fgMuted),
                       ),
                     ],
                   ),
@@ -1208,16 +1208,16 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                     color: usedBonus > 0 ? appTheme.danger : null,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Divider(height: 1, color: appTheme.divider),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       '訂單金額小計',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -1252,7 +1252,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
   }) {
     final appTheme = context.appTheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1289,7 +1289,7 @@ class _TempBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: appTheme.info.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -1297,7 +1297,7 @@ class _TempBadge extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: FontWeight.w700,
           color: appTheme.info,
         ),
@@ -1319,7 +1319,7 @@ class _OutlineButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(appTheme.radiusSm),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(appTheme.radiusSm),
           border: Border.all(color: appTheme.divider),
@@ -1348,7 +1348,7 @@ class _CartItemRow extends StatelessWidget {
     final accent = appTheme.brandPalette.tone500;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1381,14 +1381,14 @@ class _CartItemRow extends StatelessWidget {
                       WidgetSpan(
                         alignment: PlaceholderAlignment.middle,
                         child: Padding(
-                          padding: const EdgeInsets.only(right: 6),
+                          padding: const EdgeInsets.only(right: 4),
                           child: _AddonTag(),
                         ),
                       ),
                     TextSpan(
                       text: item.name,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         height: 1.4,
                         color: appTheme.fg,
@@ -1398,33 +1398,33 @@ class _CartItemRow extends StatelessWidget {
                       TextSpan(
                         text: ' ${item.cardTypeLabel}',
                         style: TextStyle(
-                            fontSize: 10, color: appTheme.fgMuted),
+                            fontSize: 12, color: appTheme.fgMuted),
                       ),
                   ]),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (item.spec.isNotEmpty) ...[
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 4),
                   Text(
                     item.spec,
-                    style: TextStyle(fontSize: 11, color: appTheme.fgMuted),
+                    style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
                   ),
                 ],
                 if (item.isBundle &&
                     item.bundleItems != null &&
                     item.bundleItems!.isNotEmpty) ...[
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 4),
                   Text(
                     '組合商品內容：${_bundleText(item.bundleItems!)}',
                     style: TextStyle(
-                        fontSize: 11, height: 1.4, color: appTheme.fgMuted),
+                        fontSize: 12, height: 1.4, color: appTheme.fgMuted),
                   ),
                 ],
                 const SizedBox(height: 4),
                 Text(
                   '數量 ${item.qty}',
-                  style: TextStyle(fontSize: 11, color: appTheme.fgMuted),
+                  style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
                 ),
               ],
             ),
@@ -1435,7 +1435,7 @@ class _CartItemRow extends StatelessWidget {
             style: GoogleFonts.getFont(
               appTheme.fontDisplay,
               textStyle: TextStyle(
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w800,
                 color: accent,
               ),
@@ -1551,14 +1551,14 @@ class _DeliveryMethodSheetState extends State<_DeliveryMethodSheet> {
           children: [
             // 標題列 + 關閉
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 8, 12),
+              padding: const EdgeInsets.fromLTRB(20, 16, 8, 12),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       widget.applyAll ? '選擇運送方式（套用全部）' : '選擇運送方式',
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -1577,7 +1577,7 @@ class _DeliveryMethodSheetState extends State<_DeliveryMethodSheet> {
                 width: double.infinity,
                 margin: const EdgeInsets.fromLTRB(16, 0, 16, 4),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 decoration: BoxDecoration(
                   color: appTheme.bgSubtle,
                   borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -1651,7 +1651,7 @@ class _DeliveryMethodSheetState extends State<_DeliveryMethodSheet> {
                         '完成',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -1772,7 +1772,7 @@ class _HomeAddressCard extends StatelessWidget {
                           child: Text(
                             '${addr.name}  ${addr.phone}',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: appTheme.fg,
                             ),
@@ -1781,10 +1781,10 @@ class _HomeAddressCard extends StatelessWidget {
                           ),
                         ),
                         if (addr.isDefault) ...[
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 1),
+                                horizontal: 4, vertical: 2),
                             decoration: BoxDecoration(
                               color: accent.withValues(alpha: 0.12),
                               borderRadius:
@@ -1793,7 +1793,7 @@ class _HomeAddressCard extends StatelessWidget {
                             child: Text(
                               '預設',
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: accent,
                               ),
@@ -1808,7 +1808,7 @@ class _HomeAddressCard extends StatelessWidget {
                       children: [
                         Icon(Icons.place_outlined,
                             size: 13, color: appTheme.fgMuted),
-                        const SizedBox(width: 3),
+                        const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             addr.address,
@@ -1822,10 +1822,10 @@ class _HomeAddressCard extends StatelessWidget {
                       ],
                     ),
                     if (addr.note != null) ...[
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
                         addr.note!,
-                        style: TextStyle(fontSize: 11, color: appTheme.danger),
+                        style: TextStyle(fontSize: 12, color: appTheme.danger),
                       ),
                     ],
                   ],
@@ -1839,7 +1839,7 @@ class _HomeAddressCard extends StatelessWidget {
                     size: 18,
                     color: addr.isDefault ? accent : appTheme.fgMuted,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Icon(Icons.delete_outline,
                       size: 18, color: appTheme.fgMuted),
                 ],
@@ -1898,7 +1898,7 @@ class _StorePickupExpansion extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Icon(Icons.place_outlined,
@@ -1910,7 +1910,7 @@ class _StorePickupExpansion extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Icon(Icons.person_outline,
@@ -1956,7 +1956,7 @@ class _StoreChip extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(appTheme.chipRadius),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(appTheme.chipRadius),
           border: Border.all(
@@ -1969,7 +1969,7 @@ class _StoreChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration: BoxDecoration(
                 color: appTheme.bgSubtle,
                 borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -1977,13 +1977,13 @@ class _StoreChip extends StatelessWidget {
               child: Text(
                 store.brand,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: appTheme.fgMuted,
                 ),
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
             Text(
               store.name,
               style: TextStyle(
@@ -1992,7 +1992,7 @@ class _StoreChip extends StatelessWidget {
                 color: selected ? accent : appTheme.fg,
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
             Text(
               store.price,
               style: TextStyle(
@@ -2034,11 +2034,11 @@ class _AddNewRow extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.add, size: 16, color: accent),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: accent,
                 ),
@@ -2059,15 +2059,15 @@ class _AddonTag extends StatelessWidget {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
       ),
       child: Text(
         '加購',
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 12,
           height: 1.1,
           fontWeight: FontWeight.w700,
           color: accent,
@@ -2136,7 +2136,7 @@ class _DeliveryMethodRow extends StatelessWidget {
               child: Text(
                 option.label,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: selected ? accent : appTheme.fg,
                 ),
@@ -2311,14 +2311,14 @@ class _CouponPickerSheetState extends State<_CouponPickerSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 8, 8),
+              padding: const EdgeInsets.fromLTRB(20, 16, 8, 8),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       '選擇優惠券',
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -2382,7 +2382,7 @@ class _CouponPickerSheetState extends State<_CouponPickerSheet> {
                         '完成',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -2421,7 +2421,7 @@ class _CouponPickRow extends StatelessWidget {
       onTap: onTap,
       child: Container(
         color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Row(
           children: [
             Expanded(
@@ -2440,7 +2440,7 @@ class _CouponPickRow extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       note!,
-                      style: TextStyle(fontSize: 11, color: appTheme.fgMuted),
+                      style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
                     ),
                   ],
                 ],
@@ -2450,7 +2450,7 @@ class _CouponPickRow extends StatelessWidget {
               Text(
                 trailing,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: appTheme.danger,
                 ),
@@ -2495,12 +2495,12 @@ class _FeeSummaryCard extends StatelessWidget {
     Widget row(String label, String value,
         {IconData? icon, Color? valueColor}) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
+        padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
           children: [
             if (icon != null) ...[
               Icon(icon, size: 14, color: appTheme.fgMuted),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
             ],
             Expanded(
               child: Text(label,
@@ -2520,10 +2520,10 @@ class _FeeSummaryCard extends StatelessWidget {
         children: [
           Text('費用明細',
               style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: appTheme.fg)),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           row('商品總金額', 'NT\$${_fmt(productTotal)}'),
           row('運費總金額', 'NT\$${_fmt(shippingTotal)}'),
           // 有折抵折扣時才顯示。
@@ -2540,13 +2540,13 @@ class _FeeSummaryCard extends StatelessWidget {
                 icon: Icons.stars_outlined, valueColor: appTheme.danger),
           const SizedBox(height: 8),
           Divider(height: 1, color: appTheme.divider),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('總付款金額',
                   style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg)),
               Text(
@@ -2659,7 +2659,7 @@ class _PayTile extends StatelessWidget {
       label,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: TextStyle(fontSize: 13, color: appTheme.fg),
+      style: TextStyle(fontSize: 14, color: appTheme.fg),
     );
     return InkWell(
       onTap: onTap,
@@ -2741,7 +2741,7 @@ class _ConfirmBar extends StatelessWidget {
               Text(
                 '總付款金額',
                 style: TextStyle(
-                    fontSize: 10, color: appTheme.fgMuted),
+                    fontSize: 12, color: appTheme.fgMuted),
               ),
               Text(
                 '\$${_fmt(_total)}',
@@ -2780,7 +2780,7 @@ class _ConfirmBar extends StatelessWidget {
                             '去付款',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -2819,7 +2819,7 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: 12),
             Text(message,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: appTheme.fgMuted, fontSize: 13)),
+                style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
             const SizedBox(height: 12),
             OutlinedButton(
                 onPressed: onRetry,

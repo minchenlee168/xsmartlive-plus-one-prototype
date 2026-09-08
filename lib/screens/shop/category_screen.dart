@@ -70,7 +70,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
             height: 44,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemCount: data.subs.length + 1,
               separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, i) {
@@ -157,7 +157,7 @@ class _SubChip extends StatelessWidget {
               label,
               style: TextStyle(
                 color: selected ? Colors.white : appTheme.chipFg,
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
             ),

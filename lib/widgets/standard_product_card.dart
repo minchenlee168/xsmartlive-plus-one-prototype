@@ -67,6 +67,10 @@ class _StandardProductCardState extends State<StandardProductCard> {
     // 主題館橫向列（null）維持原本緊湊版型。
     final grid = widget.imageAspectRatio != null;
     final stepSize = grid ? 28.0 : 26.0;
+    // 網格模式字級收斂到階梯（14/12）；橫向緊湊列維持原值（out of scope）。
+    final nameSize = grid ? 14.0 : 13.0;
+    final metaSize = grid ? 12.0 : 11.0; // 原價 / 庫存
+    final qtySize = grid ? 14.0 : 13.0;
 
     Widget stepBtn(IconData icon,
         {required bool enabled, required VoidCallback onTap}) {
@@ -134,14 +138,14 @@ class _StandardProductCardState extends State<StandardProductCard> {
                   // 固定保留兩行高度，讓一行 / 兩行名稱的卡片等高，
                   // 橫向列不會因短名稱在底部留下多餘空白。
                   child: SizedBox(
-                    height: 13 * (grid ? 1.35 : 1.3) * 2,
+                    height: nameSize * 1.3 * 2,
                     child: Text(
                       p.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                          fontSize: 13,
-                          height: grid ? 1.35 : 1.3,
+                          fontSize: nameSize,
+                          height: 1.3,
                           // 網格：名稱輕量（w400）讓價格帶頭；橫向列維持 w600。
                           fontWeight:
                               grid ? FontWeight.w400 : FontWeight.w600,
@@ -165,7 +169,7 @@ class _StandardProductCardState extends State<StandardProductCard> {
                       Text(
                         'NT\$${p.originalPrice!.toStringAsFixed(0)}',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: metaSize,
                           color: appTheme.fgMuted,
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -178,7 +182,7 @@ class _StandardProductCardState extends State<StandardProductCard> {
                   Text(
                     soldOut ? '已售完' : '庫存 ${widget.stock}',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: metaSize,
                       color: soldOut ? appTheme.danger : appTheme.fgMuted,
                     ),
                   ),
@@ -193,7 +197,7 @@ class _StandardProductCardState extends State<StandardProductCard> {
                         child: Text(
                           '$_qty',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 13, color: appTheme.fg),
+                          style: TextStyle(fontSize: qtySize, color: appTheme.fg),
                         ),
                       ),
                       stepBtn(Icons.add,
@@ -231,12 +235,12 @@ class _StandardProductCardState extends State<StandardProductCard> {
                             BorderRadius.circular(appTheme.buttonRadius),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.add, size: 16, color: Colors.white),
-                        SizedBox(width: 6),
-                        Icon(Icons.shopping_cart_outlined,
+                        const Icon(Icons.add, size: 16, color: Colors.white),
+                        SizedBox(width: appTheme.spacingXs),
+                        const Icon(Icons.shopping_cart_outlined,
                             size: 16, color: Colors.white),
                       ],
                     ),
@@ -333,7 +337,7 @@ class _StandardProductCardState extends State<StandardProductCard> {
                             Text(
                               'NT\$${p.price.toStringAsFixed(0)}',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 color: accent,
                               ),
@@ -343,16 +347,16 @@ class _StandardProductCardState extends State<StandardProductCard> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 16),
                   Text(
                     '選擇規格',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -386,7 +390,7 @@ class _StandardProductCardState extends State<StandardProductCard> {
                         '加入購物車',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -427,7 +431,7 @@ class _SpecChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(appTheme.radiusSm),
             border: Border.all(
@@ -438,7 +442,7 @@ class _SpecChip extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               color: selected ? accent : appTheme.fg,
             ),

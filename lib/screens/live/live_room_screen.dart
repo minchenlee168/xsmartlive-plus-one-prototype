@@ -265,12 +265,6 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
                       width: media.size.width * 0.62,
                       child: _ChatOverlay(comments: _mockChat),
                     ),
-                    // 最小化按鈕：置於愛心按鈕正上方（收合成首頁小視窗）。
-                    Positioned(
-                      bottom: 66,
-                      right: 16,
-                      child: _MinimizeButton(onTap: _minimize),
-                    ),
                     Positioned(
                       bottom: 14,
                       right: 14,
@@ -306,7 +300,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
               ),
             ],
           ),
-          // Single layout-toggle icon at the bottom-right of the screen.
+          // 版面切換鈕，右下角；最小化鈕疊在其正上方。
           Positioned(
             right: 16,
             bottom: 68,
@@ -318,6 +312,12 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
                     : _LiveLayout.split;
               }),
             ),
+          ),
+          // 最小化鈕（收合成首頁小視窗），置於「切到沈浸式」鈕上方。
+          Positioned(
+            right: 14,
+            bottom: 118,
+            child: _MinimizeButton(onTap: _minimize),
           ),
         ],
       ),
@@ -1328,12 +1328,12 @@ class _MinimizeButton extends StatelessWidget {
         child: const Tooltip(
           message: '最小化',
           child: SizedBox(
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             child: Icon(
               Icons.picture_in_picture_alt,
               color: Colors.white,
-              size: 18,
+              size: 22,
             ),
           ),
         ),
@@ -1394,7 +1394,7 @@ class _SideActionColumn extends StatelessWidget {
   final int heartCount;
   final VoidCallback onHeartTap;
 
-  /// 最小化（收合成首頁小視窗）；置於愛心按鈕上方。
+  /// 最小化（收合成首頁小視窗）；置於版面切換鈕上方。
   final VoidCallback? onMinimize;
 
   /// When true, the column appends a layout-toggle button at the bottom.
@@ -1407,15 +1407,6 @@ class _SideActionColumn extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (onMinimize != null) ...[
-          _SideActionButton(
-            icon: Icons.picture_in_picture_alt,
-            label: '最小化',
-            bg: Colors.black.withValues(alpha: 0.5),
-            onTap: onMinimize!,
-          ),
-          const SizedBox(height: 14),
-        ],
         _SideActionButton(
           icon: Icons.favorite,
           label: '$heartCount',
@@ -1436,6 +1427,16 @@ class _SideActionColumn extends StatelessWidget {
           bg: Colors.black.withValues(alpha: 0.5),
           onTap: () {},
         ),
+        // 最小化鈕置於版面切換鈕上方。
+        if (onMinimize != null) ...[
+          const SizedBox(height: 14),
+          _SideActionButton(
+            icon: Icons.picture_in_picture_alt,
+            label: '最小化',
+            bg: Colors.black.withValues(alpha: 0.5),
+            onTap: onMinimize!,
+          ),
+        ],
         if (onLayoutToggle != null) ...[
           const SizedBox(height: 14),
           _SideActionButton(

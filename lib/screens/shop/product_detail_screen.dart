@@ -162,7 +162,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             topRight: Radius.circular(appTheme.radiusLg),
                           ),
                         ),
-                        padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -176,7 +176,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                 Text(
                                   'NT\$',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w800,
                                     color: accent,
                                   ),
@@ -210,7 +210,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 3),
+                                        horizontal: 8, vertical: 2),
                                     decoration: BoxDecoration(
                                       color: accent,
                                       borderRadius: BorderRadius.circular(
@@ -220,7 +220,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                       '−$discount%',
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 11,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -237,20 +237,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             Text(
                               detail.name,
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 height: 1.4,
                                 color: appTheme.fg,
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 8),
                             // Sold + remaining + rating row
                             Row(
                               children: [
                                 Text(
                                   '已售 $soldCount',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: appTheme.fgMuted,
                                   ),
                                 ),
@@ -259,7 +259,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   Text(
                                     '剩 $stockCount 件',
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 12,
                                       color: appTheme.fgMuted,
                                     ),
                                   ),
@@ -267,7 +267,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                 Text(
                                   '★ 4.8 (124 評價)',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: appTheme.success,
                                   ),
@@ -280,8 +280,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                 detail.tags.isNotEmpty) ...[
                               const SizedBox(height: 12),
                               Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
+                                spacing: 8,
+                                runSpacing: 8,
                                 children: [
                                   if (detail.category.isNotEmpty)
                                     _TagPill(
@@ -308,13 +308,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           _ProductNote(note: _sampleProductNote()),
                           // 任選組合商品：中間顯示組合挑選（含加入購物車）。
                           if (combo != null) ...[
-                            Divider(height: 28, color: appTheme.divider),
+                            Divider(height: 24, color: appTheme.divider),
                             ComboPicker(
                                 config: combo, mode: ComboMode.page),
                           ] else ...[
                             if (detail.hasSpec &&
                                 detail.specs.isNotEmpty) ...[
-                              Divider(height: 28, color: appTheme.divider),
+                              Divider(height: 24, color: appTheme.divider),
                               _SpecSelector(
                                 specs: detail.specs,
                                 selected:
@@ -329,7 +329,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                         detail.variants, groupId, valueId),
                               ),
                             ],
-                            Divider(height: 28, color: appTheme.divider),
+                            Divider(height: 24, color: appTheme.divider),
                             _QuantityRow(
                               // 售完（stock 0）時上限需 ≥ 下限，否則 clamp(1,0)
                               // 會丟 ArgumentError（Invalid argument: 1）。
@@ -359,7 +359,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             style: GoogleFonts.getFont(
                               appTheme.fontDisplay,
                               textStyle: TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 fontWeight: appTheme.fontWeightDisplay,
                                 color: appTheme.fg,
                               ),
@@ -370,7 +370,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           if (detail.intro.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             Container(
-                              padding: const EdgeInsets.all(14),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: appTheme.bgSubtle,
                                 borderRadius: BorderRadius.circular(
@@ -379,7 +379,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               child: Text(
                                 detail.intro,
                                 style: TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 14,
                                     color: appTheme.fg,
                                     height: 1.6),
                               ),
@@ -496,8 +496,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       isScrollControlled: true,
       // 用主題色，夜間直播等深色主題才不會是白底導致文字對比不足。
       backgroundColor: context.appTheme.bgElev,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(context.appTheme.sheetRadius)),
       ),
       builder: (_) => const _CouponSheet(),
     );
@@ -558,16 +559,16 @@ class _ImageGallery extends StatelessWidget {
               right: 16,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4),
+                    horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(appTheme.avatarRadius),
                 ),
                 child: Text(
                   '${currentIndex + 1} / ${images.length}',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -730,7 +731,7 @@ class _SpecChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           border: Border.all(
             color: borderColor,
@@ -742,7 +743,7 @@ class _SpecChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 14,
             color: textColor,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             decoration: enabled ? null : TextDecoration.lineThrough,
@@ -1114,7 +1115,7 @@ class _IconColumn extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1122,7 +1123,7 @@ class _IconColumn extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: TextStyle(fontSize: 10, color: color),
+              style: TextStyle(fontSize: 12, color: color),
             ),
           ],
         ),
@@ -1156,7 +1157,7 @@ class _CouponRow extends StatelessWidget {
               Text(
                 '查看可使用的優惠券',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14,
                   color: accent,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1415,7 +1416,7 @@ class _CouponScopeTag extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(appTheme.chipRadius + 4),
+        borderRadius: BorderRadius.circular(appTheme.cardRadius),
       ),
       child: Text(
         label,
@@ -1690,7 +1691,7 @@ class _SectionCard extends StatelessWidget {
     final appTheme = context.appTheme;
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       width: double.infinity,
       color: appTheme.bgElev,
       child: child,
@@ -1714,12 +1715,12 @@ class _ProductNote extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Divider(height: 28, color: appTheme.divider),
+        Divider(height: 24, color: appTheme.divider),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(Icons.info_outline, size: 15, color: appTheme.fgMuted),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
             Text(
               '商品備註',
               style: TextStyle(
@@ -1734,7 +1735,7 @@ class _ProductNote extends StatelessWidget {
         Text(
           note,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 14,
             height: 1.6,
             color: appTheme.fgMuted,
           ),
@@ -1759,7 +1760,7 @@ class _TagPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: appTheme.brandPalette.tone50,
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -1814,7 +1815,7 @@ class _AttributeGrid extends StatelessWidget {
                   child: Text(
                     label,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       color: appTheme.fgMuted,
                     ),
                   ),
@@ -1824,7 +1825,7 @@ class _AttributeGrid extends StatelessWidget {
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       color: appTheme.fg,
                     ),
                   ),
@@ -1865,7 +1866,7 @@ class _ReviewsSection extends StatelessWidget {
               style: GoogleFonts.getFont(
                 appTheme.fontDisplay,
                 textStyle: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: appTheme.fontWeightDisplay,
                   color: appTheme.fg,
                 ),
@@ -1957,12 +1958,12 @@ class _ReviewTile extends StatelessWidget {
                 '★' * stars,
                 style: const TextStyle(
                   color: Color(0xFFFFB800),
-                  fontSize: 11,
+                  fontSize: 12,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             text,
             style: TextStyle(
@@ -2075,7 +2076,7 @@ class _UpsellCard extends StatelessWidget {
               item.categoryName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 10, color: accent),
+              style: TextStyle(fontSize: 12, color: accent),
             ),
           ],
         ],

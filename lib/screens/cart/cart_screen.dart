@@ -213,7 +213,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 _ItemVM(
                   name: item.product.name ?? '商品 #${item.productId}',
                   cardTypeLabel: '（直播卡）',
-                  specLabel: '規格 預設 / 標準',
+                  specLabel: '預設 / 標準',
                   qty: item.quantity,
                   unitPrice: item.unitPrice,
                   imageUrl: item.image,

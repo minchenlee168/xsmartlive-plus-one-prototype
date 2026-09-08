@@ -344,6 +344,18 @@ class _HeroHeader extends StatelessWidget {
     final appTheme = context.appTheme;
     final topPadding = MediaQuery.of(context).viewPadding.top;
 
+    // 依漸層亮度自動選前景色：淺色漸層（本商戶粉桃）用深字、深色漸層用白字，
+    // 讓標題與 slogan 都有足夠對比。
+    final gradColors = appTheme.primaryGradient.colors;
+    final gradLum = gradColors
+            .map((c) => c.computeLuminance())
+            .reduce((a, b) => a + b) /
+        gradColors.length;
+    final onGrad = gradLum > 0.5 ? appTheme.fg : Colors.white;
+    final onGradSoft = gradLum > 0.5
+        ? appTheme.fgMuted
+        : Colors.white.withValues(alpha: 0.78);
+
     return Container(
       padding: EdgeInsets.only(
         top: topPadding + 16,
@@ -374,7 +386,7 @@ class _HeroHeader extends StatelessWidget {
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1,
-                        color: Colors.white.withValues(alpha: 0.78),
+                        color: onGradSoft,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -385,7 +397,7 @@ class _HeroHeader extends StatelessWidget {
                         textStyle: TextStyle(
                           fontSize: 26,
                           fontWeight: appTheme.fontWeightDisplay,
-                          color: Colors.white,
+                          color: onGrad,
                           height: 1.1,
                           letterSpacing: 0.5,
                         ),
@@ -397,11 +409,13 @@ class _HeroHeader extends StatelessWidget {
               _CircleIconButton(
                 icon: Icons.search,
                 onTap: onSearchTap,
+                fg: onGrad,
               ),
               const SizedBox(width: 8),
               _CircleIconButton(
                 icon: Icons.notifications_none_outlined,
                 onTap: onBellTap,
+                fg: onGrad,
               ),
             ],
           ),
@@ -460,14 +474,21 @@ class _HeroHeader extends StatelessWidget {
 }
 
 class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({required this.icon, required this.onTap});
+  const _CircleIconButton({
+    required this.icon,
+    required this.onTap,
+    this.fg = Colors.white,
+  });
   final IconData icon;
   final VoidCallback onTap;
+
+  /// 前景色（依 header 漸層亮度傳入）；底圈為其半透明版。
+  final Color fg;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.22),
+      color: fg.withValues(alpha: 0.16),
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -475,7 +496,7 @@ class _CircleIconButton extends StatelessWidget {
         child: SizedBox(
           width: 38,
           height: 38,
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: Icon(icon, color: fg, size: 20),
         ),
       ),
     );
@@ -799,6 +820,16 @@ class _WeeklyScheduleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
+    // 依漸層亮度自動選前景色（同 hero header），淺色漸層用深字避免對比不足。
+    final gradColors = appTheme.primaryGradient.colors;
+    final gradLum = gradColors
+            .map((c) => c.computeLuminance())
+            .reduce((a, b) => a + b) /
+        gradColors.length;
+    final onGrad = gradLum > 0.5 ? appTheme.fg : Colors.white;
+    final onGradSoft = gradLum > 0.5
+        ? appTheme.fgMuted
+        : Colors.white.withValues(alpha: 0.85);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
@@ -822,14 +853,13 @@ class _WeeklyScheduleCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.auto_awesome,
-                      color: Colors.white, size: 18),
+                  Icon(Icons.auto_awesome, color: onGrad, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: onGrad,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                       ),
@@ -838,7 +868,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
                   Text(
                     '春夏保養新品週 ✨',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: onGradSoft,
                       fontSize: 11,
                     ),
                   ),

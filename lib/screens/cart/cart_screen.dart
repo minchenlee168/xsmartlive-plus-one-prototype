@@ -265,7 +265,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               top: topPadding + 12,
               left: 12,
               right: 20,
-              bottom: 14,
+              bottom: 16,
             ),
             color: appTheme.bg,
             child: Row(
@@ -279,7 +279,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     }
                   },
                   icon: Icon(Icons.chevron_left, color: appTheme.fg, size: 24),
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(8),
                   constraints: const BoxConstraints(),
                   visualDensity: VisualDensity.compact,
                 ),
@@ -300,10 +300,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 4),
                 Text(
                   '($totalItemCount)',
-                  style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+                  style: TextStyle(fontSize: 14, color: appTheme.fgMuted),
                 ),
               ],
             ),
@@ -363,7 +363,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           selected: allSelected,
                           size: 18,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 4),
                         const Text('全選',
                             style: TextStyle(fontSize: 12)),
                       ],
@@ -376,7 +376,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       Text(
                         '已選 $selectedCount 件 · ${l10n.checkoutPriceTotal}',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: appTheme.fgMuted,
                         ),
                       ),
@@ -385,7 +385,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         style: GoogleFonts.getFont(
                           appTheme.fontDisplay,
                           textStyle: TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.w900,
                             color: appTheme.brandPalette.tone500,
                           ),
@@ -405,7 +405,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       disabledForegroundColor: Colors.white,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 22, vertical: 13),
+                          horizontal: 20, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(appTheme.buttonRadius),
@@ -601,7 +601,7 @@ class _HostGroupCard extends StatelessWidget {
           children: [
             // Group header
             Container(
-              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: appTheme.divider)),
               ),
@@ -622,30 +622,30 @@ class _HostGroupCard extends StatelessWidget {
                   Text(
                     group.name,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg,
                     ),
                   ),
                   // 溫層 tag 在前
                   if (group.tempTag != null) ...[
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     _TempTag(label: group.tempTag!),
                   ],
                   // 模式 tag 在後（禁止棄標 / 暫停收單；可選購不顯示）
                   if (badge != null) ...[
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: badgeColor.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(appTheme.radiusSm),
                       ),
                       child: Text(
                         badge,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: badgeColor,
                         ),
@@ -659,14 +659,14 @@ class _HostGroupCard extends StatelessWidget {
                     Text(
                       group.note!,
                       style: TextStyle(
-                          fontSize: 11, color: appTheme.fgMuted),
+                          fontSize: 12, color: appTheme.fgMuted),
                     ),
                     if (group.subtotalNote != null) ...[
                       const SizedBox(width: 4),
                       Text(
                         group.subtotalNote!,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           color: appTheme.brandPalette.tone500,
                           fontWeight: FontWeight.w700,
                         ),
@@ -689,7 +689,7 @@ class _HostGroupCard extends StatelessWidget {
             // Group subtotal row
             Container(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               color: appTheme.bgSubtle,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -741,7 +741,7 @@ class _CartItemRow extends StatelessWidget {
     final hasImg = vm.imageUrl != null && vm.imageUrl!.isNotEmpty;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: BoxDecoration(
         border: Border(
           bottom: showDivider
@@ -765,7 +765,7 @@ class _CartItemRow extends StatelessWidget {
                 child: _SquareCheck(selected: vm.checked, size: 20),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
           ],
           // Product image — 70×70 with subtle border
           Container(
@@ -787,7 +787,7 @@ class _CartItemRow extends StatelessWidget {
                 : Icon(Icons.image_outlined,
                     color: appTheme.fgMuted, size: 24),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           // Title + spec + qty stepper
           Expanded(
             child: Column(
@@ -800,14 +800,14 @@ class _CartItemRow extends StatelessWidget {
                         WidgetSpan(
                           alignment: PlaceholderAlignment.middle,
                           child: Padding(
-                            padding: const EdgeInsets.only(right: 6),
+                            padding: const EdgeInsets.only(right: 4),
                             child: _AddonTag(),
                           ),
                         ),
                       TextSpan(
                         text: vm.name,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: appTheme.fg,
                           height: 1.4,
@@ -817,7 +817,7 @@ class _CartItemRow extends StatelessWidget {
                         TextSpan(
                           text: ' ${vm.cardTypeLabel}',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 12,
                             color: appTheme.fgMuted,
                           ),
                         ),
@@ -834,7 +834,7 @@ class _CartItemRow extends StatelessWidget {
                   Text(
                     vm.specLabel,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 12,
                       color: appTheme.fgMuted,
                     ),
                   ),
@@ -844,20 +844,20 @@ class _CartItemRow extends StatelessWidget {
                   const SizedBox(height: 4),
                   for (final e in vm.specAllocation.entries)
                     Padding(
-                      padding: const EdgeInsets.only(top: 1),
+                      padding: const EdgeInsets.only(top: 2),
                       child: Text(
                         '${e.key} ×${e.value}',
-                        style: TextStyle(fontSize: 11, color: appTheme.fg),
+                        style: TextStyle(fontSize: 12, color: appTheme.fg),
                       ),
                     ),
                 ],
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Text('數量',
                         style: TextStyle(
-                            fontSize: 10, color: appTheme.fgMuted)),
-                    const SizedBox(width: 10),
+                            fontSize: 12, color: appTheme.fgMuted)),
+                    const SizedBox(width: 8),
                     _QtyStepper(
                       qty: vm.qty,
                       onMinus: vm.onDecrement,
@@ -867,7 +867,7 @@ class _CartItemRow extends StatelessWidget {
                 ),
                 // 買多優惠提示（達標前顯示還差幾件，達標後顯示已折抵）
                 if (vm.bulkOffer != null) ...[
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   _BulkOfferLine(offer: vm.bulkOffer!, qty: vm.qty),
                 ],
                 // 直播下標：待挑選提示 + 挑選 / 修改規格按鈕
@@ -915,21 +915,21 @@ class _CartItemRow extends StatelessWidget {
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
+                      horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     border: Border.all(color: appTheme.divider),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(appTheme.radiusSm),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.close,
                           size: 11, color: appTheme.fgMuted),
-                      const SizedBox(width: 3),
+                      const SizedBox(width: 4),
                       Text(
                         '刪除',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: appTheme.fgMuted,
                         ),
                       ),
@@ -971,7 +971,7 @@ class _SquareCheck extends StatelessWidget {
         color: selected
             ? appTheme.brandPalette.tone500
             : Colors.transparent,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
         border: Border.all(
           color: selected
               ? appTheme.brandPalette.tone500
@@ -1012,12 +1012,12 @@ class _TempTag extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
       ),
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: FontWeight.w700,
           color: color,
         ),
@@ -1055,7 +1055,7 @@ class _BulkOfferLine extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
               color: color,
               height: 1.4,
@@ -1079,7 +1079,7 @@ class _ItemNoteBanner extends StatelessWidget {
     final appTheme = context.appTheme;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: appTheme.info.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -1088,7 +1088,7 @@ class _ItemNoteBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.info_outline, size: 13, color: appTheme.info),
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
           Expanded(
             child: Text.rich(
               TextSpan(
@@ -1102,7 +1102,7 @@ class _ItemNoteBanner extends StatelessWidget {
                       text: note,
                       style: TextStyle(color: appTheme.fgMuted)),
                 ],
-                style: const TextStyle(fontSize: 11, height: 1.4),
+                style: const TextStyle(fontSize: 12, height: 1.4),
               ),
             ),
           ),
@@ -1123,20 +1123,20 @@ class _BundleBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(44, 0, 14, 10),
+      padding: const EdgeInsets.fromLTRB(44, 0, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             '— 組合商品 —',
-            style: TextStyle(fontSize: 10, color: appTheme.fgMuted),
+            style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: appTheme.bgSubtle,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
             ),
             child: Column(
               children: [
@@ -1167,12 +1167,12 @@ class _BundleThumb extends StatelessWidget {
           height: 38,
           decoration: BoxDecoration(
             color: appTheme.divider,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(appTheme.radiusSm),
           ),
           child: Icon(Icons.inventory_2_outlined,
               size: 18, color: appTheme.fgMuted),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1180,7 +1180,7 @@ class _BundleThumb extends StatelessWidget {
               Text(
                 sub.spec != null ? '${sub.name}（${sub.spec}）' : sub.name,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: appTheme.fg,
                 ),
@@ -1189,7 +1189,7 @@ class _BundleThumb extends StatelessWidget {
               ),
               Text(
                 '數量 ${sub.qty}',
-                style: TextStyle(fontSize: 10, color: appTheme.fgMuted),
+                style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
               ),
             ],
           ),
@@ -1213,7 +1213,7 @@ class _SpecPendingBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF7ED),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(context.appTheme.buttonRadius),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1223,7 +1223,7 @@ class _SpecPendingBadge extends StatelessWidget {
           Text(
             '待挑選規格（尚缺 $remaining）',
             style: const TextStyle(
-              fontSize: 11,
+              fontSize: 12,
               color: amber,
               fontWeight: FontWeight.w500,
             ),
@@ -1247,10 +1247,10 @@ class _ChooseSpecButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           border: Border.all(color: appTheme.brandPalette.tone500),
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(appTheme.buttonRadius),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1260,7 +1260,7 @@ class _ChooseSpecButton extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 12,
                 color: appTheme.brandPalette.tone500,
                 fontWeight: FontWeight.w600,
               ),
@@ -1279,8 +1279,8 @@ void _showSpecAllocSheet(BuildContext context, _ItemVM vm) {
     context: context,
     isScrollControlled: true,
     backgroundColor: appTheme.bgElev,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(appTheme.sheetRadius)),
     ),
     builder: (ctx) => _SpecAllocSheet(vm: vm),
   );
@@ -1378,7 +1378,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
               child: Text(widget.vm.name,
                   style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
             ),
@@ -1391,17 +1391,17 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                   Expanded(
                     child: Container(
                       height: 36,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
                         border: Border.all(color: appTheme.divider),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(appTheme.buttonRadius),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<SpecOption>(
                           isExpanded: true,
                           isDense: true,
                           value: _pick,
-                          style: TextStyle(fontSize: 13, color: appTheme.fg),
+                          style: TextStyle(fontSize: 14, color: appTheme.fg),
                           items: [
                             for (final o in opts)
                               DropdownMenuItem(
@@ -1415,7 +1415,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   _QtyStepper(
                     qty: _pickQty,
                     onMinus: () => setState(
@@ -1424,22 +1424,22 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                       if (_pickQty < addCap) _pickQty++;
                     }),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   GestureDetector(
                     onTap: canAdd ? _add : null,
                     behavior: HitTestBehavior.opaque,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: canAdd
                             ? appTheme.brandPalette.tone500
                             : appTheme.muted.withValues(alpha: 0.4),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(appTheme.buttonRadius),
                       ),
                       child: const Text('加入',
                           style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: Colors.white)),
                     ),
@@ -1457,7 +1457,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                       : '剩餘庫存 ${_pick!.stock}'
                           '${_pick!.limit != null ? '　限購 ${_pick!.limit} 件' : ''}',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 12,
                     color:
                         _pick!.stock <= 0 ? appTheme.danger : appTheme.fgMuted,
                   ),
@@ -1468,7 +1468,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
                 child: Text('已選規格',
-                    style: TextStyle(fontSize: 11, color: appTheme.fgMuted)),
+                    style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
               ),
               for (final e in _draft.entries)
                 Padding(
@@ -1527,7 +1527,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                     disabledBackgroundColor: appTheme.fgMuted,
                     disabledForegroundColor: Colors.white,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(appTheme.buttonRadius),
@@ -1565,7 +1565,7 @@ class _QtyStepper extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: appTheme.divider),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1638,25 +1638,25 @@ class _GiftZone extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(44, 0, 14, 10),
+      padding: const EdgeInsets.fromLTRB(44, 0, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             '— 滿件贈品區 —',
-            style: TextStyle(fontSize: 10, color: appTheme.fgMuted),
+            style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: appTheme.bgSubtle,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
             ),
             child: Row(
               children: [
                 _GiftThumb(label: '滿額贈 小香包'),
-                SizedBox(width: 10),
+                SizedBox(width: 8),
                 _GiftThumb(label: '專屬保溫袋'),
               ],
             ),
@@ -1682,12 +1682,12 @@ class _GiftThumb extends StatelessWidget {
             height: 38,
             decoration: BoxDecoration(
               color: appTheme.divider,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
             ),
             child: Icon(Icons.card_giftcard,
                 size: 20, color: appTheme.fgMuted),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1695,7 +1695,7 @@ class _GiftThumb extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: appTheme.fg,
                   ),
@@ -1704,7 +1704,7 @@ class _GiftThumb extends StatelessWidget {
                 ),
                 Text(
                   '數量 1',
-                  style: TextStyle(fontSize: 10, color: appTheme.fgMuted),
+                  style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
                 ),
               ],
             ),
@@ -1737,10 +1737,10 @@ class _EmptyCart extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             '挑幾件喜歡的商品吧',
-            style: TextStyle(color: appTheme.fgMuted, fontSize: 13),
+            style: TextStyle(color: appTheme.fgMuted, fontSize: 14),
           ),
           const SizedBox(height: 24),
           FilledButton(
@@ -1749,7 +1749,7 @@ class _EmptyCart extends StatelessWidget {
               backgroundColor: appTheme.brandPalette.tone500,
               foregroundColor: Colors.white,
               padding:
-                  const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius:
                     BorderRadius.circular(appTheme.buttonRadius),
@@ -1793,15 +1793,15 @@ class _AddonTag extends StatelessWidget {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(appTheme.radiusSm),
       ),
       child: Text(
         '加購',
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 12,
           height: 1.1,
           fontWeight: FontWeight.w700,
           color: accent,
@@ -1895,7 +1895,7 @@ class _AddonSection extends ConsumerWidget {
         children: [
           // 標題 + 搜尋 + 篩選
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1919,12 +1919,12 @@ class _AddonSection extends ConsumerWidget {
                       child: Text(
                         '共 ${products.length} 件',
                         style: TextStyle(
-                            fontSize: 11, color: appTheme.fgMuted),
+                            fontSize: 12, color: appTheme.fgMuted),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 _AddonSearchBox(),
                 const SizedBox(height: 8),
                 Row(
@@ -1976,7 +1976,7 @@ class _AddonSearchBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: appTheme.bgSubtle,
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -2004,7 +2004,7 @@ class _AddonDropChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: appTheme.bgElev,
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -2066,7 +2066,7 @@ class _AddonCartDropdown extends ConsumerWidget {
           child: Text(
             '全部購物車',
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               color: appTheme.brandPalette.tone500,
               fontWeight: isAll ? FontWeight.w800 : FontWeight.w700,
             ),
@@ -2078,7 +2078,7 @@ class _AddonCartDropdown extends ConsumerWidget {
             child: Text(
               g.name,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 14,
                 color: appTheme.fg,
                 fontWeight:
                     g.id == selectedId ? FontWeight.w700 : FontWeight.w400,
@@ -2087,7 +2087,7 @@ class _AddonCartDropdown extends ConsumerWidget {
           ),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: appTheme.bgElev,
           borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -2132,13 +2132,13 @@ class _AddonCard extends ConsumerWidget {
             children: [
               Icon(Icons.storefront_outlined,
                   size: 11, color: appTheme.fgMuted),
-              const SizedBox(width: 3),
+              const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   product.groupName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 10, color: appTheme.fgMuted),
+                  style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
                 ),
               ),
             ],
@@ -2212,7 +2212,7 @@ class _AddonCard extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.add, size: 16, color: Colors.white),
-                    SizedBox(width: 6),
+                    SizedBox(width: 4),
                     Icon(Icons.shopping_cart_outlined,
                         size: 16, color: Colors.white),
                   ],
@@ -2318,7 +2318,7 @@ class _LivebuyReplaySectionState extends State<_LivebuyReplaySection> {
         border: Border.all(color: appTheme.divider),
       ),
       clipBehavior: Clip.antiAlias,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -2335,7 +2335,7 @@ class _LivebuyReplaySectionState extends State<_LivebuyReplaySection> {
               ),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Center(
             child: Text(
               '只要點選商品的圖片，就會跳轉到直播回放介紹',
@@ -2434,7 +2434,7 @@ class _ReplayVideoCard extends StatelessWidget {
                         height: 24,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(appTheme.radiusSm),
                         ),
                         alignment: Alignment.center,
                         child: Icon(Icons.push_pin, size: 14, color: accent),
@@ -2460,13 +2460,13 @@ class _ReplayVideoCard extends StatelessWidget {
                               height: 30,
                               decoration: BoxDecoration(
                                 color: appTheme.bgSubtle,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(appTheme.radiusSm),
                               ),
                               alignment: Alignment.center,
                               child: Icon(Icons.image_outlined,
                                   size: 16, color: appTheme.fgMuted),
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 4),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment:
@@ -2478,7 +2478,7 @@ class _ReplayVideoCard extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                        fontSize: 10, color: appTheme.fg),
+                                        fontSize: 12, color: appTheme.fg),
                                   ),
                                   Text(
                                     'NT\$ ${video.productPrice}',
@@ -2499,7 +2499,7 @@ class _ReplayVideoCard extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Text(
           video.title,
           maxLines: 1,

@@ -100,7 +100,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 onTap: () => _pushAndRefresh('/coupons'),
               ),
               (
-                label: '收藏',
+                label: '最愛',
                 value: '0',
                 onTap: () => _pushAndRefresh('/favorites'),
               ),

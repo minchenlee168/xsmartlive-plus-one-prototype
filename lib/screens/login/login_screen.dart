@@ -470,10 +470,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       color: context.appTheme.fgMuted, fontSize: 12, fontWeight: FontWeight.w500);
 
   Widget _rowLabel(String left, String right) {
+    // 左側 label 佔與國碼下拉相同寬度、右側 label 對齊手機號碼輸入框左緣。
     return Row(
       children: [
-        Text(left,  style: _labelStyle),
-        const SizedBox(width: 90),
+        SizedBox(width: _codeWidth, child: Text(left, style: _labelStyle)),
+        const SizedBox(width: 8),
         Text(right, style: _labelStyle),
       ],
     );
@@ -481,9 +482,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _colLabel(String text) => Text(text, style: _labelStyle);
 
+  // 國碼下拉固定寬度，讓上方「手機號碼」label 能對齊右側輸入框左緣。
+  static const double _codeWidth = 90;
+
   Widget _codeDropdown() {
     final appTheme = context.appTheme;
     return Container(
+      width: _codeWidth,
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(

@@ -138,7 +138,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get menuMyOrders => '我的訂單';
 
   @override
-  String get menuFavorites => '我的收藏';
+  String get menuFavorites => '我的最愛';
 
   @override
   String get menuHistory => '瀏覽紀錄';
@@ -1109,7 +1109,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get menuMyOrders => '我的订单';
 
   @override
-  String get menuFavorites => '我的收藏';
+  String get menuFavorites => '我的最爱';
 
   @override
   String get menuHistory => '浏览记录';
@@ -2080,7 +2080,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get menuMyOrders => '我的訂單';
 
   @override
-  String get menuFavorites => '我的收藏';
+  String get menuFavorites => '我的最愛';
 
   @override
   String get menuHistory => '瀏覽紀錄';

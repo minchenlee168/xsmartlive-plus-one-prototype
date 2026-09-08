@@ -38,10 +38,15 @@ class StandardProductCard extends StatefulWidget {
     super.key,
     required this.product,
     required this.stock,
+    this.imageAspectRatio,
   });
 
   final Product product;
   final int stock;
+
+  /// 選填：圖片長寬比（例如 1.0 = 方形，對照設計稿的網格）。
+  /// null 時用固定高度 104（主題館橫向列用）。
+  final double? imageAspectRatio;
 
   @override
   State<StandardProductCard> createState() => _StandardProductCardState();
@@ -58,6 +63,10 @@ class _StandardProductCardState extends State<StandardProductCard> {
     final soldOut = widget.stock <= 0;
     // 任選組合商品：不顯示庫存與數量選擇（改由挑選彈窗決定），按鈕開挑選彈窗。
     final combo = comboForId(p.id);
+    // 網格模式（imageAspectRatio 有值，如分類頁）採用較寬鬆、協調的比例；
+    // 主題館橫向列（null）維持原本緊湊版型。
+    final grid = widget.imageAspectRatio != null;
+    final stepSize = grid ? 28.0 : 26.0;
 
     Widget stepBtn(IconData icon,
         {required bool enabled, required VoidCallback onTap}) {
@@ -65,8 +74,8 @@ class _StandardProductCardState extends State<StandardProductCard> {
         onTap: enabled ? onTap : null,
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
         child: Container(
-          width: 26,
-          height: 26,
+          width: stepSize,
+          height: stepSize,
           decoration: BoxDecoration(
             color: appTheme.bgSubtle,
             borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -74,7 +83,8 @@ class _StandardProductCardState extends State<StandardProductCard> {
           ),
           alignment: Alignment.center,
           child: Icon(icon,
-              size: 15, color: enabled ? appTheme.fg : appTheme.muted),
+              size: grid ? 16 : 15,
+              color: enabled ? appTheme.fg : appTheme.muted),
         ),
       );
     }
@@ -91,17 +101,29 @@ class _StandardProductCardState extends State<StandardProductCard> {
         // 卡片依內容高度收合，避免在等比 grid 中被撐高留白。
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 圖片（prototype 佔位）
-          Container(
-            height: 104,
-            width: double.infinity,
-            color: appTheme.bgSubtle,
-            alignment: Alignment.center,
-            child: Icon(Icons.image_outlined,
-                size: 26, color: appTheme.fgMuted),
-          ),
+          // 圖片（prototype 佔位）；imageAspectRatio 指定時用等比方形。
+          if (widget.imageAspectRatio != null)
+            AspectRatio(
+              aspectRatio: widget.imageAspectRatio!,
+              child: Container(
+                width: double.infinity,
+                color: appTheme.bgSubtle,
+                alignment: Alignment.center,
+                child: Icon(Icons.image_outlined,
+                    size: 26, color: appTheme.fgMuted),
+              ),
+            )
+          else
+            Container(
+              height: 104,
+              width: double.infinity,
+              color: appTheme.bgSubtle,
+              alignment: Alignment.center,
+              child: Icon(Icons.image_outlined,
+                  size: 26, color: appTheme.fgMuted),
+            ),
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(grid ? appTheme.spacingMd : 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -112,15 +134,17 @@ class _StandardProductCardState extends State<StandardProductCard> {
                   // 固定保留兩行高度，讓一行 / 兩行名稱的卡片等高，
                   // 橫向列不會因短名稱在底部留下多餘空白。
                   child: SizedBox(
-                    height: 13 * 1.3 * 2,
+                    height: 13 * (grid ? 1.35 : 1.3) * 2,
                     child: Text(
                       p.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           fontSize: 13,
-                          height: 1.3,
-                          fontWeight: FontWeight.w600,
+                          height: grid ? 1.35 : 1.3,
+                          // 網格：名稱輕量（w400）讓價格帶頭；橫向列維持 w600。
+                          fontWeight:
+                              grid ? FontWeight.w400 : FontWeight.w600,
                           color: appTheme.fg),
                     ),
                   ),
@@ -132,7 +156,7 @@ class _StandardProductCardState extends State<StandardProductCard> {
                     Text(
                       'NT\$${p.price.toStringAsFixed(0)}',
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: grid ? 16 : 15,
                           fontWeight: FontWeight.w800,
                           color: accent),
                     ),
@@ -150,7 +174,7 @@ class _StandardProductCardState extends State<StandardProductCard> {
                   ],
                 ),
                 if (combo == null) ...[
-                  const SizedBox(height: 4),
+                  SizedBox(height: grid ? appTheme.spacingSm : 4),
                   Text(
                     soldOut ? '已售完' : '庫存 ${widget.stock}',
                     style: TextStyle(
@@ -178,10 +202,10 @@ class _StandardProductCardState extends State<StandardProductCard> {
                     ],
                   ),
                 ],
-                const SizedBox(height: 8),
+                SizedBox(height: grid ? appTheme.spacingMd : 8),
                 SizedBox(
                   width: double.infinity,
-                  height: 32,
+                  height: grid ? 36 : 32,
                   child: FilledButton(
                     onPressed: soldOut
                         ? null

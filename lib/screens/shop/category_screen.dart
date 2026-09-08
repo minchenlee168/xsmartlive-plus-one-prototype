@@ -67,25 +67,22 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 子分類篩選
+          // 與商城頁頁籤（_CategoryChips）樣式一致：列高 40、左右內距 20。
           SizedBox(
-            height: 44,
+            height: 40,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              // 只留左右內距；垂直方向讓 chip 依內容置中，避免壓縮到文字。
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               itemCount: data.subs.length + 1,
               separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, i) {
                 final label = i == 0 ? '全部' : data.subs[i - 1];
                 final value = i == 0 ? null : data.subs[i - 1];
                 final selected = _sub == value;
-                // Center：chip 依內容高度呈現並垂直置中，不被列高拉伸/裁切。
-                return Center(
-                  child: _SubChip(
-                    label: label,
-                    selected: selected,
-                    onTap: () => setState(() => _sub = value),
-                  ),
+                return _SubChip(
+                  label: label,
+                  selected: selected,
+                  onTap: () => setState(() => _sub = value),
                 );
               },
             ),
@@ -147,25 +144,25 @@ class _SubChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
+    final cs = Theme.of(context).colorScheme;
     final accent = appTheme.brandPalette.tone500;
-    // 用 StadiumBorder + 邊框：未選取 chip 也有清楚外框（不會因低對比融進背景
-    // 而看起來比選取的小）。兩種狀態邊框寬度相同，尺寸一致。
+    // 與商城頁頁籤（shop_screen 的 _CategoryChips）完全一致的樣式。
     return Material(
       color: selected ? accent : appTheme.chip,
-      shape: StadiumBorder(
-        side: BorderSide(color: selected ? accent : appTheme.divider),
-      ),
+      borderRadius: BorderRadius.circular(999),
       child: InkWell(
-        customBorder: const StadiumBorder(),
+        borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: selected ? Colors.white : appTheme.chipFg,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: selected ? cs.onPrimary : appTheme.chipFg,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),

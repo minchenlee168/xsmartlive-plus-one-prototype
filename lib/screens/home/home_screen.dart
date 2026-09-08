@@ -108,7 +108,7 @@ class _FlashSaleSection extends ConsumerWidget {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -129,7 +129,7 @@ class _FlashSaleSection extends ConsumerWidget {
                     Text(
                       '距結束',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: appTheme.fgMuted,
                       ),
@@ -155,7 +155,7 @@ class _FlashSaleSection extends ConsumerWidget {
             ),
           ),
           if (products.isNotEmpty) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             // 限時搶購商品卡比照主題館：標準商品卡（庫存 + 數量 + ＋購物車）。
             _StandardCardWrap(products: products),
           ],
@@ -280,7 +280,7 @@ class _CountdownBlock extends StatelessWidget {
     final appTheme = context.appTheme;
     return Container(
       constraints: const BoxConstraints(minWidth: 28),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: appTheme.fg,
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -291,7 +291,7 @@ class _CountdownBlock extends StatelessWidget {
         style: GoogleFonts.jetBrainsMono(
           color: appTheme.bg,
           fontWeight: FontWeight.w800,
-          fontSize: 13,
+          fontSize: 14,
         ),
       ),
     );
@@ -310,7 +310,7 @@ class _CountdownColon extends StatelessWidget {
         ':',
         style: TextStyle(
           fontWeight: FontWeight.w700,
-          fontSize: 13,
+          fontSize: 14,
           color: appTheme.fg,
         ),
       ),
@@ -361,7 +361,7 @@ class _HeroHeader extends StatelessWidget {
         top: topPadding + 16,
         left: 20,
         right: 20,
-        bottom: 22,
+        bottom: 20,
       ),
       decoration: BoxDecoration(
         gradient: appTheme.primaryGradient,
@@ -383,7 +383,7 @@ class _HeroHeader extends StatelessWidget {
                     Text(
                       tagline,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1,
                         color: onGradSoft,
@@ -395,7 +395,7 @@ class _HeroHeader extends StatelessWidget {
                       style: GoogleFonts.getFont(
                         appTheme.fontDisplay,
                         textStyle: TextStyle(
-                          fontSize: 26,
+                          fontSize: 24,
                           fontWeight: appTheme.fontWeightDisplay,
                           color: onGrad,
                           height: 1.1,
@@ -419,13 +419,13 @@ class _HeroHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           // Search bar pill
           GestureDetector(
             onTap: onSearchTap,
             child: Container(
               height: 46,
-              padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
+              padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(appTheme.cardRadius),
@@ -433,7 +433,7 @@ class _HeroHeader extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(Icons.search, size: 18, color: appTheme.fgMuted),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       searchPlaceholder,
@@ -446,7 +446,7 @@ class _HeroHeader extends StatelessWidget {
                   Container(
                     height: double.infinity,
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                     decoration: BoxDecoration(
                       color: appTheme.brandPalette.tone500,
                       borderRadius:
@@ -531,7 +531,7 @@ class _SectionHeader extends StatelessWidget {
               style: GoogleFonts.getFont(
                 appTheme.fontDisplay,
                 textStyle: TextStyle(
-                  fontSize: 17,
+                  fontSize: 16,
                   fontWeight: appTheme.fontWeightDisplay,
                   color: appTheme.fg,
                 ),
@@ -586,7 +586,7 @@ class _ReplaysCarousel extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         scrollDirection: Axis.horizontal,
         itemCount: placeholders.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final item = placeholders[i];
           return _ReplayCard(
@@ -648,22 +648,22 @@ class _ReplayCard extends StatelessWidget {
                     left: 8,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.55),
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: BorderRadius.circular(appTheme.avatarRadius),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.play_arrow,
                               color: Colors.white, size: 11),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 4),
                           Text(
                             duration,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -675,7 +675,7 @@ class _ReplayCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             title.isNotEmpty ? title : '—',
             maxLines: 1,
@@ -755,7 +755,7 @@ class _CategoriesGrid extends StatelessWidget {
           final c = items[i];
           return Expanded(
             child: Padding(
-              padding: EdgeInsets.only(right: i == items.length - 1 ? 0 : 10),
+              padding: EdgeInsets.only(right: i == items.length - 1 ? 0 : 8),
               child: InkWell(
                 borderRadius: BorderRadius.circular(appTheme.cardRadius),
                 onTap: () => context.push('/shop/category/${c.id}'),
@@ -779,14 +779,14 @@ class _CategoriesGrid extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Text(
                       c.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: appTheme.fg,
                         height: 1.2,
@@ -843,7 +843,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
           children: [
             // Card header
             Container(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               decoration: BoxDecoration(
                 gradient: appTheme.primaryGradient,
                 borderRadius: BorderRadius.only(
@@ -854,7 +854,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(Icons.auto_awesome, color: onGrad, size: 18),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       title,
@@ -869,7 +869,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
                     '春夏保養新品週 ✨',
                     style: TextStyle(
                       color: onGradSoft,
-                      fontSize: 11,
+                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -880,7 +880,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
               final s = entry.value;
               return Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 18, vertical: 14),
+                    horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: i < _mockSchedule.length - 1
@@ -897,7 +897,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
                           Text(
                             s.day,
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: appTheme.fgMuted,
                             ),
@@ -926,7 +926,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: appTheme.fg,
                             ),
@@ -943,7 +943,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
                             child: Text(
                               '✨ ${s.tag}',
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: appTheme.chipFg,
                               ),

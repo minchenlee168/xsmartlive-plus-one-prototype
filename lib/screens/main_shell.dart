@@ -406,8 +406,8 @@ class _LiveMiniButton extends StatelessWidget {
                           ),
                         ),
                       ),
-                // 暗色遮罩 + 播放三角，讓它一眼看出是可展開的影片。
-                Container(color: Colors.black.withValues(alpha: 0.28)),
+                // 半透明紅色遮罩 + 播放三角，一眼看出是可展開的直播影片。
+                Container(color: appTheme.danger.withValues(alpha: 0.42)),
                 const Center(
                   child: Icon(Icons.play_arrow_rounded,
                       color: Colors.white, size: 22),

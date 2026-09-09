@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
-import '../../utils/responsive.dart';
+import '../../widgets/product_card.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -46,199 +46,43 @@ class FavoritesScreen extends ConsumerWidget {
               ],
             );
           }
+          // 收藏卡改用共用「標準商品卡」ProductCard，與全站商品卡樣式一致；
+          // 右上疊一顆愛心作為「移除收藏」入口（原型：目前為佔位）。
           return Column(
             children: [
               _Header(count: favorites.length, showCount: true),
               Expanded(
-                child: GridView.builder(
-                  padding: EdgeInsets.all(appTheme.spacingMd),
-                  gridDelegate:
-                      SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: Responsive.productGridColumns(context),
-                    crossAxisSpacing: appTheme.spacingMd,
-                    mainAxisSpacing: appTheme.spacingMd,
-                    childAspectRatio: 0.62,
-                  ),
-                  itemCount: favorites.length,
-                  itemBuilder: (context, i) {
-                    final fav = favorites[i];
-                    final p = fav.product;
-                    final scheme = Theme.of(context).colorScheme;
-
-                    return Card(
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final spacing = appTheme.spacingMd;
+                    final hPad = appTheme.spacingMd;
+                    final avail = constraints.maxWidth - hPad * 2;
+                    final cols = (avail / 190).floor().clamp(2, 6);
+                    final cardW = (avail - spacing * (cols - 1)) / cols;
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.all(appTheme.spacingMd),
+                      child: Wrap(
+                        spacing: spacing,
+                        runSpacing: spacing,
                         children: [
-                          Expanded(
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                Container(
-                                  color: scheme.surfaceContainerHighest,
-                                  child: Icon(Icons.image_outlined,
-                                      size: 40,
-                                      color: scheme.onSurfaceVariant),
-                                ),
-                                if (!p.inStock)
-                                  Container(
-                                    color: Colors.black54,
-                                    child: const Center(
-                                      child: Text('已售完',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold)),
-                                    ),
+                          for (final fav in favorites)
+                            SizedBox(
+                              width: cardW,
+                              child: Stack(
+                                children: [
+                                  ProductCard(
+                                    variant: ProductCardVariant.standard,
+                                    product: fav.product,
+                                    stock: previewStockFor(fav.product),
                                   ),
-                                if (p.originalPrice != null)
                                   Positioned(
-                                    top: 6,
-                                    left: 6,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: appTheme.danger,
-                                        borderRadius:
-                                            BorderRadius.circular(
-                                                appTheme.radiusSm),
-                                      ),
-                                      child: const Text('特價',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold)),
-                                    ),
+                                    top: appTheme.spacingSm,
+                                    right: appTheme.spacingSm,
+                                    child: _RemoveFavButton(onTap: () {}),
                                   ),
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: appTheme.bgElev,
-                                      shape: BoxShape.circle,
-                                      boxShadow: appTheme.elevation1,
-                                    ),
-                                    child: IconButton(
-                                      icon: Icon(Icons.favorite,
-                                          color: appTheme.danger, size: 16),
-                                      onPressed: () {},
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(appTheme.spacingSm),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(p.name,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 12, color: appTheme.fg)),
-                                Text(fav.streamer,
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        color: appTheme.fgMuted)),
-                                SizedBox(height: appTheme.spacingXs),
-                                Row(
-                                  children: [
-                                    Text(
-                                      'NT\$${p.price.toStringAsFixed(0)}',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: scheme.primary),
-                                    ),
-                                    if (p.originalPrice != null) ...[
-                                      SizedBox(width: appTheme.spacingXs),
-                                      Text(
-                                        'NT\$${p.originalPrice!.toStringAsFixed(0)}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: appTheme.fgMuted,
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                SizedBox(height: appTheme.spacingSm),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: SizedBox(
-                                        height: 28,
-                                        child: DecoratedBox(
-                                          decoration: BoxDecoration(
-                                            gradient:
-                                                appTheme.primaryGradient,
-                                            borderRadius:
-                                                BorderRadius.circular(
-                                                    appTheme.buttonRadius),
-                                          ),
-                                          child: ElevatedButton(
-                                            onPressed: p.inStock
-                                                ? () => ref
-                                                    .read(cartProvider
-                                                        .notifier)
-                                                    .addItem(p)
-                                                : null,
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              shadowColor:
-                                                  Colors.transparent,
-                                              padding: EdgeInsets.zero,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        appTheme
-                                                            .buttonRadius),
-                                              ),
-                                            ),
-                                            child: Text(
-                                                p.inStock ? '加入購物車' : '已售完',
-                                                style: const TextStyle(
-                                                    fontSize: 11,
-                                                    color: Colors.white)),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: appTheme.spacingSm),
-                                    SizedBox(
-                                      height: 28,
-                                      width: 28,
-                                      child: OutlinedButton(
-                                        onPressed: () {},
-                                        style: OutlinedButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          side: BorderSide(
-                                              color: appTheme.divider),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(
-                                                    appTheme.buttonRadius),
-                                          ),
-                                        ),
-                                        child: Icon(Icons.delete_outline,
-                                            size: 14,
-                                            color: appTheme.fgMuted),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                     );
@@ -248,6 +92,30 @@ class FavoritesScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// 收藏卡右上角的「移除收藏」愛心鈕（原型：佔位）。
+class _RemoveFavButton extends StatelessWidget {
+  const _RemoveFavButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return Material(
+      color: appTheme.bgElev,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          width: 28,
+          height: 28,
+          child: Icon(Icons.favorite, color: appTheme.danger, size: 16),
+        ),
       ),
     );
   }
@@ -282,8 +150,7 @@ class _Header extends StatelessWidget {
           if (showCount) ...[
             SizedBox(height: appTheme.spacingXs),
             Text('$count 件商品',
-                style:
-                    TextStyle(fontSize: 12, color: appTheme.fgMuted)),
+                style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
           ],
         ],
       ),

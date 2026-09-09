@@ -324,6 +324,12 @@ class _ProductCardState extends ConsumerState<ProductCard>
   }
 
   void _addToCart(String? spec) {
+    // 真的加進購物車（依數量），不只跳提示——標準卡各處（首頁 / 分類 / 商城 /
+    // 我的最愛）加入購物車皆生效。
+    final notifier = ref.read(cartProvider.notifier);
+    for (var i = 0; i < _qty; i++) {
+      notifier.addItem(widget.product);
+    }
     final name = widget.product.name;
     final label = spec == null ? '$name ×$_qty' : '$name（$spec）×$_qty';
     ScaffoldMessenger.of(context)

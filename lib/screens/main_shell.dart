@@ -438,7 +438,7 @@ class _CSBubble extends StatelessWidget {
                 width: 10,
                 height: 10,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF22C55E),
+                  color: context.appTheme.success,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
                 ),

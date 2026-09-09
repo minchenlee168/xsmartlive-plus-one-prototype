@@ -637,8 +637,8 @@ class _SocialPostCard extends StatelessWidget {
                 Container(
                   width: 6,
                   height: 6,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF22C55E),
+                  decoration: BoxDecoration(
+                    color: context.appTheme.success,
                     shape: BoxShape.circle,
                   ),
                 ),

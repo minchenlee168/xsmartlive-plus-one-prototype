@@ -800,19 +800,19 @@ class _DetailToggleRow extends StatelessWidget {
             width: 25,
             height: 25,
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: appTheme.bgSubtle,
               borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: const Color(0xFFF1F5F9)),
+              border: Border.all(color: appTheme.bgSubtle),
             ),
             alignment: Alignment.center,
             child: AnimatedRotation(
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeInOut,
               turns: expanded ? 0.5 : 0,
-              child: const Icon(
+              child: Icon(
                 Icons.keyboard_arrow_down,
                 size: 16,
-                color: Color(0xFF475569),
+                color: appTheme.fgMuted,
               ),
             ),
           ),
@@ -836,10 +836,11 @@ class _OrderDetailBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final appTheme = context.appTheme;
     final detailAsync = ref.watch(purchaseDetailProvider(orderId));
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appTheme.bg,
         borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.all(4),
@@ -880,8 +881,8 @@ class _OrderDetailBody extends ConsumerWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.error_outline,
-                  size: 16, color: Color(0xFFEF4444)),
+              Icon(Icons.error_outline,
+                  size: 16, color: appTheme.danger),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -918,6 +919,7 @@ class _DetailItemBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final appTheme = context.appTheme;
     final name = item.productName ?? '';
     final spec = item.variantName;
     final unitPrice = item.unitPrice;
@@ -927,7 +929,7 @@ class _DetailItemBlock extends StatelessWidget {
         border: Border(
           bottom: isLast
               ? BorderSide.none
-              : const BorderSide(color: Color(0xFFCBD5E1)),
+              : BorderSide(color: appTheme.divider),
         ),
       ),
       padding: const EdgeInsets.only(bottom: 8),
@@ -942,7 +944,7 @@ class _DetailItemBlock extends StatelessWidget {
                 child: Container(
                   width: 48,
                   height: 48,
-                  color: const Color(0xFFD9D9D9),
+                  color: appTheme.divider,
                   child: item.imageUrl == null
                       ? null
                       : Image.network(
@@ -963,10 +965,10 @@ class _DetailItemBlock extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       // 與上方 label 後方內容一致（同字級、同一般字重）。
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF334155),
+                        color: appTheme.fg,
                         height: 1.1,
                       ),
                     ),
@@ -974,9 +976,9 @@ class _DetailItemBlock extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         l10n.ordersItemSpec(spec),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF334155),
+                          color: appTheme.fg,
                           height: 1.4,
                         ),
                       ),
@@ -991,19 +993,19 @@ class _DetailItemBlock extends StatelessWidget {
                   if (unitPrice != null)
                     Text(
                       '\$$unitPrice',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF334155),
+                        color: appTheme.fg,
                       ),
                     ),
                   const SizedBox(height: 2),
                   Text(
                     l10n.ordersItemQtySuffix(item.quantity),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF334155),
+                      color: appTheme.fg,
                     ),
                   ),
                 ],
@@ -1105,6 +1107,7 @@ class _FulfillmentPackage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final appTheme = context.appTheme;
     final activeIndex = _activeIndex();
     // 已配箱（待出貨起）才有包裹編號；尚未配箱則顯示「尚未配箱」。
     final headerLabel =
@@ -1128,10 +1131,10 @@ class _FulfillmentPackage extends StatelessWidget {
               Expanded(
                 child: Text(
                   headerLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF334155),
+                    color: appTheme.fg,
                     height: 1.5,
                   ),
                 ),
@@ -1139,10 +1142,10 @@ class _FulfillmentPackage extends StatelessWidget {
               Text(
                 l10n.ordersPackagePieces(
                     int.tryParse(fulfillment.itemQuantity) ?? 0),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155),
+                  color: appTheme.fg,
                   height: 1.5,
                 ),
               ),
@@ -1151,7 +1154,7 @@ class _FulfillmentPackage extends StatelessWidget {
           const SizedBox(height: 4),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: appTheme.bg,
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.symmetric(
@@ -1284,9 +1287,9 @@ class _TimelineEvent extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
-    const grey = Color(0xFF94A3B8);
-    const lineGrey = Color(0xFFE2E8F0);
-    final labelColor = reached ? const Color(0xFF334155) : grey;
+    final grey = appTheme.muted;
+    final lineGrey = appTheme.divider;
+    final labelColor = reached ? appTheme.fg : grey;
 
     Widget line(bool show, bool active) => Expanded(
           child: show
@@ -1302,9 +1305,9 @@ class _TimelineEvent extends StatelessWidget {
           child: Text(
             reached ? timestamp : '',
             maxLines: 1,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
-              color: Color(0xFF334155),
+              color: appTheme.fg,
             ),
           ),
         ),
@@ -1320,7 +1323,7 @@ class _TimelineEvent extends StatelessWidget {
                 color: reached ? accent : Colors.white,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: reached ? accent : const Color(0xFFCBD5E1),
+                  color: reached ? accent : appTheme.divider,
                   width: 1.5,
                 ),
               ),
@@ -1431,9 +1434,10 @@ class _InfoPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    const baseText = Color(0xFF334155);
-    const border = Color(0xFFE2E8F0);
-    const danger = Color(0xFFEF4444);
+    final appTheme = context.appTheme;
+    final baseText = appTheme.fg;
+    final border = appTheme.divider;
+    final danger = appTheme.danger;
 
     final rights = [
       l10n.ordersInfoRightsItem1,
@@ -1453,7 +1457,7 @@ class _InfoPanel extends StatelessWidget {
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6),
-        side: const BorderSide(color: border),
+        side: BorderSide(color: border),
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: screenHeight * 0.78),
@@ -1462,7 +1466,7 @@ class _InfoPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: border)),
               ),
               padding: const EdgeInsets.fromLTRB(15.75, 5.25, 5.25, 5.25),
@@ -1471,7 +1475,7 @@ class _InfoPanel extends StatelessWidget {
                   Expanded(
                     child: Text(
                       l10n.ordersInfoPanelTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: baseText,
@@ -1484,10 +1488,10 @@ class _InfoPanel extends StatelessWidget {
                     constraints: const BoxConstraints(
                         minWidth: 35, minHeight: 35),
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close,
                       size: 14,
-                      color: Color(0xFF64748B),
+                      color: appTheme.fgMuted,
                     ),
                   ),
                 ],
@@ -1505,10 +1509,10 @@ class _InfoPanel extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       l10n.ordersInfoReturnTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF050004),
+                        color: appTheme.fg,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -1522,7 +1526,7 @@ class _InfoPanel extends StatelessWidget {
                             TextSpan(text: l10n.ordersInfoReturnRule2Prefix),
                             TextSpan(
                               text: l10n.ordersTimelineDelivered,
-                              style: const TextStyle(color: danger),
+                              style: TextStyle(color: danger),
                             ),
                             TextSpan(text: l10n.ordersInfoReturnRule2Suffix),
                           ],
@@ -1550,8 +1554,9 @@ class _NumberedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const baseText = Color(0xFF334155);
-    const style = TextStyle(
+    final appTheme = context.appTheme;
+    final baseText = appTheme.fg;
+    final style = TextStyle(
       fontSize: 14,
       color: baseText,
       height: 1.625,
@@ -1586,17 +1591,18 @@ class _KeywordChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
     return Align(
       alignment: Alignment.centerLeft,
       child: InputChip(
         label: Text(keyword),
         onDeleted: onClear,
-        deleteIconColor: const Color(0xFF475569),
+        deleteIconColor: appTheme.fgMuted,
         backgroundColor: Colors.white,
-        side: const BorderSide(color: Color(0xFFCBD5E1)),
-        labelStyle: const TextStyle(
+        side: BorderSide(color: appTheme.divider),
+        labelStyle: TextStyle(
           fontSize: 13,
-          color: Color(0xFF334155),
+          color: appTheme.fg,
         ),
       ),
     );
@@ -1709,9 +1715,10 @@ class _SearchSheetState extends State<_SearchSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    const borderColor = Color(0xFFCBD5E1);
-    const baseText = Color(0xFF334155);
-    const placeholder = Color(0xFF64748B);
+    final appTheme = context.appTheme;
+    final borderColor = appTheme.divider;
+    final baseText = appTheme.fg;
+    final placeholder = appTheme.fgMuted;
     final primary = context.appTheme.brandPalette.tone500;
 
     return Padding(
@@ -1729,7 +1736,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                   Expanded(
                     child: Text(
                       l10n.ordersSearchTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: baseText,
@@ -1746,7 +1753,7 @@ class _SearchSheetState extends State<_SearchSheet> {
               const SizedBox(height: 4),
               Text(
                 l10n.ordersSearchDateLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: baseText,
@@ -1775,7 +1782,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                       Expanded(
                         child: Text(
                           '${_fmt(_start)} - ${_fmt(_end)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             color: baseText,
                           ),
@@ -1785,7 +1792,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                         width: 35,
                         height: 35,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: appTheme.bgSubtle,
                           border: Border(
                               left: BorderSide(color: borderColor)),
                           borderRadius: const BorderRadius.only(
@@ -1798,8 +1805,8 @@ class _SearchSheetState extends State<_SearchSheet> {
                           'assets/icons/orders/calendar.svg',
                           width: 14,
                           height: 14,
-                          colorFilter: const ColorFilter.mode(
-                              Color(0xFF475569), BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              appTheme.fgMuted, BlendMode.srcIn),
                         ),
                       ),
                     ],
@@ -1809,7 +1816,7 @@ class _SearchSheetState extends State<_SearchSheet> {
               const SizedBox(height: 6),
               Text(
                 l10n.ordersSearchDateHelper,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   color: baseText,
                   height: 1.6,
@@ -1838,13 +1845,13 @@ class _SearchSheetState extends State<_SearchSheet> {
                         controller: _keywordCtrl,
                         textInputAction: TextInputAction.search,
                         onSubmitted: (_) => _submit(),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 14, color: baseText),
                         decoration: InputDecoration(
                           isDense: true,
                           border: InputBorder.none,
                           hintText: l10n.ordersSearchKeywordPlaceholder,
-                          hintStyle: const TextStyle(
+                          hintStyle: TextStyle(
                             fontSize: 14,
                             color: placeholder,
                           ),
@@ -1904,8 +1911,8 @@ class _SearchSheetState extends State<_SearchSheet> {
                 const SizedBox(height: 8),
                 Text(
                   _error!,
-                  style: const TextStyle(
-                      color: Color(0xFFEF4444), fontSize: 12),
+                  style: TextStyle(
+                      color: appTheme.danger, fontSize: 12),
                 ),
               ],
               const SizedBox(height: 12),

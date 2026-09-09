@@ -1208,21 +1208,22 @@ class _SpecPendingBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const amber = Color(0xFFB45309);
+    final appTheme = context.appTheme;
+    final amber = appTheme.onWarningContainer;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF7ED),
-        borderRadius: BorderRadius.circular(context.appTheme.buttonRadius),
+        color: appTheme.warningContainer,
+        borderRadius: BorderRadius.circular(appTheme.buttonRadius),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error_outline, size: 12, color: amber),
+          Icon(Icons.error_outline, size: 12, color: amber),
           const SizedBox(width: 4),
           Text(
             '待挑選規格（尚缺 $remaining）',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: amber,
               fontWeight: FontWeight.w500,

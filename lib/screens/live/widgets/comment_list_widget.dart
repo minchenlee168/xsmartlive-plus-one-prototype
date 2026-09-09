@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/live_stream.dart';
+import '../../../theme/app_theme_extension.dart';
 
 class CommentListWidget extends StatelessWidget {
   const CommentListWidget({super.key, required this.comments});
@@ -30,7 +31,7 @@ class _CommentTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: Colors.grey.shade300,
+            backgroundColor: context.appTheme.divider,
             child: const Icon(Icons.person, size: 18, color: Colors.white),
           ),
           const SizedBox(width: 10),
@@ -45,8 +46,8 @@ class _CommentTile extends StatelessWidget {
             height: 28,
             child: IconButton(
               padding: EdgeInsets.zero,
-              icon: const Icon(Icons.thumb_up_outlined,
-                  size: 16, color: Colors.grey),
+              icon: Icon(Icons.thumb_up_outlined,
+                  size: 16, color: context.appTheme.muted),
               onPressed: () {},
             ),
           ),

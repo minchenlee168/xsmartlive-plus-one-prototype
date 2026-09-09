@@ -149,7 +149,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         width: 9,
                         height: 9,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF22C55E),
+                          color: appTheme.success,
                           shape: BoxShape.circle,
                           border: Border.all(
                               color: appTheme.bgElev, width: 1.5),

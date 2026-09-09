@@ -1956,8 +1956,8 @@ class _ReviewTile extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 '★' * stars,
-                style: const TextStyle(
-                  color: Color(0xFFFFB800),
+                style: TextStyle(
+                  color: appTheme.starGold,
                   fontSize: 12,
                 ),
               ),

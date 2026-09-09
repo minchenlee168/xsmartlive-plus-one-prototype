@@ -43,7 +43,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final currentLocale = localeAsync.valueOrNull ?? const Locale('zh', 'TW');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: appTheme.bgSubtle,
       appBar: AppBar(
         title: Text(l10n.settingsTitle),
         flexibleSpace: Container(
@@ -92,16 +92,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEDE9FE),
+                  color: appTheme.brandPalette.tone50,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.info_outline,
-                    size: 20, color: Color(0xFF7C3AED)),
+                child: Icon(Icons.info_outline,
+                    size: 20, color: appTheme.brandPalette.tone500),
               ),
               title: Text(l10n.settingsAppVersion),
               trailing: Text(
                 _version.isEmpty ? '—' : '$_version (build $_buildNumber)',
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
+                style: TextStyle(color: appTheme.fgMuted, fontSize: 13),
               ),
             ),
           ),
@@ -121,10 +121,10 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Colors.grey,
+            color: context.appTheme.fgMuted,
             letterSpacing: 0.5),
       ),
     );
@@ -150,15 +150,18 @@ class _LanguageTile extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color(0xFFEDE9FE),
+          color: context.appTheme.brandPalette.tone50,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Icon(Icons.language, size: 20, color: Color(0xFF7C3AED)),
+        child: Icon(Icons.language,
+            size: 20, color: context.appTheme.brandPalette.tone500),
       ),
       title: Text(displayName),
       trailing: isSelected
-          ? const Icon(Icons.check_circle, color: Color(0xFF7C3AED))
-          : const Icon(Icons.radio_button_unchecked, color: Colors.grey),
+          ? Icon(Icons.check_circle,
+              color: context.appTheme.brandPalette.tone500)
+          : Icon(Icons.radio_button_unchecked,
+              color: context.appTheme.muted),
       onTap: onTap,
     );
   }

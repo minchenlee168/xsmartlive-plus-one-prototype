@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/live_stream.dart';
+import '../../../theme/app_theme_extension.dart';
 
 class LivePlayerWidget extends StatelessWidget {
   const LivePlayerWidget({
@@ -52,7 +53,7 @@ class LivePlayerWidget extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color: context.appTheme.danger,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Text('🔴 LIVE',

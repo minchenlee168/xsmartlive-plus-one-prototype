@@ -32,9 +32,9 @@ class CartDrawer extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+                  Icon(Icons.error_outline, color: appTheme.danger, size: 48),
                   const SizedBox(height: 12),
-                  Text(l10n.cartLoadFailed, style: TextStyle(color: Colors.grey.shade600)),
+                  Text(l10n.cartLoadFailed, style: TextStyle(color: appTheme.fgMuted)),
                   const SizedBox(height: 8),
                   TextButton(
                     onPressed: () => ref.read(cartApiProvider.notifier).refresh(),
@@ -53,7 +53,7 @@ class CartDrawer extends ConsumerWidget {
                   itemCount: items.fold(0, (s, c) => s + c.quantity),
                   onClose: () => Navigator.of(context).pop(),
                 ),
-                Divider(color: Colors.grey.shade200, height: 1),
+                Divider(color: appTheme.divider, height: 1),
                 Expanded(
                   child: items.isEmpty
                       ? const _EmptyCart()
@@ -69,7 +69,7 @@ class CartDrawer extends ConsumerWidget {
                         ),
                 ),
                 if (items.isNotEmpty) ...[
-                  Divider(color: Colors.grey.shade200, height: 1),
+                  Divider(color: appTheme.divider, height: 1),
                   _CartFooter(
                     subtotal: cart?.subtotal ?? 0.0,
                     discount: cart?.discount ?? 0.0,
@@ -95,14 +95,15 @@ class _CartHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final appTheme = context.appTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           Text(
             l10n.cartTitle(itemCount),
-            style: const TextStyle(
-              color: Color(0xFF1A1A2E),
+            style: TextStyle(
+              color: appTheme.fg,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
@@ -110,7 +111,7 @@ class _CartHeader extends StatelessWidget {
           const Spacer(),
           GestureDetector(
             onTap: onClose,
-            child: Icon(Icons.close, color: Colors.grey.shade500, size: 24),
+            child: Icon(Icons.close, color: appTheme.muted, size: 24),
           ),
         ],
       ),
@@ -148,6 +149,7 @@ class _CartItemTileState extends ConsumerState<_CartItemTile> {
   Widget build(BuildContext context) {
     final item = widget.item;
     final l10n = AppLocalizations.of(context)!;
+    final appTheme = context.appTheme;
     final name = item.product.name ?? l10n.cartProductFallback;
     final subtotal = item.unitPrice * item.quantity;
 
@@ -161,7 +163,7 @@ class _CartItemTileState extends ConsumerState<_CartItemTile> {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: appTheme.bgSubtle,
               borderRadius: BorderRadius.circular(8),
             ),
             clipBehavior: Clip.antiAlias,
@@ -169,7 +171,7 @@ class _CartItemTileState extends ConsumerState<_CartItemTile> {
               item.image ?? '',
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
-                  Icon(Icons.image_not_supported, color: Colors.grey.shade300, size: 28),
+                  Icon(Icons.image_not_supported, color: appTheme.divider, size: 28),
               loadingBuilder: (_, child, progress) =>
                   progress == null ? child : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
             ),
@@ -182,8 +184,8 @@ class _CartItemTileState extends ConsumerState<_CartItemTile> {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
-                      color: Color(0xFF1A1A2E),
+                  style: TextStyle(
+                      color: appTheme.fg,
                       fontSize: 14,
                       fontWeight: FontWeight.w500),
                   maxLines: 2,
@@ -207,10 +209,10 @@ class _CartItemTileState extends ConsumerState<_CartItemTile> {
                             )
                           : Text(
                               '${item.quantity}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF1A1A2E)),
+                                  color: appTheme.fg),
                             ),
                     ),
                     _QtyButton(
@@ -230,8 +232,8 @@ class _CartItemTileState extends ConsumerState<_CartItemTile> {
             children: [
               Text(
                 l10n.cartItemPrice(subtotal.toStringAsFixed(0)),
-                style: const TextStyle(
-                    color: Color(0xFF7C3AED),
+                style: TextStyle(
+                    color: appTheme.brandPalette.tone500,
                     fontSize: 13,
                     fontWeight: FontWeight.w600),
               ),
@@ -239,7 +241,7 @@ class _CartItemTileState extends ConsumerState<_CartItemTile> {
               GestureDetector(
                 onTap: widget.onRemove,
                 child: Icon(Icons.delete_outline,
-                    color: Colors.grey.shade400, size: 18),
+                    color: appTheme.muted, size: 18),
               ),
             ],
           ),
@@ -263,22 +265,23 @@ class _QtyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final active = enabled && onTap != null;
+    final appTheme = context.appTheme;
     return GestureDetector(
       onTap: active ? onTap : null,
       child: Container(
         width: 26,
         height: 26,
         decoration: BoxDecoration(
-          color: active ? Colors.grey.shade100 : Colors.grey.shade50,
+          color: active ? appTheme.bgSubtle : appTheme.bgSubtle,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: active ? Colors.grey.shade300 : Colors.grey.shade200,
+            color: active ? appTheme.divider : appTheme.divider,
           ),
         ),
         child: Icon(
           icon,
           size: 14,
-          color: active ? const Color(0xFF1A1A2E) : Colors.grey.shade300,
+          color: active ? appTheme.fg : appTheme.divider,
         ),
       ),
     );
@@ -309,9 +312,9 @@ class _CartFooter extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(l10n.cartSubtotal,
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+                  style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
               Text('\$${subtotal.toStringAsFixed(0)}',
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 14)),
+                  style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
             ],
           ),
           if (discount > 0) ...[
@@ -321,10 +324,10 @@ class _CartFooter extends StatelessWidget {
               children: [
                 Text(l10n.cartDiscount,
                     style:
-                        TextStyle(color: Colors.green.shade600, fontSize: 14)),
+                        TextStyle(color: appTheme.success, fontSize: 14)),
                 Text('-\$${discount.toStringAsFixed(0)}',
                     style: TextStyle(
-                        color: Colors.green.shade600, fontSize: 14)),
+                        color: appTheme.success, fontSize: 14)),
               ],
             ),
           ],
@@ -333,8 +336,8 @@ class _CartFooter extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(l10n.cartTotal,
-                  style: const TextStyle(
-                      color: Color(0xFF1A1A2E),
+                  style: TextStyle(
+                      color: appTheme.fg,
                       fontSize: 15,
                       fontWeight: FontWeight.w600)),
               Text(
@@ -382,14 +385,15 @@ class _EmptyCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.shopping_cart_outlined, color: Color(0xFFD1C4E9), size: 56),
+          Icon(Icons.shopping_cart_outlined, color: appTheme.brandPalette.tone100, size: 56),
           const SizedBox(height: 12),
           Text(AppLocalizations.of(context)!.cartEmpty,
-              style: const TextStyle(color: Color(0xFFB0BEC5), fontSize: 14)),
+              style: TextStyle(color: appTheme.muted, fontSize: 14)),
         ],
       ),
     );

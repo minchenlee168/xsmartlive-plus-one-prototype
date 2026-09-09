@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../theme/app_theme_extension.dart';
+
 /// Full-screen WebView that handles server-side OAuth flows (LINE, TikTok).
 ///
 /// Flow:
@@ -55,7 +57,6 @@ class _OAuthWebScreenState extends State<OAuthWebScreen> {
 
   static const _bg = Color(0xFF09090B);
   static const _surface = Color(0xFF18181B);
-  static const _primary = Color(0xFF7008E7);
 
   @override
   void initState() {
@@ -108,10 +109,11 @@ class _OAuthWebScreenState extends State<OAuthWebScreen> {
         children: [
           WebViewWidget(controller: _controller),
           if (_isLoading)
-            const ColoredBox(
+            ColoredBox(
               color: _bg,
               child: Center(
-                child: CircularProgressIndicator(color: _primary),
+                child: CircularProgressIndicator(
+                    color: context.appTheme.brandPalette.tone500),
               ),
             ),
         ],

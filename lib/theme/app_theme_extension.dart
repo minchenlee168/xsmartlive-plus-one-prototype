@@ -84,6 +84,14 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     // ── Extended semantic colors ──────────────────────────────
     this.success = const Color(0xFF10B981),
     this.warning = const Color(0xFFF59E0B),
+    // Light amber container + on-container text for warning-state callouts
+    // (e.g. "待挑選規格" hint). `warning` alone lacks a surface tint and the
+    // amber-on-amber text needs a darker shade for contrast.
+    this.warningContainer = const Color(0xFFFFF7ED),
+    this.onWarningContainer = const Color(0xFFB45309),
+    // Rating star gold — deliberately warmer/brighter than `warning` (#F59E0B)
+    // so review stars keep their gold identity.
+    this.starGold = const Color(0xFFFFB800),
     this.info = const Color(0xFF3B82F6),
     this.divider = const Color(0xFFE5E7EB),
     this.muted = const Color(0xFF9CA3AF),
@@ -179,6 +187,9 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
   // Extended semantic colors
   final Color success;
   final Color warning;
+  final Color warningContainer;
+  final Color onWarningContainer;
+  final Color starGold;
   final Color info;
   final Color divider;
   final Color muted;
@@ -238,6 +249,9 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     Color? danger,
     Color? success,
     Color? warning,
+    Color? warningContainer,
+    Color? onWarningContainer,
+    Color? starGold,
     Color? info,
     Color? divider,
     Color? muted,
@@ -282,6 +296,9 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
       danger: danger ?? this.danger,
       success: success ?? this.success,
       warning: warning ?? this.warning,
+      warningContainer: warningContainer ?? this.warningContainer,
+      onWarningContainer: onWarningContainer ?? this.onWarningContainer,
+      starGold: starGold ?? this.starGold,
       info: info ?? this.info,
       divider: divider ?? this.divider,
       muted: muted ?? this.muted,
@@ -351,6 +368,11 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
       danger: Color.lerp(danger, other.danger, t)!,
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
+      warningContainer:
+          Color.lerp(warningContainer, other.warningContainer, t)!,
+      onWarningContainer:
+          Color.lerp(onWarningContainer, other.onWarningContainer, t)!,
+      starGold: Color.lerp(starGold, other.starGold, t)!,
       info: Color.lerp(info, other.info, t)!,
       divider: Color.lerp(divider, other.divider, t)!,
       muted: Color.lerp(muted, other.muted, t)!,

@@ -702,7 +702,7 @@ class _ThemeHallSections extends StatelessWidget {
                     hall.title,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -724,8 +724,8 @@ class _ThemeHallSections extends StatelessWidget {
           SizedBox(
             // 卡片名稱固定保留兩行高度後所有卡等高，列高貼齊卡片內容，
             // 既不會底部溢位、也不留多餘空白。
-            // 標準卡圖片 1:1 + 刪除線原價改放售價下方一行，整卡再變高，故列高再上調。
-            height: hall.standard ? 374 : 282,
+            // 標準卡圖片 1:1 + 原價在售價下方 + 商品名 16（兩行），整卡高度隨之上調。
+            height: hall.standard ? 384 : 292,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -853,7 +853,7 @@ class _StoreCollectionCard extends StatelessWidget {
                       collection.typeLabel,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.85),
-                        fontSize: 11,
+                        fontSize: 12,
                       ),
                     ),
                 ],

@@ -114,7 +114,7 @@ class _SectionLabel extends StatelessWidget {
       child: Text(
         text.toUpperCase(),
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.2,
           color: appTheme.fgMuted,
@@ -191,7 +191,7 @@ class _PresetCard extends StatelessWidget {
                       Text(
                         AppLocalizations.of(context)!.themeCurrentlyApplied,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: tokens.brandPalette.tone500,
                         ),

@@ -402,7 +402,7 @@ class _AddressCardShell extends StatelessWidget {
           Text(
             body,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               height: 1.5,
               color: disabled ? appTheme.fgMuted : appTheme.fg,
             ),

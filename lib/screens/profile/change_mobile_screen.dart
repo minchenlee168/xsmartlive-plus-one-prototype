@@ -334,7 +334,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                           _otpSent ? '確認更新' : '送出驗證碼',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

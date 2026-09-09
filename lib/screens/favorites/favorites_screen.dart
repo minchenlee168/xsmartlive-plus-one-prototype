@@ -38,7 +38,7 @@ class FavoritesScreen extends ConsumerWidget {
                         SizedBox(height: appTheme.spacingXs),
                         Text('快去直播間挖掘喜歡的商品吧！',
                             style: TextStyle(
-                                fontSize: 14, color: appTheme.fgMuted)),
+                                fontSize: 12, color: appTheme.fgMuted)),
                       ],
                     ),
                   ),
@@ -283,7 +283,7 @@ class _Header extends StatelessWidget {
             SizedBox(height: appTheme.spacingXs),
             Text('$count 件商品',
                 style:
-                    TextStyle(fontSize: 14, color: appTheme.fgMuted)),
+                    TextStyle(fontSize: 12, color: appTheme.fgMuted)),
           ],
         ],
       ),

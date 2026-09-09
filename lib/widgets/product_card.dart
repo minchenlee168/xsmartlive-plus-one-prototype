@@ -128,8 +128,8 @@ class _ProductCardState extends ConsumerState<ProductCard>
     final grid = widget.imageAspectRatio != null;
     final stepSize = grid ? 28.0 : 26.0;
     // 網格模式字級收斂到階梯（14/12）；橫向緊湊列維持原值（out of scope）。
-    // 名稱 14（手機易讀）；原價/庫存 11。售價字型另依精簡卡（襯線）。
-    const nameSize = 14.0;
+    // 名稱 16 / w600（卡片標題級，手機清楚易讀）；原價/庫存 11。
+    const nameSize = 16.0;
     const metaSize = 11.0; // 原價 / 庫存
     final qtySize = grid ? 14.0 : 13.0;
 
@@ -211,8 +211,8 @@ class _ProductCardState extends ConsumerState<ProductCard>
                       style: TextStyle(
                           fontSize: nameSize,
                           height: 1.3,
-                          // 依精簡卡：名稱 w500。
-                          fontWeight: FontWeight.w500,
+                          // 卡片標題級：w600，手機清楚。
+                          fontWeight: FontWeight.w600,
                           color: appTheme.fg),
                     ),
                   ),
@@ -670,14 +670,14 @@ class _ProductCardState extends ConsumerState<ProductCard>
                     // 固定保留兩行高度，讓一行 / 兩行名稱的卡片等高，
                     // 橫向列不會因短名稱在底部留下多餘空白。
                     SizedBox(
-                      height: 14 * 1.3 * 2,
+                      height: 16 * 1.3 * 2,
                       child: Text(
                         product.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                           height: 1.3,
                           color: appTheme.fg,
                         ),

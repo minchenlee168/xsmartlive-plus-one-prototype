@@ -271,7 +271,7 @@ class _StreamerRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     '${streamer.followers} 粉絲',
-                    style: TextStyle(fontSize: 11, color: appTheme.muted),
+                    style: TextStyle(fontSize: 12, color: appTheme.muted),
                   ),
                 ],
               ),
@@ -310,7 +310,7 @@ class _FollowButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(appTheme.buttonRadius),
           ),
         ),
-        child: const Text('已追蹤', style: TextStyle(fontSize: 12)),
+        child: const Text('已追蹤', style: TextStyle(fontSize: 14)),
       );
     }
     return FilledButton(
@@ -326,7 +326,7 @@ class _FollowButton extends StatelessWidget {
         ),
       ),
       child: const Text('追蹤',
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
     );
   }
 }

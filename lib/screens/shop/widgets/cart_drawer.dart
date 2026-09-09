@@ -104,7 +104,7 @@ class _CartHeader extends StatelessWidget {
             l10n.cartTitle(itemCount),
             style: TextStyle(
               color: appTheme.fg,
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -234,7 +234,7 @@ class _CartItemTileState extends ConsumerState<_CartItemTile> {
                 l10n.cartItemPrice(subtotal.toStringAsFixed(0)),
                 style: TextStyle(
                     color: appTheme.brandPalette.tone500,
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
@@ -338,13 +338,13 @@ class _CartFooter extends StatelessWidget {
               Text(l10n.cartTotal,
                   style: TextStyle(
                       color: appTheme.fg,
-                      fontSize: 15,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600)),
               Text(
                 'NT\$${total.toStringAsFixed(0)}',
                 style: TextStyle(
                   color: appTheme.primaryGradient.colors.last,
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -368,7 +368,7 @@ class _CartFooter extends StatelessWidget {
                   l10n.cartCheckout,
                   style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 15,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600),
                 ),
               ),

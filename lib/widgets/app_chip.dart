@@ -7,7 +7,7 @@ import '../theme/app_theme_extension.dart';
 /// Single source of truth for the horizontal category / sub-category rail so
 /// the two rails can never visually drift again. Visuals come entirely from
 /// theme tokens (`context.appTheme`) — the only literals are the chip's own
-/// intrinsic constants (999 pill radius, 16/8 padding, 13pt label).
+/// intrinsic constants (999 pill radius, 16/8 padding, 14pt label).
 class AppChip extends StatelessWidget {
   const AppChip({
     super.key,
@@ -38,7 +38,7 @@ class AppChip extends StatelessWidget {
                 color: selected
                     ? Theme.of(context).colorScheme.onPrimary
                     : appTheme.chipFg,
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
             ),

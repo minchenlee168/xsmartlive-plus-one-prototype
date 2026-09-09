@@ -113,7 +113,7 @@ class _LanguageCard extends StatelessWidget {
                     Text(
                       tag,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         color: appTheme.fgMuted,
                         letterSpacing: 0.5,
                       ),

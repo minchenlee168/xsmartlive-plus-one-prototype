@@ -73,7 +73,7 @@ class FlashSaleScreen extends ConsumerWidget {
                               '⚡ 限時搶購',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 18,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
@@ -92,7 +92,7 @@ class FlashSaleScreen extends ConsumerWidget {
                         '−40%',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 34,
+                          fontSize: 32,
                           fontWeight: FontWeight.w900,
                           letterSpacing: -1,
                         ),

@@ -122,7 +122,7 @@ class _Header extends StatelessWidget {
             style: GoogleFonts.getFont(
               appTheme.fontDisplay,
               textStyle: TextStyle(
-                fontSize: 26,
+                fontSize: 24,
                 fontWeight: appTheme.fontWeightDisplay,
                 color: appTheme.fg,
               ),
@@ -131,7 +131,7 @@ class _Header extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+            style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
           ),
         ],
       ),
@@ -252,7 +252,7 @@ class _FeaturedCard extends StatelessWidget {
                         stream.streamer,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -263,7 +263,7 @@ class _FeaturedCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.9),
-                          fontSize: 13,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -494,7 +494,7 @@ class _EmptyTab extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               label,
-              style: TextStyle(color: appTheme.fgMuted, fontSize: 13),
+              style: TextStyle(color: appTheme.fgMuted, fontSize: 14),
             ),
           ],
         ),
@@ -645,7 +645,7 @@ class _SocialPostCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               color: appTheme.fg,
               height: 1.35,
@@ -655,7 +655,7 @@ class _SocialPostCard extends StatelessWidget {
           if (item.providerPostId != null)
             Text(
               variant == _SocialVariant.group ? '社團貼文' : '粉絲團貼文',
-              style: TextStyle(fontSize: 10, color: appTheme.fgMuted),
+              style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
             ),
         ],
       ),

@@ -263,7 +263,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               appVersion == null
                   ? brandName
                   : '$brandName · v$appVersion',
-              style: TextStyle(fontSize: 11, color: appTheme.fgMuted),
+              style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
             ),
           ),
           const SizedBox(height: 28),
@@ -498,7 +498,7 @@ class _OrdersIconGrid extends StatelessWidget {
                   style: GoogleFonts.getFont(
                     appTheme.fontDisplay,
                     textStyle: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: appTheme.fontWeightDisplay,
                       color: appTheme.fg,
                     ),
@@ -564,7 +564,7 @@ class _OrdersIconGrid extends StatelessWidget {
                                 Text(
                                   s.label,
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: appTheme.fgMuted,
                                   ),
                                   textAlign: TextAlign.center,
@@ -619,7 +619,7 @@ class _RecentOrdersSection extends ConsumerWidget {
                 child: Text(
                   '近期訂單',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: appTheme.fgMuted,
                   ),
@@ -710,7 +710,7 @@ class _RecentOrderCard extends StatelessWidget {
                   Text(
                     '#${order.id}',
                     style: GoogleFonts.jetBrainsMono(
-                      fontSize: 11,
+                      fontSize: 12,
                       color: appTheme.fgMuted,
                     ),
                   ),

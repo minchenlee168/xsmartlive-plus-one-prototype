@@ -1132,7 +1132,7 @@ class _ProductList extends StatelessWidget {
                           child: const Text(
                             '立即下單',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -1600,7 +1600,7 @@ class _FloatingProductCard extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1650,7 +1650,7 @@ class _FloatingProductCard extends ConsumerWidget {
                   '立即下單',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                   ),
                 ),

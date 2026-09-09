@@ -676,7 +676,7 @@ class _AmountBreakdownSheet extends StatelessWidget {
               ),
               Text('NT\$${b.total}',
                   style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.w900,
                       color: accent)),
             ],
@@ -1478,7 +1478,7 @@ class _InfoPanel extends StatelessWidget {
                     child: Text(
                       l10n.ordersInfoPanelTitle,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: baseText,
                         height: 1.0,
@@ -2529,7 +2529,7 @@ class _LabeledValue extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: TextStyle(fontSize: 11, color: appTheme.fgMuted)),
+            style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
         const SizedBox(height: 2),
         Text(value, style: TextStyle(fontSize: 14, color: appTheme.fg)),
       ],

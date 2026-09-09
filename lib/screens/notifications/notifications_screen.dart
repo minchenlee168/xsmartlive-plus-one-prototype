@@ -81,7 +81,7 @@ class _NotificationsScreenState
                       EdgeInsets.symmetric(horizontal: appTheme.spacingLg),
                   child: Text('${unread.length} 則未讀通知',
                       style: TextStyle(
-                          fontSize: 14, color: appTheme.fgMuted)),
+                          fontSize: 12, color: appTheme.fgMuted)),
                 ),
                 SizedBox(height: appTheme.spacingXs),
                 TabBar(

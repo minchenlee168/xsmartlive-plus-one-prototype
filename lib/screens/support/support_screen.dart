@@ -137,7 +137,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         'C',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 13,
+                          fontSize: 12,
                           fontWeight: FontWeight.w800,
                         ),
                       ),

@@ -230,17 +230,22 @@ class _ProductCardState extends ConsumerState<ProductCard>
                     ),
                   ),
                 ),
-                if (p.originalPrice != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    'NT\$${p.originalPrice!.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      fontSize: metaSize,
-                      color: appTheme.fgMuted,
-                      decoration: TextDecoration.lineThrough,
-                    ),
-                  ),
-                ],
+                // 永遠保留原價這一行的高度（沒原價時留等高空位），讓所有卡等高、
+                // grid 不會有的高有的矮。
+                const SizedBox(height: 2),
+                SizedBox(
+                  height: metaSize * 1.35,
+                  child: p.originalPrice != null
+                      ? Text(
+                          'NT\$${p.originalPrice!.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: metaSize,
+                            color: appTheme.fgMuted,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        )
+                      : null,
+                ),
                 if (combo == null) ...[
                   SizedBox(height: grid ? appTheme.spacingSm : 4),
                   Text(
@@ -697,17 +702,21 @@ class _ProductCardState extends ConsumerState<ProductCard>
                         ),
                       ),
                     ),
-                    if (hasOriginal) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        'NT\$${product.originalPrice!.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: appTheme.fgMuted,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ],
+                    // 永遠保留原價這一行的高度（沒原價時留等高空位），讓所有卡等高。
+                    const SizedBox(height: 2),
+                    SizedBox(
+                      height: 11 * 1.35,
+                      child: hasOriginal
+                          ? Text(
+                              'NT\$${product.originalPrice!.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: appTheme.fgMuted,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            )
+                          : null,
+                    ),
                     const SizedBox(height: 6),
                     // 「＋」按鈕靠右（已移除「已售 N」文字）。
                     Row(

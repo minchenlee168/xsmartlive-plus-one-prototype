@@ -16,8 +16,7 @@ import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/app_chip.dart';
-import '../../widgets/shop_product_card.dart';
-import '../../widgets/standard_product_card.dart';
+import '../../widgets/product_card.dart';
 import 'theme_hall_data.dart';
 
 /// Shop screen — corresponds to prototype `src/screens/catalog.jsx` plus
@@ -30,7 +29,7 @@ import 'theme_hall_data.dart';
 ///   3. Sort row (熱銷 / 最新 / 價格↑ / 價格↓)
 ///   4. Banner carousel (kept from previous version)
 ///   5. 直播公告 (kept from previous version)
-///   6. 2-column product grid using [ShopProductCard]
+///   6. 2-column product grid using [ProductCard]
 class ShopScreen extends ConsumerWidget {
   const ShopScreen({super.key});
 
@@ -735,11 +734,15 @@ class _ThemeHallSections extends StatelessWidget {
               itemBuilder: (context, i) => SizedBox(
                 width: hall.standard ? 176 : 150,
                 child: hall.standard
-                    ? StandardProductCard(
+                    ? ProductCard(
+                        variant: ProductCardVariant.standard,
                         product: hall.items[i].product,
                         stock: hall.items[i].stock,
                       )
-                    : ShopProductCard(product: hall.items[i].product),
+                    : ProductCard(
+                        variant: ProductCardVariant.compact,
+                        product: hall.items[i].product,
+                      ),
               ),
             ),
           ),

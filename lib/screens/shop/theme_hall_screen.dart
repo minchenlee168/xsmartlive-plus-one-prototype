@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../theme/app_theme_extension.dart';
 import '../../widgets/back_leading_button.dart';
-import '../../widgets/standard_product_card.dart';
+import '../../widgets/product_card.dart';
 import 'theme_hall_data.dart';
 
 /// 主題館頁：由商城主題館標題右側「查看更多」進入。
@@ -155,8 +155,10 @@ class ThemeHallScreen extends StatelessWidget {
                       for (final item in hall.items)
                         SizedBox(
                           width: cardW,
-                          child: StandardProductCard(
-                              product: item.product, stock: item.stock),
+                          child: ProductCard(
+                              variant: ProductCardVariant.standard,
+                              product: item.product,
+                              stock: item.stock),
                         ),
                     ],
                   ),

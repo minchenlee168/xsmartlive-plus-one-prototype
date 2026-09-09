@@ -10,7 +10,7 @@ import '../../providers/live_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../utils/responsive.dart';
-import '../../widgets/standard_product_card.dart';
+import '../../widgets/product_card.dart';
 
 /// Home screen — corresponds to the React prototype `src/screens/home.jsx`.
 ///
@@ -187,7 +187,8 @@ class _StandardCardWrap extends StatelessWidget {
             for (final p in products)
               SizedBox(
                 width: cardW,
-                child: StandardProductCard(
+                child: ProductCard(
+                  variant: ProductCardVariant.standard,
                   product: p,
                   stock: previewStockFor(p),
                 ),

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/product_provider.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../widgets/back_leading_button.dart';
-import '../../widgets/standard_product_card.dart';
+import '../../widgets/product_card.dart';
 
 /// 限時搶購頁：由首頁「限時搶購」標題右側「查看更多」進入。
 /// 呈現標題 banner 與全部限時搶購商品（標準商品卡）。
@@ -133,7 +133,8 @@ class FlashSaleScreen extends ConsumerWidget {
                         for (final p in products)
                           SizedBox(
                             width: cardW,
-                            child: StandardProductCard(
+                            child: ProductCard(
+                              variant: ProductCardVariant.standard,
                               product: p,
                               stock: previewStockFor(p),
                             ),

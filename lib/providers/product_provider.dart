@@ -11,7 +11,7 @@ import '../models/product_spec.dart';
 import '../models/product_variant.dart';
 import '../screens/shop/category_screen.dart' show categoryPreviewProducts;
 import '../screens/shop/theme_hall_data.dart';
-import '../widgets/standard_product_card.dart'
+import '../widgets/product_card.dart'
     show productSpecOptions, previewStockFor;
 import 'analytics_provider.dart';
 import 'auth_provider.dart';

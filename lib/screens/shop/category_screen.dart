@@ -6,7 +6,7 @@ import '../../models/product.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../widgets/app_chip.dart';
 import '../../widgets/back_leading_button.dart';
-import '../../widgets/standard_product_card.dart';
+import '../../widgets/product_card.dart';
 
 /// 商城分類頁（B）：由商城分類 tab 進入，含子分類篩選 + 商品卡。
 ///
@@ -112,7 +112,8 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                             for (final p in products)
                               SizedBox(
                                 width: cardW,
-                                child: StandardProductCard(
+                                child: ProductCard(
+                                  variant: ProductCardVariant.standard,
                                   product: p.product,
                                   stock: previewStockFor(p.product),
                                   // 1:1 方形圖片，與精簡卡及全站商品卡統一比例。

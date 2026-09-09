@@ -254,7 +254,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
                       child: Row(
                         children: [
                           _LivePill(color: appTheme.danger),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           _ViewerPill(viewers: stream.viewers),
                         ],
                       ),
@@ -394,7 +394,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen>
             child: Row(
               children: [
                 _LivePill(color: appTheme.danger),
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 _ViewerPill(viewers: stream.viewers),
               ],
             ),
@@ -557,14 +557,14 @@ class _TopBar extends ConsumerWidget {
           icon: AppIcons.back,
           onTap: () => Navigator.of(context).maybePop(),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(4, 4, 6, 4),
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
 
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(appTheme.avatarRadius),
             ),
             child: Row(
               children: [
@@ -607,7 +607,7 @@ class _TopBar extends ConsumerWidget {
                         children: [
                           const Icon(AppIcons.eye,
                               color: Colors.white, size: 10),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 4),
                           Text(
                             '${stream.viewers > 0 ? stream.viewers : 3333} 觀看',
                             style: TextStyle(
@@ -622,16 +622,16 @@ class _TopBar extends ConsumerWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 5),
+                      horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: appTheme.brandPalette.tone500,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(appTheme.avatarRadius),
                   ),
                   child: const Text(
                     '+ 追蹤',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -640,7 +640,7 @@ class _TopBar extends ConsumerWidget {
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         _GlassCircleButton(
           icon: Icons.headset_mic_outlined,
           onTap: () => context.push('/support'),
@@ -684,7 +684,7 @@ class _LivePill extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.appTheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(appTheme.radiusSm),
@@ -702,7 +702,7 @@ class _LivePill extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 5),
+          SizedBox(width: 4),
           Text(
             'LIVE',
             style: TextStyle(
@@ -797,18 +797,18 @@ class _ChatOverlayState extends State<_ChatOverlay> {
               alignment: Alignment.centerLeft,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 5),
+                    horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: c.isSelf
                       ? appTheme.brandPalette.tone500
                       : Colors.black.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(appTheme.cardRadius),
                 ),
                 child: RichText(
                   text: TextSpan(
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: 12,
                       height: 1.4,
                     ),
                     children: [
@@ -947,7 +947,7 @@ class _ProductList extends StatelessWidget {
               Text(
                 '此場直播尚無商品',
                 style:
-                    TextStyle(color: appTheme.fgMuted, fontSize: 13),
+                    TextStyle(color: appTheme.fgMuted, fontSize: 14),
               ),
             ],
           ),
@@ -958,7 +958,7 @@ class _ProductList extends StatelessWidget {
     return Container(
       color: appTheme.bg,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 80),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         children: [
           Row(
             children: [
@@ -977,7 +977,7 @@ class _ProductList extends StatelessWidget {
               Text(
                 '滑動瀏覽 ›',
                 style: TextStyle(
-                    fontSize: 11, color: appTheme.fgMuted),
+                    fontSize: 12, color: appTheme.fgMuted),
               ),
             ],
           ),
@@ -987,11 +987,11 @@ class _ProductList extends StatelessWidget {
             final p = entry.value;
             final active = i == activeIndex;
             return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 8),
               child: GestureDetector(
                 onTap: () => onTap(i),
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: appTheme.bgElev,
                     borderRadius:
@@ -1043,7 +1043,7 @@ class _ProductList extends StatelessWidget {
                                 '${i + 1}',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 11,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -1062,7 +1062,7 @@ class _ProductList extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: appTheme.fg,
                                 height: 1.3,
@@ -1078,7 +1078,7 @@ class _ProductList extends StatelessWidget {
                                   style: GoogleFonts.getFont(
                                     appTheme.fontDisplay,
                                     textStyle: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w900,
                                       color:
                                           appTheme.brandPalette.tone500,
@@ -1086,14 +1086,14 @@ class _ProductList extends StatelessWidget {
                                   ),
                                 ),
                                 if (p.originalPrice != null) ...[
-                                  const SizedBox(width: 5),
+                                  const SizedBox(width: 4),
                                   Padding(
                                     padding:
                                         const EdgeInsets.only(bottom: 2),
                                     child: Text(
                                       '\$${p.originalPrice!.toStringAsFixed(0)}',
                                       style: TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 12,
                                         color: appTheme.fgMuted,
                                         decoration:
                                             TextDecoration.lineThrough,
@@ -1107,7 +1107,7 @@ class _ProductList extends StatelessWidget {
                             Text(
                               '已售 ${p.sales}',
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 12,
                                 color: appTheme.fgMuted,
                               ),
                             ),
@@ -1123,7 +1123,7 @@ class _ProductList extends StatelessWidget {
                             backgroundColor:
                                 appTheme.brandPalette.tone500,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 8),
+                                horizontal: 12, vertical: 8),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                   appTheme.radiusSm),
@@ -1216,10 +1216,10 @@ class _BottomInputBar extends StatelessWidget {
           Expanded(
             child: Container(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: appTheme.bgSubtle,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(appTheme.avatarRadius),
                 border: Border.all(color: appTheme.divider),
               ),
               child: Row(
@@ -1231,12 +1231,12 @@ class _BottomInputBar extends StatelessWidget {
                     child: TextField(
                       controller: ctrl,
                       style: TextStyle(
-                          color: appTheme.fg, fontSize: 13),
+                          color: appTheme.fg, fontSize: 14),
                       decoration: InputDecoration(
                         hintText: hint,
                         hintStyle: TextStyle(
                           color: appTheme.fgMuted,
-                          fontSize: 13,
+                          fontSize: 14,
                         ),
                         border: InputBorder.none,
                         isDense: true,
@@ -1284,13 +1284,13 @@ class _ViewerPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(context.appTheme.avatarRadius),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(AppIcons.eye, color: Colors.white, size: 11),
-          const SizedBox(width: 3),
+          const SizedBox(width: 4),
           Text(
             '$n',
             style: const TextStyle(
@@ -1571,10 +1571,10 @@ class _FloatingProductCard extends ConsumerWidget {
                 left: -4,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 5, vertical: 2),
+                      horizontal: 4, vertical: 2),
                   decoration: BoxDecoration(
                     color: accent,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(appTheme.avatarRadius),
                   ),
                   child: Text(
                     '#$index',
@@ -1588,7 +1588,7 @@ class _FloatingProductCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1600,7 +1600,7 @@ class _FloatingProductCard extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1621,11 +1621,11 @@ class _FloatingProductCard extends ConsumerWidget {
                       ),
                     ),
                     if (hasOriginal) ...[
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 4),
                       Text(
                         '\$${product.originalPrice!.toStringAsFixed(0)}',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: Colors.white.withValues(alpha: 0.6),
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -1645,7 +1645,7 @@ class _FloatingProductCard extends ConsumerWidget {
               onTap: () =>
                   ref.read(cartProvider.notifier).addItem(product),
               child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Text(
                   '立即下單',
                   style: TextStyle(
@@ -1708,10 +1708,10 @@ class _GlassBottomInput extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(appTheme.avatarRadius),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.15),
               ),
@@ -1729,13 +1729,13 @@ class _GlassBottomInput extends StatelessWidget {
                     controller: ctrl,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 13,
+                      fontSize: 14,
                     ),
                     decoration: InputDecoration(
                       hintText: hint,
                       hintStyle: TextStyle(
                         color: Colors.white.withValues(alpha: 0.55),
-                        fontSize: 13,
+                        fontSize: 14,
                       ),
                       border: InputBorder.none,
                       isDense: true,

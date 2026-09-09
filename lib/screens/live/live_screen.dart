@@ -10,6 +10,7 @@ import '../../providers/live_provider.dart';
 import '../../theme/app_icons.dart';
 import '../../theme/app_theme_extension.dart';
 import '../../utils/responsive.dart';
+import '../../widgets/app_chip.dart';
 
 /// Live List — corresponds to prototype `src/screens/live.jsx` `LiveList()`.
 ///
@@ -158,33 +159,17 @@ class _PillTabs extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        children: tabs.map((t) {
-          final isSelected = t.$1 == selected;
-          return Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: GestureDetector(
-              onTap: () => onChange(t.$1),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? appTheme.brandPalette.tone500
-                      : appTheme.chip,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  t.$2,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected ? Colors.white : appTheme.chipFg,
-                  ),
-                ),
+        children: [
+          for (final t in tabs)
+            Padding(
+              padding: EdgeInsets.only(right: appTheme.spacingSm),
+              child: AppChip(
+                label: t.$2,
+                selected: t.$1 == selected,
+                onTap: () => onChange(t.$1),
               ),
             ),
-          );
-        }).toList(),
+        ],
       ),
     );
   }

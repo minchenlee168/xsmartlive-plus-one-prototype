@@ -218,15 +218,21 @@ class _ProductCardState extends ConsumerState<ProductCard>
                   ),
                 ),
                 const SizedBox(height: 4),
-                // 售價（品牌襯線 16/w800）；刪除線原價放在售價「下方」一行。
-                Text(
-                  'NT\$${p.price.toStringAsFixed(0)}',
-                  style: GoogleFonts.getFont(
-                    appTheme.fontDisplay,
-                    textStyle: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: accent,
+                // 售價（品牌襯線 20/w800，手機更清楚）；長金額 FittedBox 縮放不截斷。
+                // 刪除線原價放在售價「下方」一行。
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'NT\$${p.price.toStringAsFixed(0)}',
+                    maxLines: 1,
+                    style: GoogleFonts.getFont(
+                      appTheme.fontDisplay,
+                      textStyle: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: accent,
+                      ),
                     ),
                   ),
                 ),
@@ -696,15 +702,20 @@ class _ProductCardState extends ConsumerState<ProductCard>
                     ),
 
                     const SizedBox(height: 6),
-                    // 售價（品牌襯線 16/w800）；刪除線原價放在售價「下方」一行。
-                    Text(
-                      'NT\$${product.price.toStringAsFixed(0)}',
-                      style: GoogleFonts.getFont(
-                        appTheme.fontDisplay,
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: accent,
+                    // 售價（品牌襯線 20/w800，手機更清楚）；長金額 FittedBox 縮放不截斷。
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'NT\$${product.price.toStringAsFixed(0)}',
+                        maxLines: 1,
+                        style: GoogleFonts.getFont(
+                          appTheme.fontDisplay,
+                          textStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: accent,
+                          ),
                         ),
                       ),
                     ),

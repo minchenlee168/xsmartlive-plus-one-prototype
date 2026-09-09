@@ -73,8 +73,19 @@ class FavoritesScreen extends ConsumerWidget {
                                   ProductCard(
                                     variant: ProductCardVariant.standard,
                                     product: fav.product,
-                                    stock: previewStockFor(fav.product),
+                                    // 下架品由遮罩表達不可購買，給正庫存避免又顯示「已售完」。
+                                    stock: kDelistedFavoriteIds
+                                            .contains(fav.product.id)
+                                        ? 99
+                                        : previewStockFor(fav.product),
                                   ),
+                                  // 已下架：蓋遮罩、吸收點擊（不可加入購物車 / 進內頁）。
+                                  if (kDelistedFavoriteIds
+                                      .contains(fav.product.id))
+                                    const Positioned.fill(
+                                      child: _DelistedOverlay(),
+                                    ),
+                                  // 愛心置於最上層，下架商品仍可移除收藏。
                                   Positioned(
                                     top: appTheme.spacingSm,
                                     right: appTheme.spacingSm,
@@ -92,6 +103,40 @@ class FavoritesScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// 已下架遮罩：覆蓋整張卡、置中顯示「已下架」，並吸收點擊（不可購買 / 進內頁）。
+class _DelistedOverlay extends StatelessWidget {
+  const _DelistedOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    final appTheme = context.appTheme;
+    return GestureDetector(
+      onTap: () {},
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: appTheme.bg.withValues(alpha: 0.74),
+          borderRadius: BorderRadius.circular(appTheme.cardRadius),
+        ),
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: appTheme.fg,
+              borderRadius: BorderRadius.circular(appTheme.radiusSm),
+            ),
+            child: Text('已下架',
+                style: TextStyle(
+                  color: appTheme.bgElev,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                )),
+          ),
+        ),
       ),
     );
   }

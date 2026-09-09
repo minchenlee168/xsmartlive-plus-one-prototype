@@ -682,7 +682,6 @@ class _HostGroupCard extends StatelessWidget {
                 vm: group.items[idx],
                 showDivider: idx < group.items.length - 1,
               ),
-              if (group.giftZone && idx == 0) const _GiftZone(),
               if (group.items[idx].isBundle)
                 _BundleBox(items: group.items[idx].bundleItems!),
             ],
@@ -1629,93 +1628,6 @@ class _StepperButton extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Mock gift sub-items zone (Kelly group only) — 滿件贈品區
-// `// TODO(API): cart should include "free gift" items linked to a group`
-// ─────────────────────────────────────────────────────────────────────────
-class _GiftZone extends StatelessWidget {
-  const _GiftZone();
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(44, 0, 16, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '— 滿件贈品區 —',
-            style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: appTheme.bgSubtle,
-              borderRadius: BorderRadius.circular(appTheme.radiusSm),
-            ),
-            child: Row(
-              children: [
-                _GiftThumb(label: '滿額贈 小香包'),
-                SizedBox(width: 8),
-                _GiftThumb(label: '專屬保溫袋'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GiftThumb extends StatelessWidget {
-  const _GiftThumb({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    return Expanded(
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: appTheme.divider,
-              borderRadius: BorderRadius.circular(appTheme.radiusSm),
-            ),
-            child: Icon(Icons.card_giftcard,
-                size: 20, color: appTheme.fgMuted),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: appTheme.fg,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  '數量 1',
-                  style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ─────────────────────────────────────────────────────────────────────────
 class _EmptyCart extends StatelessWidget {
   const _EmptyCart({required this.label});

@@ -241,10 +241,48 @@ class ProductRepository {
 
   /// Favorites endpoint does not exist on the server. Returns mock data only.
   Future<List<FavoriteProduct>> fetchFavorites() async {
-    return MockData.products
-        .take(3)
-        .map((p) => FavoriteProduct(product: p, streamer: '美妝達人'))
-        .toList();
+    return [
+      ...MockData.products
+          .take(3)
+          .map((p) => FavoriteProduct(product: p, streamer: '美妝達人')),
+      // 邊界情境測試樣本（收藏頁）：下架 / 超長商品名 / 超大金額。
+      // 下架：id 'fav_off' ∈ kDelistedFavoriteIds → 收藏頁蓋「已下架」遮罩。
+      const FavoriteProduct(
+        streamer: '週年慶快閃',
+        product: Product(
+          id: 'fav_off',
+          name: '限量聯名氣墊粉餅 #自然色',
+          price: 890,
+          originalPrice: 1200,
+          image: '',
+          category: '彩妝',
+        ),
+      ),
+      // 商品名超過兩行 → 卡片應 ellipsis 兩行、不撐破版。
+      const FavoriteProduct(
+        streamer: '設計師選品直播',
+        product: Product(
+          id: 'fav_long',
+          name: '韓系設計師聯名限定款超保暖防風連帽羽絨外套加大尺碼可拆式帽緣',
+          price: 1680,
+          originalPrice: 2380,
+          image: '',
+          category: '服飾',
+        ),
+      ),
+      // 金額很長 → 售價 / 原價應完整顯示（售價 FittedBox 縮放不截斷）。
+      const FavoriteProduct(
+        streamer: '家電旗艦館',
+        product: Product(
+          id: 'fav_price',
+          name: '頂級主廚微電腦電子壓力鍋',
+          price: 1299000,
+          originalPrice: 1580000,
+          image: '',
+          category: '生活',
+        ),
+      ),
+    ];
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────

@@ -750,16 +750,17 @@ class _CategoriesGrid extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
+      // 每格 Expanded 等寬；格與格之間用 8px SizedBox 分隔（不用內部右 padding，
+      // 否則最後一格沒右 padding 會比其他格寬 8px）。
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: List.generate(items.length, (i) {
-          final c = items[i];
-          return Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(right: i == items.length - 1 ? 0 : 8),
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            Expanded(
               child: InkWell(
                 borderRadius: BorderRadius.circular(appTheme.cardRadius),
-                onTap: () => context.push('/shop/category/${c.id}'),
+                onTap: () => context.push('/shop/category/${items[i].id}'),
                 child: Column(
                   children: [
                     AspectRatio(
@@ -770,7 +771,7 @@ class _CategoriesGrid extends StatelessWidget {
                         child: Container(
                           color: appTheme.bgSubtle,
                           child: Image.asset(
-                            c.asset,
+                            items[i].asset,
                             fit: BoxFit.cover,
                             errorBuilder: (_, _, _) => Icon(
                               Icons.image_outlined,
@@ -782,7 +783,7 @@ class _CategoriesGrid extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      c.label,
+                      items[i].label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
@@ -797,8 +798,8 @@ class _CategoriesGrid extends StatelessWidget {
                 ),
               ),
             ),
-          );
-        }),
+          ],
+        ],
       ),
     );
   }

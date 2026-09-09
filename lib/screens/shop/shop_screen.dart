@@ -725,7 +725,8 @@ class _ThemeHallSections extends StatelessWidget {
           SizedBox(
             // 卡片名稱固定保留兩行高度後所有卡等高，列高貼齊卡片內容，
             // 既不會底部溢位、也不留多餘空白。
-            height: hall.standard ? 284 : 264,
+            // 標準卡圖片改 1:1（寬 176 → 圖高 176）後整卡變高，故列高上調。
+            height: hall.standard ? 356 : 264,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),

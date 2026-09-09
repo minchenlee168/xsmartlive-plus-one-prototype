@@ -118,11 +118,10 @@ class _StandardProductCardState extends State<StandardProductCard> {
               ),
             )
           else
-            // 非網格（首頁 / 主題館）：圖片改用固定長寬比而非固定高度，
-            // 讓不同寬度的卡片（首頁 2 欄較寬）圖片比例一致、不再偏扁。
-            // 比例取商城標準卡的 176×104，故商城橫向列圖片維持不變。
+            // 非網格（首頁 / 主題館）：圖片用 1:1 方形，與精簡卡（ShopProductCard）
+            // 一致，讓全站商品卡圖片比例統一。不同寬度的卡片圖片皆等比例方形。
             AspectRatio(
-              aspectRatio: 176 / 104,
+              aspectRatio: 1,
               child: Container(
                 width: double.infinity,
                 color: appTheme.bgSubtle,

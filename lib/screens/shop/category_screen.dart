@@ -115,8 +115,8 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                                 child: StandardProductCard(
                                   product: p.product,
                                   stock: previewStockFor(p.product),
-                                  // 4:3 圖片，讓圖與內容比例協調（不過度佔高）。
-                                  imageAspectRatio: 4 / 3,
+                                  // 1:1 方形圖片，與精簡卡及全站商品卡統一比例。
+                                  imageAspectRatio: 1,
                                 ),
                               ),
                           ],

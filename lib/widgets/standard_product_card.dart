@@ -118,13 +118,18 @@ class _StandardProductCardState extends State<StandardProductCard> {
               ),
             )
           else
-            Container(
-              height: 104,
-              width: double.infinity,
-              color: appTheme.bgSubtle,
-              alignment: Alignment.center,
-              child: Icon(Icons.image_outlined,
-                  size: 26, color: appTheme.fgMuted),
+            // 非網格（首頁 / 主題館）：圖片改用固定長寬比而非固定高度，
+            // 讓不同寬度的卡片（首頁 2 欄較寬）圖片比例一致、不再偏扁。
+            // 比例取商城標準卡的 176×104，故商城橫向列圖片維持不變。
+            AspectRatio(
+              aspectRatio: 176 / 104,
+              child: Container(
+                width: double.infinity,
+                color: appTheme.bgSubtle,
+                alignment: Alignment.center,
+                child: Icon(Icons.image_outlined,
+                    size: 26, color: appTheme.fgMuted),
+              ),
             ),
           Padding(
             padding: EdgeInsets.all(grid ? appTheme.spacingMd : 8),

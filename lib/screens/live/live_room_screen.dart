@@ -1074,7 +1074,7 @@ class _ProductList extends StatelessWidget {
                                   CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  '\$${p.price.toStringAsFixed(0)}',
+                                  'NT\$${p.price.toStringAsFixed(0)}',
                                   style: GoogleFonts.getFont(
                                     appTheme.fontDisplay,
                                     textStyle: TextStyle(
@@ -1091,7 +1091,7 @@ class _ProductList extends StatelessWidget {
                                     padding:
                                         const EdgeInsets.only(bottom: 2),
                                     child: Text(
-                                      '\$${p.originalPrice!.toStringAsFixed(0)}',
+                                      'NT\$${p.originalPrice!.toStringAsFixed(0)}',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: appTheme.fgMuted,
@@ -1610,7 +1610,7 @@ class _FloatingProductCard extends ConsumerWidget {
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      '\$${product.price.toStringAsFixed(0)}',
+                      'NT\$${product.price.toStringAsFixed(0)}',
                       style: GoogleFonts.getFont(
                         appTheme.fontDisplay,
                         textStyle: TextStyle(
@@ -1623,7 +1623,7 @@ class _FloatingProductCard extends ConsumerWidget {
                     if (hasOriginal) ...[
                       const SizedBox(width: 4),
                       Text(
-                        '\$${product.originalPrice!.toStringAsFixed(0)}',
+                        'NT\$${product.originalPrice!.toStringAsFixed(0)}',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.white.withValues(alpha: 0.6),

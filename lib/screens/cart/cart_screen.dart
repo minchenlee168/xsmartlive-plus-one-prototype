@@ -381,7 +381,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         ),
                       ),
                       Text(
-                        '\$${_format(selectedTotal)}',
+                        'NT\$${_format(selectedTotal)}',
                         style: GoogleFonts.getFont(
                           appTheme.fontDisplay,
                           textStyle: TextStyle(
@@ -703,7 +703,7 @@ class _HostGroupCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '\$${_format(groupSubtotal)}',
+                    'NT\$${_format(groupSubtotal)}',
                     style: GoogleFonts.getFont(
                       appTheme.fontDisplay,
                       textStyle: TextStyle(

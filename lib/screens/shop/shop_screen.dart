@@ -448,7 +448,7 @@ class _LiveAnnouncementSection extends ConsumerWidget {
                 child: Text(
                   '公告',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: appTheme.fg,
                   ),
@@ -520,7 +520,7 @@ class _LiveAnnouncementCard extends StatelessWidget {
             item.title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: appTheme.fg,
             ),
@@ -531,7 +531,7 @@ class _LiveAnnouncementCard extends StatelessWidget {
               body,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 height: 1.6,
                 fontWeight: FontWeight.w500,
                 color: appTheme.fg,
@@ -724,8 +724,8 @@ class _ThemeHallSections extends StatelessWidget {
           SizedBox(
             // 卡片名稱固定保留兩行高度後所有卡等高，列高貼齊卡片內容，
             // 既不會底部溢位、也不留多餘空白。
-            // 標準卡圖片改 1:1（寬 176 → 圖高 176）後整卡變高，故列高上調。
-            height: hall.standard ? 356 : 264,
+            // 標準卡圖片 1:1 + 刪除線原價改放售價下方一行，整卡再變高，故列高再上調。
+            height: hall.standard ? 374 : 282,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),

@@ -197,7 +197,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                 if (originalPrice != null) ...[
                                   const SizedBox(width: 8),
                                   Text(
-                                    '\$${originalPrice.toStringAsFixed(0)}',
+                                    'NT\$${originalPrice.toStringAsFixed(0)}',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: appTheme.fgMuted,

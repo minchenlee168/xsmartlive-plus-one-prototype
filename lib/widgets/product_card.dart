@@ -128,8 +128,8 @@ class _ProductCardState extends ConsumerState<ProductCard>
     final grid = widget.imageAspectRatio != null;
     final stepSize = grid ? 28.0 : 26.0;
     // 網格模式字級收斂到階梯（14/12）；橫向緊湊列維持原值（out of scope）。
-    // 字體依照精簡卡（compact）：名稱 12、原價/庫存 11，不分 grid。
-    const nameSize = 12.0;
+    // 名稱 14（手機易讀）；原價/庫存 11。售價字型另依精簡卡（襯線）。
+    const nameSize = 14.0;
     const metaSize = 11.0; // 原價 / 庫存
     final qtySize = grid ? 14.0 : 13.0;
 
@@ -218,34 +218,29 @@ class _ProductCardState extends ConsumerState<ProductCard>
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'NT\$${p.price.toStringAsFixed(0)}',
-                      // 依精簡卡：售價用品牌襯線字（fontDisplay）16/w800。
-                      style: GoogleFonts.getFont(
-                        appTheme.fontDisplay,
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: accent,
-                        ),
-                      ),
+                // 售價（品牌襯線 16/w800）；刪除線原價放在售價「下方」一行。
+                Text(
+                  'NT\$${p.price.toStringAsFixed(0)}',
+                  style: GoogleFonts.getFont(
+                    appTheme.fontDisplay,
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: accent,
                     ),
-                    if (p.originalPrice != null) ...[
-                      const SizedBox(width: 4),
-                      Text(
-                        'NT\$${p.originalPrice!.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: metaSize,
-                          color: appTheme.fgMuted,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
+                if (p.originalPrice != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    'NT\$${p.originalPrice!.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: metaSize,
+                      color: appTheme.fgMuted,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                ],
                 if (combo == null) ...[
                   SizedBox(height: grid ? appTheme.spacingSm : 4),
                   Text(
@@ -675,48 +670,44 @@ class _ProductCardState extends ConsumerState<ProductCard>
                     // 固定保留兩行高度，讓一行 / 兩行名稱的卡片等高，
                     // 橫向列不會因短名稱在底部留下多餘空白。
                     SizedBox(
-                      height: 12 * 1.3 * 2,
+                      height: 14 * 1.3 * 2,
                       child: Text(
                         product.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           height: 1.3,
                           color: appTheme.fg,
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 6),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          'NT\$${product.price.toStringAsFixed(0)}',
-                          style: GoogleFonts.getFont(
-                            appTheme.fontDisplay,
-                            textStyle: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: accent,
-                            ),
-                          ),
+                    // 售價（品牌襯線 16/w800）；刪除線原價放在售價「下方」一行。
+                    Text(
+                      'NT\$${product.price.toStringAsFixed(0)}',
+                      style: GoogleFonts.getFont(
+                        appTheme.fontDisplay,
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: accent,
                         ),
-                        if (hasOriginal) ...[
-                          const SizedBox(width: 6),
-                          Text(
-                            'NT\$${product.originalPrice!.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: appTheme.fgMuted,
-                              decoration: TextDecoration.lineThrough,
-                            ),
-                          ),
-                        ],
-                      ],
+                      ),
                     ),
+                    if (hasOriginal) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        'NT\$${product.originalPrice!.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: appTheme.fgMuted,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 6),
                     // 「＋」按鈕靠右（已移除「已售 N」文字）。
                     Row(

@@ -313,7 +313,7 @@ class _CartFooter extends StatelessWidget {
             children: [
               Text(l10n.cartSubtotal,
                   style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
-              Text('\$${subtotal.toStringAsFixed(0)}',
+              Text('NT\$${subtotal.toStringAsFixed(0)}',
                   style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
             ],
           ),
@@ -341,7 +341,7 @@ class _CartFooter extends StatelessWidget {
                       fontSize: 15,
                       fontWeight: FontWeight.w600)),
               Text(
-                '\$${total.toStringAsFixed(0)}',
+                'NT\$${total.toStringAsFixed(0)}',
                 style: TextStyle(
                   color: appTheme.primaryGradient.colors.last,
                   fontSize: 18,

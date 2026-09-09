@@ -745,7 +745,7 @@ class _RecentOrderCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '\$${_format(order.amount)}',
+                    'NT\$${_format(order.amount)}',
                     style: GoogleFonts.getFont(
                       appTheme.fontDisplay,
                       textStyle: TextStyle(

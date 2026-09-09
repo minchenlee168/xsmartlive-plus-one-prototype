@@ -436,7 +436,7 @@ class _OrderInfoList extends StatelessWidget {
           emphasised: false, trailing: null),
       (
         label: l10n.ordersFieldTotal,
-        value: '\$${order.amount}',
+        value: 'NT\$${order.amount}',
         emphasised: true,
         // 訂單總額後方的「明細」按鈕 → 開金額明細。
         trailing: _AmountDetailButton(order: order),

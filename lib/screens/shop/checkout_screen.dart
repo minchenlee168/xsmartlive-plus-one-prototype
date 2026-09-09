@@ -2744,7 +2744,7 @@ class _ConfirmBar extends StatelessWidget {
                     fontSize: 12, color: appTheme.fgMuted),
               ),
               Text(
-                '\$${_fmt(_total)}',
+                'NT\$${_fmt(_total)}',
                 style: GoogleFonts.getFont(
                   appTheme.fontDisplay,
                   textStyle: TextStyle(

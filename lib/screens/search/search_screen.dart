@@ -59,8 +59,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         titleSpacing: 0,
         title: Container(
           height: 40,
-          margin: const EdgeInsets.only(right: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          margin: EdgeInsets.only(right: appTheme.spacingMd),
+          padding: EdgeInsets.symmetric(horizontal: appTheme.spacingMd),
           decoration: BoxDecoration(
             color: appTheme.bgSubtle,
             borderRadius: BorderRadius.circular(appTheme.cardRadius),
@@ -68,7 +68,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           child: Row(
             children: [
               Icon(Icons.search, size: 18, color: appTheme.fgMuted),
-              const SizedBox(width: 8),
+              SizedBox(width: appTheme.spacingSm),
               Expanded(
                 child: TextField(
                   controller: _ctrl,
@@ -110,7 +110,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(appTheme.spacingLg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -119,18 +119,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               title: l10n.searchHotTitle,
               iconColor: appTheme.danger,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: appTheme.spacingMd),
             _HotKeywordsGrid(onSearch: _search),
-            const SizedBox(height: 24),
+            SizedBox(height: appTheme.spacingXxl),
             _SectionTitle(
               icon: AppIcons.shop,
               title: l10n.homeSectionCategories,
               iconColor: appTheme.brandPalette.tone500,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: appTheme.spacingMd),
             const _CategoryGrid(),
             if (_histories.isNotEmpty) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: appTheme.spacingXxl),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -149,16 +149,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: appTheme.spacingSm),
               Wrap(
-                spacing: 8,
-                runSpacing: 6,
+                spacing: appTheme.spacingSm,
+                runSpacing: appTheme.spacingSm,
                 children: _histories
                     .map((h) => GestureDetector(
                           onTap: () => _search(h),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: appTheme.spacingMd,
+                                vertical: appTheme.spacingSm),
                             decoration: BoxDecoration(
                               color: appTheme.chip,
                               borderRadius: BorderRadius.circular(
@@ -176,7 +177,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     .toList(),
               ),
             ],
-            const SizedBox(height: 32),
+            SizedBox(height: appTheme.spacingXxxl),
           ],
         ),
       ),
@@ -201,7 +202,7 @@ class _SectionTitle extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 18, color: iconColor),
-        const SizedBox(width: 8),
+        SizedBox(width: appTheme.spacingSm),
         Text(
           title,
           style: TextStyle(
@@ -241,10 +242,10 @@ class _CategoryGrid extends ConsumerWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 16,
+        crossAxisSpacing: appTheme.spacingMd,
+        mainAxisSpacing: appTheme.spacingLg,
         childAspectRatio: 0.85,
       ),
       itemCount: _fallback.length,
@@ -269,7 +270,7 @@ class _CategoryGrid extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: appTheme.spacingXs),
             Text(
               c.label,
               maxLines: 1,
@@ -318,10 +319,10 @@ class _HotKeywordsGrid extends ConsumerWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        crossAxisSpacing: appTheme.spacingMd,
+        mainAxisSpacing: appTheme.spacingMd,
         childAspectRatio: 3.6,
       ),
       itemCount: keywords.length,
@@ -334,8 +335,9 @@ class _HotKeywordsGrid extends ConsumerWidget {
             borderRadius: BorderRadius.circular(appTheme.cardRadius),
             onTap: () => onSearch(keywords[i]),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                  horizontal: appTheme.spacingMd,
+                  vertical: appTheme.spacingSm),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(appTheme.cardRadius),
                 border: Border.all(color: appTheme.divider),
@@ -366,12 +368,12 @@ class _HotKeywordsGrid extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: appTheme.spacingSm),
                   Expanded(
                     child: Text(
                       keywords[i],
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: appTheme.fg,
                       ),

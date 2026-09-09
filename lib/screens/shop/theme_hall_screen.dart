@@ -54,7 +54,12 @@ class ThemeHallScreen extends StatelessWidget {
           // 標題（accent bar + 標題）
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              padding: EdgeInsets.fromLTRB(
+                appTheme.spacingLg,
+                appTheme.spacingLg,
+                appTheme.spacingLg,
+                0,
+              ),
               child: Row(
                 children: [
                   Container(
@@ -65,7 +70,7 @@ class ThemeHallScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: appTheme.spacingSm),
                   Expanded(
                     child: Text(
                       hall.title,
@@ -83,7 +88,12 @@ class ThemeHallScreen extends StatelessWidget {
           // Banner（比例對照設計稿 ≈ 2000:620）
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              padding: EdgeInsets.fromLTRB(
+                appTheme.spacingLg,
+                appTheme.spacingSm,
+                appTheme.spacingLg,
+                0,
+              ),
               child: AspectRatio(
                 aspectRatio: 2000 / 620,
                 child: Container(
@@ -97,7 +107,7 @@ class ThemeHallScreen extends StatelessWidget {
                       colors: [accent, accent.withValues(alpha: 0.65)],
                     ),
                   ),
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(appTheme.spacingLg),
                   alignment: Alignment.bottomLeft,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -111,7 +121,7 @@ class ThemeHallScreen extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: appTheme.spacingXxs),
                       Text(
                         hall.subtitle,
                         style: TextStyle(
@@ -129,13 +139,14 @@ class ThemeHallScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                const spacing = 12.0;
-                const hPad = 16.0;
+                final spacing = appTheme.spacingMd;
+                final hPad = appTheme.spacingLg;
                 final avail = constraints.maxWidth - hPad * 2;
                 final cols = (avail / 190).floor().clamp(2, 6);
                 final cardW = (avail - spacing * (cols - 1)) / cols;
                 return Padding(
-                  padding: const EdgeInsets.fromLTRB(hPad, 16, hPad, 24),
+                  padding: EdgeInsets.fromLTRB(
+                      hPad, appTheme.spacingLg, hPad, appTheme.spacingXxl),
                   child: Wrap(
                     spacing: spacing,
                     runSpacing: spacing,

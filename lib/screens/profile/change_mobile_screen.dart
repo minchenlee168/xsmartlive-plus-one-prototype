@@ -131,7 +131,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
         title: Text(
           '更改手機號碼',
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: appTheme.fg,
           ),
@@ -218,7 +218,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                   decoration: InputDecoration(
                     hintText: '請輸入新手機號碼',
                     hintStyle: TextStyle(
-                        color: appTheme.muted, fontSize: 13),
+                        color: appTheme.muted, fontSize: 12),
                     filled: true,
                     fillColor: appTheme.bgElev,
                     isDense: true,
@@ -261,7 +261,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
               style: TextStyle(color: appTheme.fg, fontSize: 14),
               decoration: InputDecoration(
                 hintText: '輸入 OTP 驗證碼',
-                hintStyle: TextStyle(color: appTheme.muted, fontSize: 13),
+                hintStyle: TextStyle(color: appTheme.muted, fontSize: 12),
                 filled: true,
                 fillColor: appTheme.bgElev,
                 isDense: true,
@@ -334,7 +334,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                           _otpSent ? '確認更新' : '送出驗證碼',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

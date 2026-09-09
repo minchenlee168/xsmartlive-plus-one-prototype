@@ -50,7 +50,12 @@ class _NotificationsScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  padding: EdgeInsets.fromLTRB(
+                    appTheme.spacingLg,
+                    appTheme.spacingLg,
+                    appTheme.spacingLg,
+                    appTheme.spacingXs,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -72,12 +77,13 @@ class _NotificationsScreenState
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: appTheme.spacingLg),
                   child: Text('${unread.length} 則未讀通知',
                       style: TextStyle(
-                          fontSize: 13, color: appTheme.fgMuted)),
+                          fontSize: 14, color: appTheme.fgMuted)),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: appTheme.spacingXs),
                 TabBar(
                   controller: _tabCtrl,
                   labelColor: appTheme.brandPalette.tone500,
@@ -121,16 +127,17 @@ class _NotificationList extends ConsumerWidget {
           children: [
             Icon(Icons.notifications_none,
                 size: 48, color: appTheme.muted),
-            const SizedBox(height: 12),
+            SizedBox(height: appTheme.spacingMd),
             Text('暫無通知', style: TextStyle(color: appTheme.fgMuted)),
           ],
         ),
       );
     }
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(appTheme.spacingLg),
       itemCount: notifications.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 4),
+      separatorBuilder: (context, index) =>
+          SizedBox(height: appTheme.spacingXs),
       itemBuilder: (context, i) => _NotificationTile(
         item: notifications[i],
         onTap: () => ref
@@ -168,7 +175,7 @@ class _NotificationTile extends StatelessWidget {
           ? scheme.surface
           : unreadAccent.withValues(alpha: 0.06),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(appTheme.cardRadius),
         side: BorderSide(
           color: item.isRead
               ? scheme.outlineVariant
@@ -177,21 +184,21 @@ class _NotificationTile extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(appTheme.cardRadius),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(appTheme.spacingLg),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(appTheme.spacingSm),
                 decoration: BoxDecoration(
                   color: semColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: semColor, size: 20),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: appTheme.spacingMd),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,13 +228,13 @@ class _NotificationTile extends StatelessWidget {
                           ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: appTheme.spacingXs),
                     Text(item.message,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             fontSize: 14, color: appTheme.fg)),
-                    const SizedBox(height: 4),
+                    SizedBox(height: appTheme.spacingXs),
                     Text(item.time,
                         style: TextStyle(
                             fontSize: 12, color: appTheme.fgMuted)),

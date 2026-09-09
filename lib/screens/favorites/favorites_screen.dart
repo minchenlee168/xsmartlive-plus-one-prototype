@@ -32,13 +32,13 @@ class FavoritesScreen extends ConsumerWidget {
                       children: [
                         Icon(Icons.favorite_border,
                             size: 64, color: appTheme.muted),
-                        const SizedBox(height: 16),
+                        SizedBox(height: appTheme.spacingLg),
                         Text('還沒有最愛的商品',
                             style: TextStyle(color: appTheme.fgMuted)),
-                        const SizedBox(height: 4),
+                        SizedBox(height: appTheme.spacingXs),
                         Text('快去直播間挖掘喜歡的商品吧！',
                             style: TextStyle(
-                                fontSize: 13, color: appTheme.fgMuted)),
+                                fontSize: 14, color: appTheme.fgMuted)),
                       ],
                     ),
                   ),
@@ -51,12 +51,12 @@ class FavoritesScreen extends ConsumerWidget {
               _Header(count: favorites.length, showCount: true),
               Expanded(
                 child: GridView.builder(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(appTheme.spacingMd),
                   gridDelegate:
                       SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: Responsive.productGridColumns(context),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                    crossAxisSpacing: appTheme.spacingMd,
+                    mainAxisSpacing: appTheme.spacingMd,
                     childAspectRatio: 0.62,
                   ),
                   itemCount: favorites.length,
@@ -100,7 +100,8 @@ class FavoritesScreen extends ConsumerWidget {
                                       decoration: BoxDecoration(
                                         color: appTheme.danger,
                                         borderRadius:
-                                            BorderRadius.circular(4),
+                                            BorderRadius.circular(
+                                                appTheme.radiusSm),
                                       ),
                                       child: const Text('特價',
                                           style: TextStyle(
@@ -132,7 +133,7 @@ class FavoritesScreen extends ConsumerWidget {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(8),
+                            padding: EdgeInsets.all(appTheme.spacingSm),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -143,24 +144,24 @@ class FavoritesScreen extends ConsumerWidget {
                                         fontSize: 12, color: appTheme.fg)),
                                 Text(fav.streamer,
                                     style: TextStyle(
-                                        fontSize: 11,
+                                        fontSize: 12,
                                         color: appTheme.fgMuted)),
-                                const SizedBox(height: 4),
+                                SizedBox(height: appTheme.spacingXs),
                                 Row(
                                   children: [
                                     Text(
                                       'NT\$${p.price.toStringAsFixed(0)}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           color: scheme.primary),
                                     ),
                                     if (p.originalPrice != null) ...[
-                                      const SizedBox(width: 4),
+                                      SizedBox(width: appTheme.spacingXs),
                                       Text(
                                         'NT\$${p.originalPrice!.toStringAsFixed(0)}',
                                         style: TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 12,
                                           color: appTheme.fgMuted,
                                           decoration:
                                               TextDecoration.lineThrough,
@@ -169,7 +170,7 @@ class FavoritesScreen extends ConsumerWidget {
                                     ],
                                   ],
                                 ),
-                                const SizedBox(height: 6),
+                                SizedBox(height: appTheme.spacingSm),
                                 Row(
                                   children: [
                                     Expanded(
@@ -212,7 +213,7 @@ class FavoritesScreen extends ConsumerWidget {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
+                                    SizedBox(width: appTheme.spacingSm),
                                     SizedBox(
                                       height: 28,
                                       width: 28,
@@ -224,7 +225,8 @@ class FavoritesScreen extends ConsumerWidget {
                                               color: appTheme.divider),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(6),
+                                                BorderRadius.circular(
+                                                    appTheme.buttonRadius),
                                           ),
                                         ),
                                         child: Icon(Icons.delete_outline,
@@ -263,10 +265,10 @@ class _Header extends StatelessWidget {
       width: double.infinity,
       color: appTheme.bgElev,
       padding: EdgeInsets.fromLTRB(
-        16,
+        appTheme.spacingLg,
         MediaQuery.of(context).viewPadding.top + 56,
-        16,
-        showCount ? 8 : 12,
+        appTheme.spacingLg,
+        showCount ? appTheme.spacingSm : appTheme.spacingMd,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,10 +280,10 @@ class _Header extends StatelessWidget {
                 color: appTheme.fg,
               )),
           if (showCount) ...[
-            const SizedBox(height: 4),
+            SizedBox(height: appTheme.spacingXs),
             Text('$count 件商品',
                 style:
-                    TextStyle(fontSize: 13, color: appTheme.fgMuted)),
+                    TextStyle(fontSize: 14, color: appTheme.fgMuted)),
           ],
         ],
       ),

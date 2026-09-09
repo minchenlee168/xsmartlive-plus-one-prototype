@@ -57,9 +57,9 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+            top: Radius.circular(context.appTheme.sheetRadius)),
       ),
       builder: (ctx) => _SearchSheet(
         initialStart: _startTime,
@@ -150,7 +150,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                     endTime: _endTime,
                   ),
                   if (_keyword != null) ...[
-                    const SizedBox(height: 6),
+                    SizedBox(height: appTheme.spacingSm),
                     _KeywordChip(
                       keyword: _keyword!,
                       onClear: () => setState(() {
@@ -231,10 +231,10 @@ class _StatusFilter extends StatelessWidget {
           isExpanded: true,
           value: current,
           onChanged: onChanged,
-          padding: const EdgeInsets.symmetric(horizontal: 10.5),
+          padding: EdgeInsets.symmetric(horizontal: appTheme.spacingMd),
           dropdownColor: appTheme.bgElev,
           icon: Padding(
-            padding: const EdgeInsets.only(right: 10.5),
+            padding: EdgeInsets.only(right: appTheme.spacingMd),
             child: Icon(Icons.keyboard_arrow_down,
                 size: 20, color: appTheme.fgMuted),
           ),
@@ -361,7 +361,7 @@ class _OrderCardState extends ConsumerState<_OrderCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _OrderInfoList(order: order),
-          const SizedBox(height: 7),
+          SizedBox(height: appTheme.spacingSm),
           // 配送進度/明細獨立一列 + 收合按鈕。
           _DetailToggleRow(
             expanded: _expanded,
@@ -538,7 +538,7 @@ class _InfoRow extends StatelessWidget {
           Expanded(child: valueText)
         else ...[
           Flexible(child: valueText),
-          const SizedBox(width: 10),
+          SizedBox(width: appTheme.spacingSm),
           trailing!,
           const Spacer(),
         ],
@@ -593,8 +593,9 @@ void _showAmountBreakdown(BuildContext context, Purchase order) {
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: appTheme.bgElev,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    shape: RoundedRectangleBorder(
+      borderRadius:
+          BorderRadius.vertical(top: Radius.circular(appTheme.sheetRadius)),
     ),
     builder: (_) => _AmountBreakdownSheet(order: order),
   );
@@ -612,7 +613,7 @@ class _AmountBreakdownSheet extends StatelessWidget {
     final bottom = MediaQuery.of(context).padding.bottom;
 
     Widget line(String label, String value, {bool discount = false}) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 7),
+          padding: EdgeInsets.symmetric(vertical: appTheme.spacingSm),
           child: Row(
             children: [
               Expanded(
@@ -645,7 +646,7 @@ class _AmountBreakdownSheet extends StatelessWidget {
               ),
               InkWell(
                 onTap: () => Navigator.of(context).maybePop(),
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(appTheme.avatarRadius),
                 child: Padding(
                   padding: const EdgeInsets.all(2),
                   child: Icon(Icons.close, size: 20, color: appTheme.fgMuted),
@@ -669,7 +670,7 @@ class _AmountBreakdownSheet extends StatelessWidget {
               Expanded(
                 child: Text('訂單總額',
                     style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: appTheme.fg)),
               ),
@@ -795,13 +796,13 @@ class _DetailToggleRow extends StatelessWidget {
         const SizedBox(width: 8),
         InkWell(
           onTap: onToggle,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(appTheme.avatarRadius),
           child: Container(
             width: 25,
             height: 25,
             decoration: BoxDecoration(
               color: appTheme.bgSubtle,
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(appTheme.avatarRadius),
               border: Border.all(color: appTheme.bgSubtle),
             ),
             alignment: Alignment.center,
@@ -851,7 +852,7 @@ class _OrderDetailBody extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
               child: Text(
                 l10n.orderEmpty,
-                style: const TextStyle(color: Colors.black54, fontSize: 13),
+                style: const TextStyle(color: Colors.black54, fontSize: 12),
               ),
             );
           }
@@ -887,7 +888,7 @@ class _OrderDetailBody extends ConsumerWidget {
               Expanded(
                 child: Text(
                   l10n.ordersDetailLoadFailed,
-                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
                 ),
               ),
               TextButton(
@@ -1469,7 +1470,8 @@ class _InfoPanel extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: border)),
               ),
-              padding: const EdgeInsets.fromLTRB(15.75, 5.25, 5.25, 5.25),
+              padding: EdgeInsets.fromLTRB(appTheme.spacingLg,
+                  appTheme.spacingXs, appTheme.spacingXs, appTheme.spacingXs),
               child: Row(
                 children: [
                   Expanded(
@@ -1499,8 +1501,8 @@ class _InfoPanel extends StatelessWidget {
             ),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(
-                    15.75, 12, 15.75, 15.75),
+                padding: EdgeInsets.fromLTRB(appTheme.spacingLg,
+                    appTheme.spacingMd, appTheme.spacingLg, appTheme.spacingLg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1601,7 +1603,7 @@ class _KeywordChip extends StatelessWidget {
         backgroundColor: Colors.white,
         side: BorderSide(color: appTheme.divider),
         labelStyle: TextStyle(
-          fontSize: 13,
+          fontSize: 12,
           color: appTheme.fg,
         ),
       ),
@@ -1813,7 +1815,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                   ),
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: appTheme.spacingSm),
               Text(
                 l10n.ordersSearchDateHelper,
                 style: TextStyle(
@@ -1840,7 +1842,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                         ],
                       ),
                       padding:
-                          const EdgeInsets.symmetric(horizontal: 10.5),
+                          EdgeInsets.symmetric(horizontal: appTheme.spacingMd),
                       child: TextField(
                         controller: _keywordCtrl,
                         textInputAction: TextInputAction.search,
@@ -2000,7 +2002,7 @@ class _SheetScaffold extends StatelessWidget {
                     child: Text(
                       title,
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -2058,7 +2060,7 @@ class _OrderInquirySheet extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '(待開發)',
-              style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+              style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
             ),
           ],
         ),
@@ -2119,7 +2121,7 @@ class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
         style: TextStyle(fontSize: 14, color: t.fg),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(fontSize: 13, color: t.fgMuted),
+          hintStyle: TextStyle(fontSize: 12, color: t.fgMuted),
           border: InputBorder.none,
           isDense: true,
           contentPadding:
@@ -2202,15 +2204,15 @@ class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
                     child: _readonly('原聯絡電話', '(+886) 912 345 678')),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: appTheme.spacingLg),
             _readonly('原配送地址', '桃園市桃園區南平路 303 號'),
             const SizedBox(height: 16),
             _lbl('新收件人'),
-            const SizedBox(height: 6),
+            SizedBox(height: appTheme.spacingSm),
             _field(_nameCtrl, ''),
-            const SizedBox(height: 14),
+            SizedBox(height: appTheme.spacingLg),
             _lbl('新聯絡電話'),
-            const SizedBox(height: 6),
+            SizedBox(height: appTheme.spacingSm),
             Row(
               children: [
                 Container(
@@ -2234,9 +2236,9 @@ class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
                 Expanded(child: _field(_phoneCtrl, '例如：0912345678')),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: appTheme.spacingLg),
             _lbl('城市 / 區'),
-            const SizedBox(height: 6),
+            SizedBox(height: appTheme.spacingSm),
             Row(
               children: [
                 Expanded(
@@ -2263,16 +2265,16 @@ class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: appTheme.spacingLg),
             _lbl('詳細收件地址', req: true),
-            const SizedBox(height: 6),
+            SizedBox(height: appTheme.spacingSm),
             _field(_addrCtrl, '街道、門牌、樓層'),
             if (_error != null) ...[
               const SizedBox(height: 8),
               Text(_error!,
                   style: TextStyle(color: appTheme.danger, fontSize: 12)),
             ],
-            const SizedBox(height: 18),
+            SizedBox(height: appTheme.spacingLg),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -2345,13 +2347,13 @@ class _PayInfoSheetState extends State<_PayInfoSheet> {
     final order = widget.order;
 
     Widget row(String label, Widget value) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 7),
+          padding: EdgeInsets.symmetric(vertical: appTheme.spacingSm),
           child: Row(
             children: [
               SizedBox(
                 width: 80,
                 child: Text(label,
-                    style: TextStyle(fontSize: 13, color: appTheme.fgMuted)),
+                    style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
               ),
               Expanded(child: value),
             ],
@@ -2394,7 +2396,7 @@ Widget _dialogHeader(BuildContext context, String title) {
         child: Text(
           title,
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 16,
             fontWeight: FontWeight.w800,
             color: appTheme.fg,
           ),
@@ -2467,7 +2469,7 @@ class _ShippingProgressCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _dialogHeader(context, '物流配送進度'),
-                const SizedBox(height: 14),
+                SizedBox(height: appTheme.spacingLg),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -2479,7 +2481,7 @@ class _ShippingProgressCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: appTheme.spacingLg),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
@@ -2494,7 +2496,7 @@ class _ShippingProgressCard extends StatelessWidget {
                 Divider(height: 1, color: appTheme.divider),
                 for (final r in _rows)
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    padding: EdgeInsets.symmetric(vertical: appTheme.spacingSm),
                     child: Row(
                       children: [
                         cell(r.status, 3, strong: true),

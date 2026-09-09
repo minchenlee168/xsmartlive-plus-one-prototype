@@ -110,7 +110,7 @@ class _FollowingScreenState extends State<FollowingScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: Text(
               '追蹤中的直播主 · $followingCount',
-              style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+              style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
             ),
           ),
           Divider(height: 1, color: appTheme.divider),
@@ -213,7 +213,7 @@ class _StreamerRow extends StatelessWidget {
                           horizontal: 5, vertical: 1),
                       decoration: BoxDecoration(
                         color: appTheme.danger,
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: BorderRadius.circular(appTheme.avatarRadius),
                         border: Border.all(color: appTheme.bgElev, width: 1),
                       ),
                       child: const Text(
@@ -248,7 +248,7 @@ class _StreamerRow extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      SizedBox(width: appTheme.spacingSm),
                       Text(
                         streamer.isLive ? '直播中' : '休息中',
                         style: TextStyle(
@@ -276,7 +276,7 @@ class _StreamerRow extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: appTheme.spacingSm),
             // 追蹤 / 已追蹤 切換
             _FollowButton(following: following, onTap: onToggleFollow),
           ],

@@ -110,7 +110,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               obscure: _obscureOld,
               onToggle: () => setState(() => _obscureOld = !_obscureOld),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: appTheme.spacingLg),
             _PasswordField(
               label: '新密碼',
               controller: _newCtrl,
@@ -118,7 +118,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               onToggle: () => setState(() => _obscureNew = !_obscureNew),
               hint: '至少 6 個字元',
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: appTheme.spacingLg),
             _PasswordField(
               label: '確認新密碼',
               controller: _confirmCtrl,
@@ -200,7 +200,7 @@ class _PasswordField extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: appTheme.spacingSm),
         Container(
           decoration: BoxDecoration(
             color: appTheme.bgElev,

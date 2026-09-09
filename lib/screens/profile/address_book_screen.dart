@@ -349,7 +349,7 @@ class _AddressCardShell extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(appTheme.spacingLg),
       decoration: BoxDecoration(
         color: appTheme.bgElev,
         borderRadius: BorderRadius.circular(appTheme.cardRadius),
@@ -368,7 +368,7 @@ class _AddressCardShell extends StatelessWidget {
               Text(
                 title.isNotEmpty ? title : '—',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: appTheme.fg,
                 ),
@@ -376,7 +376,7 @@ class _AddressCardShell extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 phone,
-                style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+                style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
               ),
               const Spacer(),
               if (isDefault)
@@ -402,7 +402,7 @@ class _AddressCardShell extends StatelessWidget {
           Text(
             body,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 12,
               height: 1.5,
               color: disabled ? appTheme.fgMuted : appTheme.fg,
             ),
@@ -494,7 +494,7 @@ class _CardAction extends StatelessWidget {
           children: [
             Icon(icon, size: 16, color: c),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(fontSize: 13, color: c)),
+            Text(label, style: TextStyle(fontSize: 12, color: c)),
           ],
         ),
       ),
@@ -529,9 +529,9 @@ class _EmptyState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 56, color: appTheme.muted),
-          const SizedBox(height: 14),
+          SizedBox(height: appTheme.spacingLg),
           Text(label, style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
-          const SizedBox(height: 18),
+          SizedBox(height: appTheme.spacingLg),
           SizedBox(
             height: 44,
             child: ElevatedButton.icon(
@@ -568,7 +568,7 @@ class _ErrorRetry extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(message,
-              style: TextStyle(color: appTheme.fgMuted, fontSize: 13)),
+              style: TextStyle(color: appTheme.fgMuted, fontSize: 12)),
           const SizedBox(height: 12),
           OutlinedButton(onPressed: onRetry, child: const Text('重試')),
         ],

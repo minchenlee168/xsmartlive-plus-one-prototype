@@ -98,7 +98,7 @@ class _ProviderCard extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: appTheme.fg,
                   ),

@@ -136,7 +136,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             _Label(text: '姓名'),
             const SizedBox(height: 8),
             _Field(controller: _nameCtrl, hint: '請輸入姓名'),
-            const SizedBox(height: 18),
+            SizedBox(height: appTheme.spacingLg),
             _Label(text: '電子信箱（可留空清除）'),
             const SizedBox(height: 8),
             _Field(
@@ -144,7 +144,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               hint: 'name@example.com',
               keyboardType: TextInputType.emailAddress,
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: appTheme.spacingLg),
             _Label(text: '性別'),
             const SizedBox(height: 8),
             Row(
@@ -155,11 +155,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     selected: _gender == g.$1,
                     onTap: () => setState(() => _gender = g.$1),
                   ),
-                  if (g.$1 != 3) const SizedBox(width: 10),
+                  if (g.$1 != 3) SizedBox(width: appTheme.spacingSm),
                 ],
               ],
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: appTheme.spacingLg),
             _Label(text: '生日（可留空清除）'),
             const SizedBox(height: 8),
             InkWell(
@@ -258,7 +258,7 @@ class _Field extends StatelessWidget {
       style: TextStyle(fontSize: 14, color: appTheme.fg),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: appTheme.muted, fontSize: 13),
+        hintStyle: TextStyle(color: appTheme.muted, fontSize: 12),
         filled: true,
         fillColor: appTheme.bgElev,
         isDense: true,
@@ -311,12 +311,12 @@ class _GenderPill extends StatelessWidget {
           children: [
             if (selected) ...[
               const Icon(Icons.check, size: 15, color: Colors.white),
-              const SizedBox(width: 5),
+              SizedBox(width: appTheme.spacingXs),
             ],
             Text(
               label,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
                 color: selected ? Colors.white : appTheme.fgMuted,
               ),

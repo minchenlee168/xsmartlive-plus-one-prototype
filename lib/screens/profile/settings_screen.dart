@@ -59,8 +59,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _SectionHeader(label: l10n.settingsSectionLanguage),
           Card(
             elevation: 0.5,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(appTheme.cardRadius)),
             color: Colors.white,
             child: Column(
               children: [
@@ -85,15 +85,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _SectionHeader(label: l10n.settingsSectionAbout),
           Card(
             elevation: 0.5,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(appTheme.cardRadius)),
             color: Colors.white,
             child: ListTile(
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: appTheme.brandPalette.tone50,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(appTheme.chipRadius),
                 ),
                 child: Icon(Icons.info_outline,
                     size: 20, color: appTheme.brandPalette.tone500),
@@ -101,7 +101,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               title: Text(l10n.settingsAppVersion),
               trailing: Text(
                 _version.isEmpty ? '—' : '$_version (build $_buildNumber)',
-                style: TextStyle(color: appTheme.fgMuted, fontSize: 13),
+                style: TextStyle(color: appTheme.fgMuted, fontSize: 12),
               ),
             ),
           ),
@@ -122,7 +122,7 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
             color: context.appTheme.fgMuted,
             letterSpacing: 0.5),
@@ -151,7 +151,7 @@ class _LanguageTile extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: context.appTheme.brandPalette.tone50,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(context.appTheme.chipRadius),
         ),
         child: Icon(Icons.language,
             size: 20, color: context.appTheme.brandPalette.tone500),

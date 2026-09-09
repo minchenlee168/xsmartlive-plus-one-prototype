@@ -40,7 +40,7 @@ class ThemePickerScreen extends ConsumerWidget {
             child: Text(
               l10n.themePickerDescription,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: appTheme.fgMuted,
                 height: 1.5,
               ),

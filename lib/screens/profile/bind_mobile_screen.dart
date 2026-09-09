@@ -131,7 +131,7 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
               style: TextStyle(
                   fontSize: 12, color: appTheme.fgMuted, height: 1.5),
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: appTheme.spacingLg),
             Text(
               '手機號碼',
               style: TextStyle(
@@ -140,7 +140,7 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: appTheme.spacingSm),
             Container(
               decoration: BoxDecoration(
                 color: appTheme.bgElev,
@@ -195,7 +195,7 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
               ),
             ),
             if (_otpSent) ...[
-              const SizedBox(height: 14),
+              SizedBox(height: appTheme.spacingLg),
               Text(
                 '驗證碼',
                 style: TextStyle(
@@ -204,7 +204,7 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: appTheme.spacingSm),
               Container(
                 decoration: BoxDecoration(
                   color: appTheme.bgElev,
@@ -266,7 +266,7 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
               ),
             ),
             if (_otpSent) ...[
-              const SizedBox(height: 10),
+              SizedBox(height: appTheme.spacingSm),
               TextButton(
                 onPressed: _busy
                     ? null

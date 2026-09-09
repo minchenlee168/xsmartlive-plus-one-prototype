@@ -128,7 +128,7 @@ class _AvailableCard extends StatelessWidget {
               children: [
                 Text(
                   '目前可使用紅利點數',
-                  style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+                  style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
                 ),
                 SizedBox(height: appTheme.spacingSm),
                 Text(
@@ -186,7 +186,7 @@ class _ExpiringCard extends StatelessWidget {
         children: [
           Text(
             '即將到期 (30天內)',
-            style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+            style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
           ),
           SizedBox(height: appTheme.spacingSm),
           Text(
@@ -313,7 +313,7 @@ class _FilterTab extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 color: color,
               ),
@@ -424,7 +424,7 @@ class _HistoryRow extends StatelessWidget {
                 style: GoogleFonts.getFont(
                   appTheme.fontDisplay,
                   textStyle: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
                     color: amountColor,
                   ),

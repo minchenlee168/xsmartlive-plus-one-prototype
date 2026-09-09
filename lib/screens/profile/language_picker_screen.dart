@@ -30,7 +30,7 @@ class LanguagePickerScreen extends ConsumerWidget {
         title: Text(
           '語言 / Language',
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: appTheme.fg,
           ),
@@ -93,7 +93,8 @@ class _LanguageCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(appTheme.cardRadius),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding: EdgeInsets.symmetric(
+              horizontal: appTheme.spacingLg, vertical: appTheme.spacingLg),
           child: Row(
             children: [
               Expanded(
@@ -103,7 +104,7 @@ class _LanguageCard extends StatelessWidget {
                     Text(
                       displayName,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: appTheme.fg,
                       ),

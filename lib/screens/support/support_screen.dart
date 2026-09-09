@@ -106,10 +106,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           // Sticky header
           Container(
             padding: EdgeInsets.only(
-              top: topPadding + 8,
-              left: 12,
-              right: 12,
-              bottom: 12,
+              top: topPadding + appTheme.spacingSm,
+              left: appTheme.spacingMd,
+              right: appTheme.spacingMd,
+              bottom: appTheme.spacingMd,
             ),
             decoration: BoxDecoration(
               color: appTheme.bgElev,
@@ -158,7 +158,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: appTheme.spacingSm),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +174,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                       Text(
                         l10n.supportStatus,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           color: appTheme.fgMuted,
                         ),
                       ),
@@ -192,7 +192,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           Expanded(
             child: ListView.builder(
               controller: _scroll,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(appTheme.spacingLg),
               itemCount: _messages.length,
               itemBuilder: (context, i) {
                 final m = _messages[i];
@@ -203,11 +203,12 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           // Quick replies (only shown until first user message)
           if (_showQuickReplies)
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                  horizontal: appTheme.spacingMd,
+                  vertical: appTheme.spacingSm),
               child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: appTheme.spacingSm,
+                runSpacing: appTheme.spacingSm,
                 children: [
                   l10n.supportQuickShipping,
                   l10n.supportQuickReturn,
@@ -217,8 +218,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     .map((t) => GestureDetector(
                           onTap: () => _send(t),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: appTheme.spacingMd,
+                                vertical: appTheme.spacingSm),
                             decoration: BoxDecoration(
                               color: appTheme.chip,
                               borderRadius: BorderRadius.circular(
@@ -240,12 +242,12 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           // Input bar
           Container(
             padding: EdgeInsets.fromLTRB(
-              12,
-              8,
-              12,
+              appTheme.spacingMd,
+              appTheme.spacingSm,
+              appTheme.spacingMd,
               MediaQuery.of(context).viewInsets.bottom +
                   MediaQuery.of(context).padding.bottom +
-                  8,
+                  appTheme.spacingSm,
             ),
             decoration: BoxDecoration(
               color: appTheme.bgElev,
@@ -255,11 +257,11 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
               children: [
                 Icon(Icons.add_circle_outline,
                     color: appTheme.fgMuted, size: 24),
-                const SizedBox(width: 8),
+                SizedBox(width: appTheme.spacingSm),
                 Expanded(
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: appTheme.spacingMd),
                     decoration: BoxDecoration(
                       color: appTheme.bgSubtle,
                       borderRadius:
@@ -278,7 +280,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: appTheme.spacingSm),
                 Material(
                   color: appTheme.brandPalette.tone500,
                   shape: const CircleBorder(),
@@ -324,7 +326,7 @@ class _ChatBubble extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: appTheme.spacingSm),
       child: Row(
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -348,7 +350,7 @@ class _ChatBubble extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: appTheme.spacingSm),
           ],
           ConstrainedBox(
             constraints: BoxConstraints(
@@ -359,8 +361,9 @@ class _ChatBubble extends StatelessWidget {
               ),
             ),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 10),
+              padding: EdgeInsets.symmetric(
+                  horizontal: appTheme.spacingMd,
+                  vertical: appTheme.spacingSm),
               decoration: BoxDecoration(
                 color: isMe
                     ? appTheme.brandPalette.tone500
@@ -371,7 +374,7 @@ class _ChatBubble extends StatelessWidget {
               child: Text(
                 message.text,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14,
                   color: isMe ? Colors.white : appTheme.fg,
                   height: 1.4,
                 ),

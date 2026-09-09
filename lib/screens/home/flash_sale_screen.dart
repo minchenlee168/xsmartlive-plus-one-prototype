@@ -42,7 +42,12 @@ class FlashSaleScreen extends ConsumerWidget {
           // Banner（比例對照主題館 ≈ 2000:620）
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              padding: EdgeInsets.fromLTRB(
+                appTheme.spacingLg,
+                appTheme.spacingLg,
+                appTheme.spacingLg,
+                0,
+              ),
               child: AspectRatio(
                 aspectRatio: 2000 / 620,
                 child: Container(
@@ -56,7 +61,7 @@ class FlashSaleScreen extends ConsumerWidget {
                       colors: [accent, accent.withValues(alpha: 0.65)],
                     ),
                   ),
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(appTheme.spacingLg),
                   child: Row(
                     children: [
                       Expanded(
@@ -72,7 +77,7 @@ class FlashSaleScreen extends ConsumerWidget {
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: appTheme.spacingXxs),
                             Text(
                               '限時特賣 · 售完不補',
                               style: TextStyle(
@@ -102,7 +107,7 @@ class FlashSaleScreen extends ConsumerWidget {
           if (products.isEmpty)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(40),
+                padding: EdgeInsets.all(appTheme.spacingXxxl),
                 child: Center(
                   child: Text('目前沒有限時搶購商品',
                       style: TextStyle(color: appTheme.fgMuted)),
@@ -113,13 +118,14 @@ class FlashSaleScreen extends ConsumerWidget {
             SliverToBoxAdapter(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  const spacing = 12.0;
-                  const hPad = 16.0;
+                  final spacing = appTheme.spacingMd;
+                  final hPad = appTheme.spacingLg;
                   final avail = constraints.maxWidth - hPad * 2;
                   final cols = (avail / 190).floor().clamp(2, 6);
                   final cardW = (avail - spacing * (cols - 1)) / cols;
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(hPad, 16, hPad, 24),
+                    padding: EdgeInsets.fromLTRB(
+                        hPad, appTheme.spacingLg, hPad, appTheme.spacingXxl),
                     child: Wrap(
                       spacing: spacing,
                       runSpacing: spacing,

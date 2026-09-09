@@ -223,7 +223,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // 拖曳握把 + 標題
-            const SizedBox(height: 10),
+            SizedBox(height: appTheme.spacingSm),
             Container(
               width: 40,
               height: 4,
@@ -264,10 +264,10 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
                     hint: '請輸入收件人姓名',
                     required: true,
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: appTheme.spacingLg),
                   // 國碼 + 電話
                   _Label('聯絡電話', required: true),
-                  const SizedBox(height: 6),
+                  SizedBox(height: appTheme.spacingSm),
                   Container(
                     decoration: _boxDeco(appTheme),
                     child: Row(
@@ -306,7 +306,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: appTheme.spacingLg),
                   // 類型專屬欄位
                   if (_isHome) ..._homeFields(appTheme) else ..._pickupFields(appTheme),
                   const SizedBox(height: 16),
@@ -371,7 +371,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
         districts.contains(_districtCtrl.text) ? _districtCtrl.text : null;
     return [
       _Label('縣市'),
-      const SizedBox(height: 6),
+      SizedBox(height: appTheme.spacingSm),
       _dropdownBox(
         appTheme: appTheme,
         value: city.isEmpty ? null : city,
@@ -382,9 +382,9 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
           _districtCtrl.clear(); // 換縣市時清掉舊的鄉鎮區
         }),
       ),
-      const SizedBox(height: 14),
+      SizedBox(height: appTheme.spacingLg),
       _Label('鄉鎮區'),
-      const SizedBox(height: 6),
+      SizedBox(height: appTheme.spacingSm),
       _dropdownBox(
         appTheme: appTheme,
         value: districtValue,
@@ -394,7 +394,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
             ? null
             : (v) => setState(() => _districtCtrl.text = v ?? ''),
       ),
-      const SizedBox(height: 14),
+      SizedBox(height: appTheme.spacingLg),
       _LabeledField(
           label: '詳細地址', controller: _addressCtrl, hint: '例：中山二路 10 號'),
     ];
@@ -468,7 +468,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
               onTap: () => _openStoreMap('7-11'),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: appTheme.spacingSm),
           Expanded(
             child: _BrandButton(
               brand: '全家',
@@ -480,7 +480,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
           ),
         ],
       ),
-      const SizedBox(height: 14),
+      SizedBox(height: appTheme.spacingLg),
       // 選到門市後直接帶入（唯讀顯示，不需填寫）；未選則提示。
       if (selected)
         _SelectedStoreCard(
@@ -505,7 +505,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
               Expanded(
                 child: Text(
                   '請點選上方超商，於電子地圖選擇取貨門市',
-                  style: TextStyle(fontSize: 13, color: appTheme.fgMuted),
+                  style: TextStyle(fontSize: 12, color: appTheme.fgMuted),
                 ),
               ),
             ],
@@ -580,7 +580,7 @@ class _LabeledField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _Label(label, required: required),
-        const SizedBox(height: 6),
+        SizedBox(height: appTheme.spacingSm),
         Container(
           decoration: BoxDecoration(
             color: appTheme.bg,
@@ -702,7 +702,7 @@ class _BrandButton extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: selected ? color : appTheme.fg,
                 ),
@@ -809,7 +809,7 @@ class _StoreMapPicker extends StatelessWidget {
                     child: Text(
                       '$brand 取貨門市',
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -868,7 +868,7 @@ class _StoreMapPicker extends StatelessWidget {
                       child: Row(
                         children: [
                           Icon(Icons.place_outlined, size: 18, color: color),
-                          const SizedBox(width: 10),
+                          SizedBox(width: appTheme.spacingSm),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

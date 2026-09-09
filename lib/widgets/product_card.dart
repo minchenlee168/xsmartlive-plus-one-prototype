@@ -128,8 +128,9 @@ class _ProductCardState extends ConsumerState<ProductCard>
     final grid = widget.imageAspectRatio != null;
     final stepSize = grid ? 28.0 : 26.0;
     // 網格模式字級收斂到階梯（14/12）；橫向緊湊列維持原值（out of scope）。
-    final nameSize = grid ? 14.0 : 13.0;
-    final metaSize = grid ? 12.0 : 11.0; // 原價 / 庫存
+    // 字體依照精簡卡（compact）：名稱 12、原價/庫存 11，不分 grid。
+    const nameSize = 12.0;
+    const metaSize = 11.0; // 原價 / 庫存
     final qtySize = grid ? 14.0 : 13.0;
 
     Widget stepBtn(IconData icon,
@@ -210,9 +211,8 @@ class _ProductCardState extends ConsumerState<ProductCard>
                       style: TextStyle(
                           fontSize: nameSize,
                           height: 1.3,
-                          // 網格：名稱輕量（w400）讓價格帶頭；橫向列維持 w600。
-                          fontWeight:
-                              grid ? FontWeight.w400 : FontWeight.w600,
+                          // 依精簡卡：名稱 w500。
+                          fontWeight: FontWeight.w500,
                           color: appTheme.fg),
                     ),
                   ),
@@ -223,10 +223,15 @@ class _ProductCardState extends ConsumerState<ProductCard>
                   children: [
                     Text(
                       'NT\$${p.price.toStringAsFixed(0)}',
-                      style: TextStyle(
-                          fontSize: grid ? 16 : 15,
+                      // 依精簡卡：售價用品牌襯線字（fontDisplay）16/w800。
+                      style: GoogleFonts.getFont(
+                        appTheme.fontDisplay,
+                        textStyle: TextStyle(
+                          fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: accent),
+                          color: accent,
+                        ),
+                      ),
                     ),
                     if (p.originalPrice != null) ...[
                       const SizedBox(width: 4),
@@ -689,7 +694,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          '\$${product.price.toStringAsFixed(0)}',
+                          'NT\$${product.price.toStringAsFixed(0)}',
                           style: GoogleFonts.getFont(
                             appTheme.fontDisplay,
                             textStyle: TextStyle(
@@ -702,7 +707,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                         if (hasOriginal) ...[
                           const SizedBox(width: 6),
                           Text(
-                            '\$${product.originalPrice!.toStringAsFixed(0)}',
+                            'NT\$${product.originalPrice!.toStringAsFixed(0)}',
                             style: TextStyle(
                               fontSize: 11,
                               color: appTheme.fgMuted,

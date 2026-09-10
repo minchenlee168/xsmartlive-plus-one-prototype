@@ -721,29 +721,32 @@ class _ThemeHallSections extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           // 該主題館的商品卡（橫向捲動）：標準卡有數量選擇 + 庫存；精簡卡較簡潔。
-          SizedBox(
-            // 卡片名稱固定保留兩行高度後所有卡等高，列高貼齊卡片內容，
-            // 既不會底部溢位、也不留多餘空白。
-            // 標準卡圖片 1:1 + 原價在售價下方 + 商品名 16（兩行）+ 售價 20，
-            // 整卡再變高；橫向列固定高度加大並留 slack，避免 RenderFlex 溢位。
-            height: hall.standard ? 396 : 304,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: hall.items.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (context, i) => SizedBox(
-                width: hall.standard ? 176 : 150,
-                child: hall.standard
-                    ? ProductCard(
-                        variant: ProductCardVariant.standard,
-                        product: hall.items[i].product,
-                        stock: hall.items[i].stock,
-                      )
-                    : ProductCard(
-                        variant: ProductCardVariant.compact,
-                        product: hall.items[i].product,
-                      ),
+          // 用 IntrinsicHeight + Row 讓列高「自動＝卡片實際高」——零 slack、零溢位、
+          // 卡片字級 / 內容變了也自動跟上，不必再手動猜固定列高。
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < hall.items.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 12),
+                    SizedBox(
+                      width: hall.standard ? 176 : 150,
+                      child: hall.standard
+                          ? ProductCard(
+                              variant: ProductCardVariant.standard,
+                              product: hall.items[i].product,
+                              stock: hall.items[i].stock,
+                            )
+                          : ProductCard(
+                              variant: ProductCardVariant.compact,
+                              product: hall.items[i].product,
+                            ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),

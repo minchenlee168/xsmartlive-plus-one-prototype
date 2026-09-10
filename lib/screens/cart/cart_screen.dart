@@ -1576,13 +1576,13 @@ class _QtyStepper extends StatelessWidget {
             color: appTheme.fg,
           ),
           SizedBox(
-            width: 22,
+            width: 32,
             child: Text(
               '$qty',
               textAlign: TextAlign.center,
               // 明確用主題前景色，夜間直播等深色主題數字才看得到。
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: appTheme.fg,
               ),
@@ -1611,15 +1611,22 @@ class _StepperButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 觸控目標 ≥ 44px（Apple HIG / Material 48dp）：外框 44×44 為可點範圍，
+    // 內層 40×40 為視覺按鈕，+/− 放大到 18 好按好看。
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(context.appTheme.radiusSm),
       child: SizedBox(
-        width: 22,
-        height: 22,
+        width: 44,
+        height: 44,
         child: Center(
           child: Text(
             label,
-            style: TextStyle(fontSize: 12, color: color),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
           ),
         ),
       ),

@@ -459,7 +459,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: appTheme.fg,
                               ),
@@ -482,7 +482,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                   Text(
                     '選擇規格',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg,
                     ),
@@ -847,7 +847,7 @@ class _SpecChip extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               color: selected ? accent : appTheme.fg,
             ),

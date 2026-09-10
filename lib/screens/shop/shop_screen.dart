@@ -390,7 +390,7 @@ class _BannerSlide extends StatelessWidget {
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                    fontSize: 16,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -531,7 +531,7 @@ class _LiveAnnouncementCard extends StatelessWidget {
               body,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 height: 1.6,
                 fontWeight: FontWeight.w500,
                 color: appTheme.fg,
@@ -848,7 +848,7 @@ class _StoreCollectionCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

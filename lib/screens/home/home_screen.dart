@@ -439,7 +439,7 @@ class _HeroHeader extends StatelessWidget {
                     child: Text(
                       searchPlaceholder,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         color: appTheme.fgMuted,
                       ),
                     ),
@@ -458,7 +458,7 @@ class _HeroHeader extends StatelessWidget {
                       searchGoLabel,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.5,
                       ),
@@ -682,7 +682,7 @@ class _ReplayCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w500,
               color: appTheme.fg,
               height: 1.35,
@@ -928,7 +928,7 @@ class _WeeklyScheduleCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: appTheme.fg,
                             ),

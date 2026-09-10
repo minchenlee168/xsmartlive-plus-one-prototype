@@ -446,6 +446,11 @@ final favoritesProvider =
   }
 });
 
+/// 本地端「已取消收藏」的商品 id（原型：點愛心即時從我的最愛移除，不改後端）。
+/// TODO(API): 改為呼叫 DELETE /favorites/{id} 並 invalidate favoritesProvider。
+final removedFavoriteIdsProvider =
+    StateProvider<Set<String>>((ref) => <String>{});
+
 const List<FavoriteProduct> _sampleFavorites = [
   FavoriteProduct(
     streamer: '美妝達人小芸',

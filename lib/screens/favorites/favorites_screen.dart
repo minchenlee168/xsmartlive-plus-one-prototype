@@ -21,7 +21,12 @@ class FavoritesScreen extends ConsumerWidget {
             child: Text('載入失敗：$e',
                 style: TextStyle(color: appTheme.fgMuted))),
         data: (favorites) {
-          if (favorites.isEmpty) {
+          // 濾掉本地已取消收藏的項目（點愛心即時移除）。
+          final removed = ref.watch(removedFavoriteIdsProvider);
+          final visible = favorites
+              .where((f) => !removed.contains(f.product.id))
+              .toList();
+          if (visible.isEmpty) {
             return Column(
               children: [
                 _Header(count: 0, showCount: false),
@@ -47,10 +52,10 @@ class FavoritesScreen extends ConsumerWidget {
             );
           }
           // 收藏卡改用共用「標準商品卡」ProductCard，與全站商品卡樣式一致；
-          // 右上疊一顆愛心作為「移除收藏」入口（原型：目前為佔位）。
+          // 右上疊一顆愛心作為「移除收藏」入口（點擊即時移除）。
           return Column(
             children: [
-              _Header(count: favorites.length, showCount: true),
+              _Header(count: visible.length, showCount: true),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
@@ -65,7 +70,7 @@ class FavoritesScreen extends ConsumerWidget {
                         spacing: spacing,
                         runSpacing: spacing,
                         children: [
-                          for (final fav in favorites)
+                          for (final fav in visible)
                             SizedBox(
                               width: cardW,
                               child: Stack(
@@ -89,7 +94,13 @@ class FavoritesScreen extends ConsumerWidget {
                                   Positioned(
                                     top: appTheme.spacingSm,
                                     right: appTheme.spacingSm,
-                                    child: _RemoveFavButton(onTap: () {}),
+                                    child: _RemoveFavButton(
+                                      onTap: () => ref
+                                          .read(removedFavoriteIdsProvider
+                                              .notifier)
+                                          .update((s) =>
+                                              {...s, fav.product.id}),
+                                    ),
                                   ),
                                 ],
                               ),

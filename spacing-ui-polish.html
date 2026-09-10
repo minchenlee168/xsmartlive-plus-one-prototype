@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>間距 ui-polish 圖文說明</title>
+<title>間距 · 字級 ui-polish 圖文說明</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -40,7 +40,7 @@ code{font-family:ui-monospace,Menlo,monospace;background:var(--subtle);padding:1
 .ltok{font-size:12.5px;color:var(--goldDeep);font-family:ui-monospace,Menlo,monospace}
 .lbar{display:flex;align-items:center;gap:14px}
 .lblk{height:15px;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));flex:0 0 auto}
-.luse{color:var(--muted);font-size:13px}
+.luse{color:var(--muted);font-size:13px}.fscale{background:var(--card);border:1px solid var(--divider);border-radius:var(--r);padding:6px 14px;box-shadow:var(--shadow)}.frow{display:grid;grid-template-columns:300px 150px 1fr;align-items:center;gap:16px;padding:14px 8px;border-top:1px solid var(--divider)}.frow:first-child{border-top:0}@media(max-width:720px){.frow{grid-template-columns:1fr;gap:4px}}.fsample{color:var(--fg);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fmeta{display:flex;align-items:baseline;gap:10px}.fpx{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums;color:var(--goldDeep)}.fpx em{font-style:normal;font-weight:500;color:var(--muted);font-size:11px;margin-left:1px}.frole{font-size:12.5px;color:var(--fg)}.fuse{color:var(--muted);font-size:13px}
 
 /* 每個階梯用在哪裡 */
 .tks{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -112,7 +112,7 @@ footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--divider);colo
 <div class="wrap">
   <header>
     <div class="kicker">觀眾版APP · 加1直播（商戶預設主題）</div>
-    <h1 class="serif">間距 ui-polish 圖文說明</h1>
+    <h1 class="serif">間距 · 字級 ui-polish 圖文說明</h1>
     <p class="lede">這輪調整只做一件事：把散落在各畫面、憑手感寫下的留白數值，收斂到一套固定的
     <b>4pt 間距階梯</b>。以下先看階梯本身，再直接在<b>真實 App 畫面</b>上標出改了哪裡、從幾 px 調到幾 px。</p>
     <div class="tagrow">
@@ -275,7 +275,14 @@ footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--divider);colo
   </section>
 
   <section>
-    <h2><span class="n">05</span><span class="serif">刻意保留、沒有動的間距</span></h2>
+    <h2><span class="n">05</span><span class="serif">字級尺規（手機舒適度）</span></h2>
+    <p class="sub">同角色固定同一級、不忽大忽小。左欄是該字級的實際樣本；正文 / 清單一律 16，次要資訊 12，區塊標題 18，頁面主標 / 展示數字 20–24，微型 chrome 9–11 為刻意例外。</p>
+    <div class="fscale"><div class="frow"><div class="fsample" style="font-size:24px;font-weight:700">大標題 24</div><div class="fmeta"><span class="fpx">24<em>px</em></span><span class="frole">頁面主標 / 品牌大標</span></div><div class="fuse">登入品牌標、頁面 hero 標題</div></div><div class="frow"><div class="fsample" style="font-size:20px;font-weight:800">NT$1,280</div><div class="fmeta"><span class="fpx">20<em>px</em></span><span class="frole">展示數字 / stat / 售價</span></div><div class="fuse">紅利點數值、直播頁標題、卡片售價</div></div><div class="frow"><div class="fsample" style="font-size:18px;font-weight:700">區塊標題 18</div><div class="fmeta"><span class="fpx">18<em>px</em></span><span class="frole">區塊 / 卡片 / 彈窗標題</span></div><div class="fuse">section header、公告卡標題、彈窗 / sheet 標題</div></div><div class="frow"><div class="fsample" style="font-size:16px;font-weight:600">商品名稱・清單項・內文 16</div><div class="fmeta"><span class="fpx">16<em>px</em></span><span class="frole">主要可讀文字（主級）</span></div><div class="fuse">商品名、清單 / 選單項、內文、按鈕、輸入框、欄位值</div></div><div class="frow"><div class="fsample" style="font-size:12px;font-weight:500">庫存 25・已付款・2 小時前 12</div><div class="fmeta"><span class="fpx">12<em>px</em></span><span class="frole">次要 caption / label / meta</span></div><div class="fuse">原價、庫存、時間、計數、hint、狀態、副標</div></div><div class="frow"><div class="fsample" style="font-size:10px;font-weight:700">LIVE ・ −34% ・ 已下架 10</div><div class="fmeta"><span class="fpx">9–11<em>px</em></span><span class="frole">微型 chrome（例外）</span></div><div class="fuse">badge / pill、時間軸極小字、深色 overlay 疊加字</div></div></div>
+    <p class="note" style="margin-top:14px;color:var(--muted);font-size:12.5px">近期依實機回饋整體放大一級：主要文字 14 → <b>16</b>、區塊標題 16 → <b>18</b>、卡片售價 → <b>20</b>（次要 caption 維持 12）。</p>
+  </section>
+
+  <section>
+    <h2><span class="n">06</span><span class="serif">刻意保留、沒有動的間距</span></h2>
     <p class="sub">收斂會破壞設計意圖的地方，維持原值。</p>
     <div class="keep">
       <ul>

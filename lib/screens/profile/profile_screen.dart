@@ -618,10 +618,13 @@ class _RecentOrdersSection extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(4, 6, 4, 8),
                 child: Text(
                   '近期訂單',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: appTheme.fgMuted,
+                  style: GoogleFonts.getFont(
+                    appTheme.fontDisplay,
+                    textStyle: TextStyle(
+                      fontSize: 18,
+                      fontWeight: appTheme.fontWeightDisplay,
+                      color: appTheme.fg,
+                    ),
                   ),
                 ),
               ),

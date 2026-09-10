@@ -286,7 +286,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 const SizedBox(width: 4),
                 const Text(
                   '返回',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 const Spacer(),
                 Text(
@@ -303,7 +303,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 const SizedBox(width: 4),
                 Text(
                   '($totalItemCount)',
-                  style: TextStyle(fontSize: 14, color: appTheme.fgMuted),
+                  style: TextStyle(fontSize: 16, color: appTheme.fgMuted),
                 ),
               ],
             ),
@@ -414,7 +414,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     child: Text(
                       '去結帳 ($selectedCount)',
                       style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w700),
+                          fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ),
                 ],
@@ -622,7 +622,7 @@ class _HostGroupCard extends StatelessWidget {
                   Text(
                     group.name,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg,
                     ),
@@ -706,7 +706,7 @@ class _HostGroupCard extends StatelessWidget {
                     style: GoogleFonts.getFont(
                       appTheme.fontDisplay,
                       textStyle: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: appTheme.brandPalette.tone500,
                       ),
@@ -806,7 +806,7 @@ class _CartItemRow extends StatelessWidget {
                       TextSpan(
                         text: vm.name,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: appTheme.fg,
                           height: 1.4,
@@ -901,7 +901,7 @@ class _CartItemRow extends StatelessWidget {
                 style: GoogleFonts.getFont(
                   appTheme.fontDisplay,
                   textStyle: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
                     color: appTheme.brandPalette.tone500,
                   ),
@@ -1361,7 +1361,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                 children: [
                   Text('挑選規格',
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: appTheme.fg)),
                   const Spacer(),
@@ -1401,7 +1401,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                           isExpanded: true,
                           isDense: true,
                           value: _pick,
-                          style: TextStyle(fontSize: 14, color: appTheme.fg),
+                          style: TextStyle(fontSize: 16, color: appTheme.fg),
                           items: [
                             for (final o in opts)
                               DropdownMenuItem(
@@ -1439,7 +1439,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                       ),
                       child: const Text('加入',
                           style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.white)),
                     ),
@@ -1479,7 +1479,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                       Expanded(
                         child: Text('${e.key} ×${e.value}',
                             style:
-                                TextStyle(fontSize: 14, color: appTheme.fg)),
+                                TextStyle(fontSize: 16, color: appTheme.fg)),
                       ),
                       GestureDetector(
                         onTap: () => setState(() => _draft.remove(e.key)),
@@ -1535,7 +1535,7 @@ class _SpecAllocSheetState extends State<_SpecAllocSheet> {
                   ),
                   child: const Text('確定',
                       style: TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w700)),
+                          fontSize: 16, fontWeight: FontWeight.w700)),
                 ),
               ),
             ),
@@ -1646,14 +1646,14 @@ class _EmptyCart extends StatelessWidget {
             label,
             style: TextStyle(
               color: appTheme.fg,
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             '挑幾件喜歡的商品吧',
-            style: TextStyle(color: appTheme.fgMuted, fontSize: 14),
+            style: TextStyle(color: appTheme.fgMuted, fontSize: 16),
           ),
           const SizedBox(height: 24),
           FilledButton(
@@ -1670,7 +1670,7 @@ class _EmptyCart extends StatelessWidget {
             ),
             child: const Text(
               '去逛逛',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -1820,7 +1820,7 @@ class _AddonSection extends ConsumerWidget {
                       style: GoogleFonts.getFont(
                         appTheme.fontDisplay,
                         textStyle: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: appTheme.fg,
                         ),
@@ -1979,7 +1979,7 @@ class _AddonCartDropdown extends ConsumerWidget {
           child: Text(
             '全部購物車',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               color: appTheme.brandPalette.tone500,
               fontWeight: isAll ? FontWeight.w800 : FontWeight.w700,
             ),
@@ -1991,7 +1991,7 @@ class _AddonCartDropdown extends ConsumerWidget {
             child: Text(
               g.name,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: appTheme.fg,
                 fontWeight:
                     g.id == selectedId ? FontWeight.w700 : FontWeight.w400,
@@ -2089,7 +2089,7 @@ class _AddonCard extends ConsumerWidget {
           style: GoogleFonts.getFont(
             appTheme.fontDisplay,
             textStyle: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w800,
               color: accent,
             ),
@@ -2241,7 +2241,7 @@ class _LivebuyReplaySectionState extends State<_LivebuyReplaySection> {
               style: GoogleFonts.getFont(
                 appTheme.fontDisplay,
                 textStyle: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: appTheme.fg,
                 ),

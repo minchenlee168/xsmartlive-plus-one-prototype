@@ -30,7 +30,7 @@ class LanguagePickerScreen extends ConsumerWidget {
         title: Text(
           '語言 / Language',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: appTheme.fg,
           ),

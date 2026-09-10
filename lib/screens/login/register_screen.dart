@@ -160,12 +160,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           title: Text(
             l10n.registrationFailedTitle,
             style: theme.textTheme.titleMedium
-                ?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w600),
+                ?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w600, fontSize: 18),
           ),
           content: Text(
             message,
             style: theme.textTheme.bodyMedium
-                ?.copyWith(color: cs.onSurfaceVariant),
+                ?.copyWith(color: cs.onSurfaceVariant, fontSize: 16),
           ),
           actions: [
             TextButton(
@@ -281,6 +281,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         color: cs.onSurface,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.5,
+                        fontSize: 24,
                       ),
                     ),
                     SizedBox(height: appTheme.spacingXl),
@@ -429,7 +430,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       child: RichText(
                         text: TextSpan(
                           style: theme.textTheme.bodyMedium
-                              ?.copyWith(color: cs.onSurfaceVariant),
+                              ?.copyWith(color: cs.onSurfaceVariant, fontSize: 16),
                           children: [
                             TextSpan(text: l10n.alreadyHaveAccount),
                             TextSpan(
@@ -496,7 +497,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         child: DropdownButton<String>(
           value: _code,
           dropdownColor: cs.surface,
-          style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface),
+          style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface, fontSize: 16),
           icon: Icon(Icons.keyboard_arrow_down,
               color: cs.onSurfaceVariant, size: 16),
           items: _codes
@@ -547,7 +548,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ? '$_otpCountdown s'
                     : l10n.sendCode,
                 style: theme.textTheme.labelSmall
-                    ?.copyWith(fontWeight: FontWeight.w500),
+                    ?.copyWith(fontWeight: FontWeight.w500, fontSize: 16),
               ),
       ),
     );
@@ -586,11 +587,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       obscureText: obscure,
       keyboardType: keyboard,
       inputFormatters: inputFormatters,
-      style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface),
+      style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface, fontSize: 16),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: theme.textTheme.bodyMedium
-            ?.copyWith(color: cs.onSurfaceVariant),
+            ?.copyWith(color: cs.onSurfaceVariant, fontSize: 16),
         suffixIcon: suffix,
         filled: true,
         fillColor: cs.surface,
@@ -707,6 +708,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: enabled ? cs.onPrimary : cs.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
           ),

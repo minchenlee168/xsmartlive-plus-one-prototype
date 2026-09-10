@@ -235,7 +235,7 @@ class _HistoryCard extends StatelessWidget {
             style: GoogleFonts.getFont(
               appTheme.fontDisplay,
               textStyle: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: appTheme.fontWeightDisplay,
                 color: appTheme.fg,
               ),
@@ -313,7 +313,7 @@ class _FilterTab extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 color: color,
               ),
@@ -377,7 +377,7 @@ class _HistoryRow extends StatelessWidget {
                 Text(
                   entry.title,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: appTheme.fg,
                   ),

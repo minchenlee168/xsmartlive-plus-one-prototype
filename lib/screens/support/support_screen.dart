@@ -166,7 +166,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                       Text(
                         l10n.supportTitle,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: appTheme.fg,
                         ),
@@ -229,7 +229,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                             child: Text(
                               t,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 16,
                                 color: appTheme.chipFg,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -269,11 +269,11 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     ),
                     child: TextField(
                       controller: _ctrl,
-                      style: TextStyle(fontSize: 14, color: appTheme.fg),
+                      style: TextStyle(fontSize: 16, color: appTheme.fg),
                       decoration: InputDecoration(
                         hintText: l10n.supportInputHint,
                         hintStyle: TextStyle(
-                            fontSize: 14, color: appTheme.fgMuted),
+                            fontSize: 16, color: appTheme.fgMuted),
                         border: InputBorder.none,
                       ),
                       onSubmitted: _send,
@@ -374,7 +374,7 @@ class _ChatBubble extends StatelessWidget {
               child: Text(
                 message.text,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   color: isMe ? Colors.white : appTheme.fg,
                   height: 1.4,
                 ),

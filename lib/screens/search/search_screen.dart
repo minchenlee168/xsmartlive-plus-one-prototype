@@ -73,11 +73,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 child: TextField(
                   controller: _ctrl,
                   autofocus: true,
-                  style: TextStyle(fontSize: 14, color: appTheme.fg),
+                  style: TextStyle(fontSize: 16, color: appTheme.fg),
                   decoration: InputDecoration(
                     hintText: l10n.searchScreenHint,
                     hintStyle: TextStyle(
-                        fontSize: 14, color: appTheme.fgMuted),
+                        fontSize: 16, color: appTheme.fgMuted),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
                     isDense: true,
@@ -207,7 +207,7 @@ class _SectionTitle extends StatelessWidget {
           title,
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 14,
+            fontSize: 18,
             color: appTheme.fg,
           ),
         ),
@@ -276,7 +276,7 @@ class _CategoryGrid extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 16,
                 color: appTheme.fg,
                 fontWeight: FontWeight.w500,
               ),
@@ -373,7 +373,7 @@ class _HotKeywordsGrid extends ConsumerWidget {
                     child: Text(
                       keywords[i],
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: appTheme.fg,
                       ),

@@ -209,7 +209,7 @@ class _NotificationTile extends StatelessWidget {
                           child: Text(item.title,
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   color: appTheme.fg)),
                         ),
                         if (!item.isRead)
@@ -233,7 +233,7 @@ class _NotificationTile extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            fontSize: 14, color: appTheme.fg)),
+                            fontSize: 16, color: appTheme.fg)),
                     SizedBox(height: appTheme.spacingXs),
                     Text(item.time,
                         style: TextStyle(

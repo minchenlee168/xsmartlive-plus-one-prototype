@@ -159,7 +159,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                         '確認修改',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 14,
+                          fontSize: 16,
                         ),
                       ),
               ),
@@ -213,11 +213,11 @@ class _PasswordField extends StatelessWidget {
                 child: TextField(
                   controller: controller,
                   obscureText: obscure,
-                  style: TextStyle(fontSize: 14, color: appTheme.fg),
+                  style: TextStyle(fontSize: 16, color: appTheme.fg),
                   decoration: InputDecoration(
                     hintText: hint,
                     hintStyle:
-                        TextStyle(fontSize: 12, color: appTheme.fgMuted),
+                        TextStyle(fontSize: 16, color: appTheme.fgMuted),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(

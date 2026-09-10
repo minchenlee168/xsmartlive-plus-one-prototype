@@ -38,7 +38,7 @@ class AppChip extends StatelessWidget {
                 color: selected
                     ? Theme.of(context).colorScheme.onPrimary
                     : appTheme.chipFg,
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),

@@ -304,6 +304,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   color: cs.onSurface,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
+                  fontSize: 24,
                 ),
               ),
               SizedBox(height: appTheme.spacingMd),
@@ -312,6 +313,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: cs.onSurfaceVariant,
+                  fontSize: 16,
                 ),
               ),
               SizedBox(height: appTheme.spacingXl),
@@ -574,6 +576,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: enabled ? cs.onPrimary : cs.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
           ),
@@ -613,7 +616,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           value: _code,
           isExpanded: true,
           dropdownColor: cs.surface,
-          style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface),
+          style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface, fontSize: 16),
           icon: Icon(Icons.keyboard_arrow_down,
               color: cs.onSurfaceVariant, size: 16),
           items: _codes
@@ -658,11 +661,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       obscureText: obscure,
       keyboardType: keyboard,
       inputFormatters: inputFormatters,
-      style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface),
+      style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface, fontSize: 16),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: theme.textTheme.bodyMedium
-            ?.copyWith(color: cs.onSurfaceVariant),
+            ?.copyWith(color: cs.onSurfaceVariant, fontSize: 16),
         suffixIcon: suffix,
         filled: true,
         fillColor: cs.surface,

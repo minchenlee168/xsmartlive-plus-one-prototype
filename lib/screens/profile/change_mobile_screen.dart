@@ -131,7 +131,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
         title: Text(
           '更改手機號碼',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: appTheme.fg,
           ),
@@ -165,7 +165,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
             child: Text(
               currentMobile ?? '尚未設定手機號碼',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: currentMobile != null
                     ? appTheme.fg
                     : appTheme.fgMuted,
@@ -194,7 +194,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                   child: DropdownButton<String>(
                     value: _country,
                     dropdownColor: appTheme.bgElev,
-                    style: TextStyle(color: appTheme.fg, fontSize: 14),
+                    style: TextStyle(color: appTheme.fg, fontSize: 16),
                     icon: Icon(Icons.keyboard_arrow_down,
                         color: appTheme.muted, size: 16),
                     items: _codes
@@ -214,11 +214,11 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                   enabled: !_busy && !_otpSent,
                   onChanged: (_) => setState(() {}),
                   keyboardType: TextInputType.phone,
-                  style: TextStyle(color: appTheme.fg, fontSize: 14),
+                  style: TextStyle(color: appTheme.fg, fontSize: 16),
                   decoration: InputDecoration(
                     hintText: '請輸入新手機號碼',
                     hintStyle: TextStyle(
-                        color: appTheme.muted, fontSize: 12),
+                        color: appTheme.muted, fontSize: 16),
                     filled: true,
                     fillColor: appTheme.bgElev,
                     isDense: true,
@@ -258,10 +258,10 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
               controller: _otpCtrl,
               enabled: !_busy,
               keyboardType: TextInputType.number,
-              style: TextStyle(color: appTheme.fg, fontSize: 14),
+              style: TextStyle(color: appTheme.fg, fontSize: 16),
               decoration: InputDecoration(
                 hintText: '輸入 OTP 驗證碼',
-                hintStyle: TextStyle(color: appTheme.muted, fontSize: 12),
+                hintStyle: TextStyle(color: appTheme.muted, fontSize: 16),
                 filled: true,
                 fillColor: appTheme.bgElev,
                 isDense: true,
@@ -294,7 +294,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               child: const Text('重新發送驗證碼',
-                  style: TextStyle(fontSize: 12)),
+                  style: TextStyle(fontSize: 16)),
             ),
           ],
           if (_error != null) ...[
@@ -334,7 +334,7 @@ class _ChangeMobileScreenState extends ConsumerState<ChangeMobileScreen> {
                           _otpSent ? '確認更新' : '送出驗證碼',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

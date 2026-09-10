@@ -244,13 +244,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           l10n.termsDialogTitle,
           style: TextStyle(
             color: appTheme.fg,
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
         content: Text(
           l10n.termsDialogContent,
-          style: TextStyle(color: appTheme.fgMuted, fontSize: 14, height: 1.5),
+          style: TextStyle(color: appTheme.fgMuted, fontSize: 16, height: 1.5),
         ),
         actions: [
           TextButton(
@@ -294,10 +294,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         title: Text(l10n.loginFailedTitle,
             style: TextStyle(
                 color: appTheme.fg,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w600)),
         content: Text(message,
-            style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
+            style: TextStyle(color: appTheme.fgMuted, fontSize: 16)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -437,7 +437,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Center(
                   child: RichText(
                     text: TextSpan(
-                      style: TextStyle(color: appTheme.fgMuted, fontSize: 14),
+                      style: TextStyle(color: appTheme.fgMuted, fontSize: 16),
                       children: [
                         TextSpan(text: l10n.noAccountText),
                         TextSpan(
@@ -500,7 +500,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: DropdownButton<String>(
           value: _code,
           dropdownColor: appTheme.bgElev,
-          style: TextStyle(color: appTheme.fg, fontSize: 14),
+          style: TextStyle(color: appTheme.fg, fontSize: 16),
           icon: Icon(Icons.keyboard_arrow_down,
               color: appTheme.muted, size: 16),
           items: _codes
@@ -529,10 +529,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       controller:   ctrl,
       obscureText:  obscure,
       keyboardType: keyboard,
-      style: TextStyle(color: appTheme.fg, fontSize: 14),
+      style: TextStyle(color: appTheme.fg, fontSize: 16),
       decoration: InputDecoration(
         hintText:    hint,
-        hintStyle:   TextStyle(color: appTheme.muted, fontSize: 14),
+        hintStyle:   TextStyle(color: appTheme.muted, fontSize: 16),
         suffixIcon:  suffix,
         filled:      true,
         fillColor:   appTheme.bgElev,
@@ -750,7 +750,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         children: [
           icon,
           const SizedBox(width: 8),
-          Text(label, style: TextStyle(color: appTheme.fg, fontSize: 14)),
+          Text(label, style: TextStyle(color: appTheme.fg, fontSize: 16)),
         ],
       ),
     );

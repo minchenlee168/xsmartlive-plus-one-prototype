@@ -808,7 +808,7 @@ class _ChatOverlayState extends State<_ChatOverlay> {
                   text: TextSpan(
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 12,
+                      fontSize: 16,
                       height: 1.4,
                     ),
                     children: [
@@ -947,7 +947,7 @@ class _ProductList extends StatelessWidget {
               Text(
                 '此場直播尚無商品',
                 style:
-                    TextStyle(color: appTheme.fgMuted, fontSize: 14),
+                    TextStyle(color: appTheme.fgMuted, fontSize: 16),
               ),
             ],
           ),
@@ -968,7 +968,7 @@ class _ProductList extends StatelessWidget {
               Text(
                 '直播商品 · ${products.length}',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: appTheme.fg,
                 ),
@@ -1062,7 +1062,7 @@ class _ProductList extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: appTheme.fg,
                                 height: 1.3,
@@ -1132,7 +1132,7 @@ class _ProductList extends StatelessWidget {
                           child: const Text(
                             '立即下單',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -1231,12 +1231,12 @@ class _BottomInputBar extends StatelessWidget {
                     child: TextField(
                       controller: ctrl,
                       style: TextStyle(
-                          color: appTheme.fg, fontSize: 14),
+                          color: appTheme.fg, fontSize: 16),
                       decoration: InputDecoration(
                         hintText: hint,
                         hintStyle: TextStyle(
                           color: appTheme.fgMuted,
-                          fontSize: 14,
+                          fontSize: 16,
                         ),
                         border: InputBorder.none,
                         isDense: true,
@@ -1600,7 +1600,7 @@ class _FloatingProductCard extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1650,7 +1650,7 @@ class _FloatingProductCard extends ConsumerWidget {
                   '立即下單',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -1729,13 +1729,13 @@ class _GlassBottomInput extends StatelessWidget {
                     controller: ctrl,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 16,
                     ),
                     decoration: InputDecoration(
                       hintText: hint,
                       hintStyle: TextStyle(
                         color: Colors.white.withValues(alpha: 0.55),
-                        fontSize: 14,
+                        fontSize: 16,
                       ),
                       border: InputBorder.none,
                       isDense: true,

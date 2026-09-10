@@ -231,7 +231,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         title: Text(
           '結帳',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: appTheme.fg,
           ),
@@ -459,7 +459,7 @@ class _SectionTitle extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: appTheme.fg,
             ),
@@ -744,19 +744,19 @@ class _DeliveryInfoCard extends ConsumerWidget {
                 children: [
                   Text(
                     '配送方式',
-                    style: TextStyle(fontSize: 14, color: appTheme.fg),
+                    style: TextStyle(fontSize: 16, color: appTheme.fg),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
                       summary,
-                      style: TextStyle(fontSize: 14, color: appTheme.fgMuted),
+                      style: TextStyle(fontSize: 16, color: appTheme.fgMuted),
                     ),
                   ),
                   Text(
                     '套用全部',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: accent,
                     ),
@@ -784,7 +784,7 @@ class _DeliveryInfoCard extends ConsumerWidget {
                           Text(
                             groups[i].sellerName,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: appTheme.fg,
                             ),
@@ -995,7 +995,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                   child: Text(
                     '${g.sellerName} 訂單明細',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg,
                     ),
@@ -1174,7 +1174,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                               controller: _bonusCtrl,
                               onChanged: _onBonusInput,
                               style:
-                                  TextStyle(fontSize: 14, color: appTheme.fg),
+                                  TextStyle(fontSize: 16, color: appTheme.fg),
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
                               cursorColor: accent,
@@ -1217,7 +1217,7 @@ class _CartOrderCardState extends State<_CartOrderCard> {
                     Text(
                       '訂單金額小計',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -1388,7 +1388,7 @@ class _CartItemRow extends StatelessWidget {
                     TextSpan(
                       text: item.name,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         height: 1.4,
                         color: appTheme.fg,
@@ -1435,7 +1435,7 @@ class _CartItemRow extends StatelessWidget {
             style: GoogleFonts.getFont(
               appTheme.fontDisplay,
               textStyle: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: accent,
               ),
@@ -1558,7 +1558,7 @@ class _DeliveryMethodSheetState extends State<_DeliveryMethodSheet> {
                     child: Text(
                       widget.applyAll ? '選擇運送方式（套用全部）' : '選擇運送方式',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -1772,7 +1772,7 @@ class _HomeAddressCard extends StatelessWidget {
                           child: Text(
                             '${addr.name}  ${addr.phone}',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: appTheme.fg,
                             ),
@@ -2038,7 +2038,7 @@ class _AddNewRow extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: accent,
                 ),
@@ -2145,7 +2145,7 @@ class _DeliveryMethodRow extends StatelessWidget {
             Text(
               option.priceLabel,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: selected ? accent : appTheme.fgMuted,
               ),
             ),
@@ -2318,7 +2318,7 @@ class _CouponPickerSheetState extends State<_CouponPickerSheet> {
                     child: Text(
                       '選擇優惠券',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -2431,7 +2431,7 @@ class _CouponPickRow extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                       color: selected ? accent : appTheme.fg,
                     ),
@@ -2450,7 +2450,7 @@ class _CouponPickRow extends StatelessWidget {
               Text(
                 trailing,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: appTheme.danger,
                 ),
@@ -2520,7 +2520,7 @@ class _FeeSummaryCard extends StatelessWidget {
         children: [
           Text('費用明細',
               style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: appTheme.fg)),
           const SizedBox(height: 8),
@@ -2546,7 +2546,7 @@ class _FeeSummaryCard extends StatelessWidget {
             children: [
               Text('總付款金額',
                   style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg)),
               Text(
@@ -2659,7 +2659,7 @@ class _PayTile extends StatelessWidget {
       label,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: TextStyle(fontSize: 14, color: appTheme.fg),
+      style: TextStyle(fontSize: 16, color: appTheme.fg),
     );
     return InkWell(
       onTap: onTap,
@@ -2819,7 +2819,7 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: 12),
             Text(message,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
+                style: TextStyle(color: appTheme.fgMuted, fontSize: 16)),
             const SizedBox(height: 12),
             OutlinedButton(
                 onPressed: onRetry,

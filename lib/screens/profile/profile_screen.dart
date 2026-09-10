@@ -498,7 +498,7 @@ class _OrdersIconGrid extends StatelessWidget {
                   style: GoogleFonts.getFont(
                     appTheme.fontDisplay,
                     textStyle: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: appTheme.fontWeightDisplay,
                       color: appTheme.fg,
                     ),
@@ -564,7 +564,7 @@ class _OrdersIconGrid extends StatelessWidget {
                                 Text(
                                   s.label,
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 16,
                                     color: appTheme.fgMuted,
                                   ),
                                   textAlign: TextAlign.center,
@@ -818,7 +818,7 @@ class _MenuList extends StatelessWidget {
                         child: Text(
                           m.label,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             color: appTheme.fg,
                           ),
                         ),

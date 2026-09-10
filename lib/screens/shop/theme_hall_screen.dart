@@ -75,7 +75,7 @@ class ThemeHallScreen extends StatelessWidget {
                     child: Text(
                       hall.title,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -117,7 +117,7 @@ class ThemeHallScreen extends StatelessWidget {
                         hall.title,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w800,
                         ),
                       ),

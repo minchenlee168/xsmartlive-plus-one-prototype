@@ -192,7 +192,7 @@ class _ComboPickerState extends State<ComboPicker> {
                       Text('加入購物車',
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700)),
                     ],
                   ),
@@ -217,7 +217,7 @@ class _ComboPickerState extends State<ComboPicker> {
               Expanded(
                 child: Text('請選擇 ${_cfg.pickCount} 件商品',
                     style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: appTheme.fg)),
               ),
@@ -244,7 +244,7 @@ class _ComboPickerState extends State<ComboPicker> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: appTheme.fg)),
                     const SizedBox(height: 4),
@@ -262,7 +262,7 @@ class _ComboPickerState extends State<ComboPicker> {
           Row(
             children: [
               Text('數量',
-                  style: TextStyle(fontSize: 14, color: appTheme.fg)),
+                  style: TextStyle(fontSize: 16, color: appTheme.fg)),
               const SizedBox(width: 16),
               _stepper(
                 appTheme,
@@ -271,13 +271,13 @@ class _ComboPickerState extends State<ComboPicker> {
                 onPlus: () => setState(() => _sets++),
               ),
               const SizedBox(width: 8),
-              Text('組', style: TextStyle(fontSize: 14, color: appTheme.fg)),
+              Text('組', style: TextStyle(fontSize: 16, color: appTheme.fg)),
             ],
           ),
           const SizedBox(height: 14),
           Text('選擇商品',
               style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: appTheme.fg)),
         ],
@@ -295,13 +295,13 @@ class _ComboPickerState extends State<ComboPicker> {
           Expanded(
             child: Text('商品組合（請選擇 ${_cfg.pickCount} 件商品）',
                 style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: appTheme.fg)),
           ),
           Text('已選 $_totalPicked / ${_cfg.pickCount}',
               style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w700, color: accent)),
+                  fontSize: 16, fontWeight: FontWeight.w700, color: accent)),
         ],
       ),
     );
@@ -323,7 +323,7 @@ class _ComboPickerState extends State<ComboPicker> {
               children: [
                 Text(p.item.name,
                     style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: appTheme.fg)),
                 const SizedBox(height: 2),
@@ -370,7 +370,7 @@ class _ComboPickerState extends State<ComboPicker> {
       ),
       child: const Text('挑選',
           style: TextStyle(
-              color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+              color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
     );
 
     if (dense) {
@@ -395,7 +395,7 @@ class _ComboPickerState extends State<ComboPicker> {
                     children: [
                       Text(it.name,
                           style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: appTheme.fg)),
                       const SizedBox(height: 2),
@@ -445,7 +445,7 @@ class _ComboPickerState extends State<ComboPicker> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: appTheme.fg)),
           const SizedBox(height: 2),
@@ -486,7 +486,7 @@ class _ComboPickerState extends State<ComboPicker> {
           value: _spec(it),
           icon: Icon(Icons.keyboard_arrow_down,
               size: 18, color: appTheme.fgMuted),
-          style: TextStyle(fontSize: 14, color: appTheme.fg),
+          style: TextStyle(fontSize: 16, color: appTheme.fg),
           dropdownColor: appTheme.bgElev,
           items: [
             for (final s in it.specs)
@@ -528,7 +528,7 @@ class _ComboPickerState extends State<ComboPicker> {
           constraints: const BoxConstraints(minWidth: 36),
           alignment: Alignment.center,
           child: Text('$value',
-              style: TextStyle(fontSize: 14, color: appTheme.fg)),
+              style: TextStyle(fontSize: 16, color: appTheme.fg)),
         ),
         btn(Icons.add, onPlus),
       ],

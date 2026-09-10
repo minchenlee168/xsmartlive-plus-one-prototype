@@ -494,7 +494,7 @@ class _EmptyTab extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               label,
-              style: TextStyle(color: appTheme.fgMuted, fontSize: 14),
+              style: TextStyle(color: appTheme.fgMuted, fontSize: 16),
             ),
           ],
         ),
@@ -546,7 +546,7 @@ class _SocialPostSection extends ConsumerWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: appTheme.fg,
                   ),
@@ -645,7 +645,7 @@ class _SocialPostCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: appTheme.fg,
               height: 1.35,

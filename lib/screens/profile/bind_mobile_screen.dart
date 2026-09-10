@@ -161,7 +161,7 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
                                   child: Text(
                                     c,
                                     style: TextStyle(
-                                        fontSize: 14, color: appTheme.fg),
+                                        fontSize: 16, color: appTheme.fg),
                                   ),
                                 ))
                             .toList(),
@@ -179,11 +179,11 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
                       controller: _mobileCtrl,
                       enabled: !_otpSent,
                       keyboardType: TextInputType.phone,
-                      style: TextStyle(fontSize: 14, color: appTheme.fg),
+                      style: TextStyle(fontSize: 16, color: appTheme.fg),
                       decoration: InputDecoration(
                         hintText: '請輸入手機號碼',
                         hintStyle: TextStyle(
-                            fontSize: 12, color: appTheme.fgMuted),
+                            fontSize: 16, color: appTheme.fgMuted),
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
@@ -214,11 +214,11 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
                 child: TextField(
                   controller: _otpCtrl,
                   keyboardType: TextInputType.number,
-                  style: TextStyle(fontSize: 14, color: appTheme.fg),
+                  style: TextStyle(fontSize: 16, color: appTheme.fg),
                   decoration: InputDecoration(
                     hintText: '請輸入 6 位數驗證碼',
                     hintStyle: TextStyle(
-                        fontSize: 12, color: appTheme.fgMuted),
+                        fontSize: 16, color: appTheme.fgMuted),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
@@ -260,7 +260,7 @@ class _BindMobileScreenState extends ConsumerState<BindMobileScreen> {
                         _otpSent ? '確認綁定' : '送出驗證碼',
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 14,
+                          fontSize: 16,
                         ),
                       ),
               ),

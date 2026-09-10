@@ -125,7 +125,7 @@ class _ProviderCard extends StatelessWidget {
             child: Text(
               bound ? '解除綁定' : '綁定',
               style: const TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w600),
+                  fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ],

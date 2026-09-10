@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/flavor_config.dart';
 import '../data/repositories/theme_repository.dart';
 import '../data/theme_cache_storage.dart';
+import '../theme/app_theme_extension.dart';
 import '../theme/preset_themes.dart';
 import '../theme/remote_theme_builder.dart';
 import '../theme/theme_state.dart';
@@ -107,9 +108,39 @@ ThemeData _ensureBrightness(ThemeData base, Brightness brightness) {
     seedColor: base.colorScheme.primary,
     brightness: brightness,
   );
+  // 由亮色主題衍生暗色時，也要把 AppThemeExtension 的「表面色」換成暗色 token，
+  // 否則 appTheme.bg/bgElev/fg 仍是亮色（白底 + 深字），在暗色頁面上會與 Material
+  // 暗色 chrome 打架、造成如發票下拉「淺字疊白底看不到」的問題。品牌色 / 圓角 /
+  // 間距 / 字體不變。
+  final baseAppTheme = base.extension<AppThemeExtension>();
+  List<ThemeExtension<dynamic>>? extensions;
+  if (brightness == Brightness.dark &&
+      baseAppTheme != null &&
+      !baseAppTheme.isDarkSurface) {
+    extensions = [
+      for (final e in base.extensions.values)
+        if (e is! AppThemeExtension) e,
+      _darkSurfaces(baseAppTheme),
+    ];
+  }
   return base.copyWith(
     brightness: brightness,
     colorScheme: reseeded,
     scaffoldBackgroundColor: reseeded.surface,
+    extensions: extensions,
   );
 }
+
+/// 保留品牌調色盤 / 圓角 / 間距 / 字體，只把「表面 / 文字 / 分隔線」換成暗色。
+AppThemeExtension _darkSurfaces(AppThemeExtension t) => t.copyWith(
+      bg: const Color(0xFF121214),
+      bgElev: const Color(0xFF1E1E22),
+      bgSubtle: const Color(0xFF262629),
+      fg: const Color(0xFFF5F5F7),
+      fgMuted: const Color(0xFFA1A1A8),
+      chip: const Color(0xFF2A2A2E),
+      chipFg: const Color(0xFFE5E5E7),
+      divider: const Color(0x1FFFFFFF),
+      muted: const Color(0xFF8E8E93),
+      isDarkSurface: true,
+    );

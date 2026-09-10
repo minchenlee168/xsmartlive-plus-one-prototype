@@ -241,7 +241,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
                         ? (_isEdit ? '編輯宅配地址' : '新增宅配地址')
                         : (_isEdit ? '編輯超商取貨門市' : '新增超商取貨門市'),
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg,
                     ),
@@ -282,7 +282,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
                                         value: c,
                                         child: Text(c,
                                             style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 16,
                                                 color: appTheme.fg)),
                                       ))
                                   .toList(),
@@ -299,7 +299,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
                             controller: _phoneCtrl,
                             keyboardType: TextInputType.phone,
                             style:
-                                TextStyle(fontSize: 14, color: appTheme.fg),
+                                TextStyle(fontSize: 16, color: appTheme.fg),
                             decoration: _innerDeco(appTheme, '請輸入電話'),
                           ),
                         ),
@@ -315,7 +315,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
                     children: [
                       Text('設為預設地址',
                           style:
-                              TextStyle(fontSize: 14, color: appTheme.fg)),
+                              TextStyle(fontSize: 16, color: appTheme.fg)),
                       const Spacer(),
                       Switch(
                         value: _isDefault,
@@ -352,7 +352,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
                             )
                           : const Text('儲存',
                               style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w700)),
+                                  fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -415,9 +415,9 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
           isExpanded: true,
           value: value,
           hint: Text(hint,
-              style: TextStyle(fontSize: 14, color: appTheme.fgMuted)),
+              style: TextStyle(fontSize: 16, color: appTheme.fgMuted)),
           onChanged: onChanged,
-          style: TextStyle(fontSize: 14, color: appTheme.fg),
+          style: TextStyle(fontSize: 16, color: appTheme.fg),
           dropdownColor: appTheme.bgElev,
           icon: Icon(Icons.keyboard_arrow_down, color: appTheme.fgMuted),
           items: [
@@ -523,7 +523,7 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
   static InputDecoration _innerDeco(AppThemeExtension t, String hint) =>
       InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(fontSize: 12, color: t.fgMuted),
+        hintStyle: TextStyle(fontSize: 16, color: t.fgMuted),
         border: InputBorder.none,
         isDense: true,
         contentPadding:
@@ -589,10 +589,10 @@ class _LabeledField extends StatelessWidget {
           ),
           child: TextField(
             controller: controller,
-            style: TextStyle(fontSize: 14, color: appTheme.fg),
+            style: TextStyle(fontSize: 16, color: appTheme.fg),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(fontSize: 12, color: appTheme.fgMuted),
+              hintStyle: TextStyle(fontSize: 16, color: appTheme.fgMuted),
               border: InputBorder.none,
               isDense: true,
               contentPadding:
@@ -702,7 +702,7 @@ class _BrandButton extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: selected ? color : appTheme.fg,
                 ),
@@ -751,7 +751,7 @@ class _SelectedStoreCard extends StatelessWidget {
                 Text(
                   '$brand · $name',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: appTheme.fg,
                   ),
@@ -772,7 +772,7 @@ class _SelectedStoreCard extends StatelessWidget {
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: const Text('重新選擇', style: TextStyle(fontSize: 12)),
+            child: const Text('重新選擇', style: TextStyle(fontSize: 16)),
           ),
         ],
       ),
@@ -809,7 +809,7 @@ class _StoreMapPicker extends StatelessWidget {
                     child: Text(
                       '$brand 取貨門市',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -840,7 +840,7 @@ class _StoreMapPicker extends StatelessWidget {
                   Text(
                     '電子地圖',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: appTheme.fg,
                     ),
@@ -876,7 +876,7 @@ class _StoreMapPicker extends StatelessWidget {
                                 Text(
                                   s.name,
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: appTheme.fg,
                                   ),

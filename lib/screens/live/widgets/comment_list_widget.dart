@@ -38,7 +38,7 @@ class _CommentTile extends StatelessWidget {
           Expanded(
             child: Text(
               comment.message,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              style: const TextStyle(fontSize: 16, color: Colors.black87),
             ),
           ),
           SizedBox(

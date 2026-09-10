@@ -179,7 +179,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       child: Text(
                         _birthday ?? '請選擇生日',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           color: _birthday != null
                               ? appTheme.fg
                               : appTheme.fgMuted,
@@ -219,7 +219,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       )
                     : const Text('儲存',
                         style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 14)),
+                            fontWeight: FontWeight.w700, fontSize: 16)),
               ),
             ),
           ],
@@ -255,10 +255,10 @@ class _Field extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: TextStyle(fontSize: 14, color: appTheme.fg),
+      style: TextStyle(fontSize: 16, color: appTheme.fg),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: appTheme.muted, fontSize: 12),
+        hintStyle: TextStyle(color: appTheme.muted, fontSize: 16),
         filled: true,
         fillColor: appTheme.bgElev,
         isDense: true,
@@ -316,7 +316,7 @@ class _GenderPill extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
                 color: selected ? Colors.white : appTheme.fgMuted,
               ),

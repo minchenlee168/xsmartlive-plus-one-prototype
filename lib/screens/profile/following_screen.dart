@@ -242,7 +242,7 @@ class _StreamerRow extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: appTheme.fg,
                           ),
@@ -310,7 +310,7 @@ class _FollowButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(appTheme.buttonRadius),
           ),
         ),
-        child: const Text('已追蹤', style: TextStyle(fontSize: 14)),
+        child: const Text('已追蹤', style: TextStyle(fontSize: 16)),
       );
     }
     return FilledButton(
@@ -326,7 +326,7 @@ class _FollowButton extends StatelessWidget {
         ),
       ),
       child: const Text('追蹤',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
     );
   }
 }

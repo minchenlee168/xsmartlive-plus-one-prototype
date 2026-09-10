@@ -240,7 +240,7 @@ class _StatusFilter extends StatelessWidget {
           ),
           style: TextStyle(
             color: appTheme.fg,
-            fontSize: 14,
+            fontSize: 16,
           ),
           items: [
             for (final item in items)
@@ -296,7 +296,7 @@ class _DateRangeSummary extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
             height: 1.35,
           ),
@@ -528,7 +528,7 @@ class _InfoRow extends StatelessWidget {
         Text(
           '$label：',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
             color: appTheme.fg,
             height: 1.5,
@@ -618,11 +618,11 @@ class _AmountBreakdownSheet extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(label,
-                    style: TextStyle(fontSize: 14, color: appTheme.fg)),
+                    style: TextStyle(fontSize: 16, color: appTheme.fg)),
               ),
               Text(value,
                   style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: discount ? appTheme.danger : appTheme.fg)),
             ],
@@ -640,7 +640,7 @@ class _AmountBreakdownSheet extends StatelessWidget {
               Expanded(
                 child: Text('金額明細',
                     style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: appTheme.fg)),
               ),
@@ -785,7 +785,7 @@ class _DetailToggleRow extends StatelessWidget {
               child: Text(
                 l10n.ordersDetailToggle,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: appTheme.fg,
                 ),
@@ -1478,7 +1478,7 @@ class _InfoPanel extends StatelessWidget {
                     child: Text(
                       l10n.ordersInfoPanelTitle,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: baseText,
                         height: 1.0,
@@ -1512,7 +1512,7 @@ class _InfoPanel extends StatelessWidget {
                     Text(
                       l10n.ordersInfoReturnTitle,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -1559,7 +1559,7 @@ class _NumberedItem extends StatelessWidget {
     final appTheme = context.appTheme;
     final baseText = appTheme.fg;
     final style = TextStyle(
-      fontSize: 14,
+      fontSize: 16,
       color: baseText,
       height: 1.625,
     );
@@ -1739,7 +1739,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                     child: Text(
                       l10n.ordersSearchTitle,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: baseText,
                       ),
@@ -1756,7 +1756,7 @@ class _SearchSheetState extends State<_SearchSheet> {
               Text(
                 l10n.ordersSearchDateLabel,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: baseText,
                 ),
@@ -1785,7 +1785,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                         child: Text(
                           '${_fmt(_start)} - ${_fmt(_end)}',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             color: baseText,
                           ),
                         ),
@@ -1848,13 +1848,13 @@ class _SearchSheetState extends State<_SearchSheet> {
                         textInputAction: TextInputAction.search,
                         onSubmitted: (_) => _submit(),
                         style: TextStyle(
-                            fontSize: 14, color: baseText),
+                            fontSize: 16, color: baseText),
                         decoration: InputDecoration(
                           isDense: true,
                           border: InputBorder.none,
                           hintText: l10n.ordersSearchKeywordPlaceholder,
                           hintStyle: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             color: placeholder,
                           ),
                           contentPadding:
@@ -1899,7 +1899,7 @@ class _SearchSheetState extends State<_SearchSheet> {
                             l10n.ordersSearchSubmit,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -1959,7 +1959,7 @@ class _PaginationBar extends StatelessWidget {
           Text(
             '$currentPage / $totalPages',
             style:
-                const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           IconButton(
             icon: const Icon(Icons.chevron_right),
@@ -2002,7 +2002,7 @@ class _SheetScaffold extends StatelessWidget {
                     child: Text(
                       title,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: appTheme.fg,
                       ),
@@ -2052,7 +2052,7 @@ class _OrderInquirySheet extends StatelessWidget {
             Text(
               'AI 智能客服',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: appTheme.fg,
               ),
@@ -2118,10 +2118,10 @@ class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
       decoration: _boxDeco(t),
       child: TextField(
         controller: c,
-        style: TextStyle(fontSize: 14, color: t.fg),
+        style: TextStyle(fontSize: 16, color: t.fg),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(fontSize: 12, color: t.fgMuted),
+          hintStyle: TextStyle(fontSize: 16, color: t.fgMuted),
           border: InputBorder.none,
           isDense: true,
           contentPadding:
@@ -2146,9 +2146,9 @@ class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
           isExpanded: true,
           value: value,
           hint: Text(hint,
-              style: TextStyle(fontSize: 14, color: t.fgMuted)),
+              style: TextStyle(fontSize: 16, color: t.fgMuted)),
           onChanged: onChanged,
-          style: TextStyle(fontSize: 14, color: t.fg),
+          style: TextStyle(fontSize: 16, color: t.fg),
           dropdownColor: t.bgElev,
           icon: Icon(Icons.keyboard_arrow_down, color: t.fgMuted),
           items: [
@@ -2166,7 +2166,7 @@ class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
       children: [
         _lbl(label),
         const SizedBox(height: 4),
-        Text(value, style: TextStyle(fontSize: 14, color: t.fg)),
+        Text(value, style: TextStyle(fontSize: 16, color: t.fg)),
       ],
     );
   }
@@ -2221,7 +2221,7 @@ class _ChangeAddressSheetState extends State<_ChangeAddressSheet> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _phoneCode,
-                      style: TextStyle(fontSize: 14, color: appTheme.fg),
+                      style: TextStyle(fontSize: 16, color: appTheme.fg),
                       dropdownColor: appTheme.bgElev,
                       onChanged: (v) =>
                           setState(() => _phoneCode = v ?? _phoneCode),
@@ -2363,7 +2363,7 @@ class _PayInfoSheetState extends State<_PayInfoSheet> {
     Widget txt(String v, {bool strong = false, Color? color}) => Text(
           v,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: strong ? FontWeight.w800 : FontWeight.w500,
             color: color ?? appTheme.fg,
           ),
@@ -2396,7 +2396,7 @@ Widget _dialogHeader(BuildContext context, String title) {
         child: Text(
           title,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w800,
             color: appTheme.fg,
           ),
@@ -2531,7 +2531,7 @@ class _LabeledValue extends StatelessWidget {
         Text(label,
             style: TextStyle(fontSize: 12, color: appTheme.fgMuted)),
         const SizedBox(height: 2),
-        Text(value, style: TextStyle(fontSize: 14, color: appTheme.fg)),
+        Text(value, style: TextStyle(fontSize: 16, color: appTheme.fg)),
       ],
     );
   }

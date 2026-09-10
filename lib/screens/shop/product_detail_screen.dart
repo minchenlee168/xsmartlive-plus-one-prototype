@@ -199,7 +199,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   Text(
                                     'NT\$${originalPrice.toStringAsFixed(0)}',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       color: appTheme.fgMuted,
                                       decoration:
                                           TextDecoration.lineThrough,
@@ -359,7 +359,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             style: GoogleFonts.getFont(
                               appTheme.fontDisplay,
                               textStyle: TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: appTheme.fontWeightDisplay,
                                 color: appTheme.fg,
                               ),
@@ -379,7 +379,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               child: Text(
                                 detail.intro,
                                 style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     color: appTheme.fg,
                                     height: 1.6),
                               ),
@@ -663,7 +663,7 @@ class _SpecSelector extends StatelessWidget {
                     Text(
                       spec.name,
                       style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w600),
+                          fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
@@ -743,7 +743,7 @@ class _SpecChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             color: textColor,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             decoration: enabled ? null : TextDecoration.lineThrough,
@@ -1058,7 +1058,7 @@ class _BottomBarState extends ConsumerState<_BottomBar> {
                       )
                     : Text(label,
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                         )),
               ),
@@ -1083,7 +1083,7 @@ class _BottomBarState extends ConsumerState<_BottomBar> {
                 child: const Text(
                   '立即購買',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -1147,7 +1147,7 @@ class _CouponRow extends StatelessWidget {
       children: [
         Text(
           '賣場優惠券',
-          style: TextStyle(fontSize: 14, color: appTheme.fgMuted),
+          style: TextStyle(fontSize: 16, color: appTheme.fgMuted),
         ),
         const Spacer(),
         GestureDetector(
@@ -1157,7 +1157,7 @@ class _CouponRow extends StatelessWidget {
               Text(
                 '查看可使用的優惠券',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   color: accent,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1724,7 +1724,7 @@ class _ProductNote extends StatelessWidget {
             Text(
               '商品備註',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: appTheme.fg,
               ),
@@ -1735,7 +1735,7 @@ class _ProductNote extends StatelessWidget {
         Text(
           note,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             height: 1.6,
             color: appTheme.fgMuted,
           ),
@@ -1815,7 +1815,7 @@ class _AttributeGrid extends StatelessWidget {
                   child: Text(
                     label,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       color: appTheme.fgMuted,
                     ),
                   ),
@@ -1825,7 +1825,7 @@ class _AttributeGrid extends StatelessWidget {
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       color: appTheme.fg,
                     ),
                   ),
@@ -1866,7 +1866,7 @@ class _ReviewsSection extends StatelessWidget {
               style: GoogleFonts.getFont(
                 appTheme.fontDisplay,
                 textStyle: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: appTheme.fontWeightDisplay,
                   color: appTheme.fg,
                 ),

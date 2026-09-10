@@ -38,7 +38,7 @@ class AddressBookScreen extends StatelessWidget {
             // 移除 M3 TabBar 預設底部分隔線（黑/灰線）。
             dividerColor: Colors.transparent,
             labelStyle: const TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w700),
+                fontSize: 16, fontWeight: FontWeight.w700),
             tabs: const [
               Tab(text: '宅配'),
               Tab(text: '超商取貨'),
@@ -402,7 +402,7 @@ class _AddressCardShell extends StatelessWidget {
           Text(
             body,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               height: 1.5,
               color: disabled ? appTheme.fgMuted : appTheme.fg,
             ),
@@ -494,7 +494,7 @@ class _CardAction extends StatelessWidget {
           children: [
             Icon(icon, size: 16, color: c),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(fontSize: 12, color: c)),
+            Text(label, style: TextStyle(fontSize: 16, color: c)),
           ],
         ),
       ),
@@ -530,7 +530,7 @@ class _EmptyState extends StatelessWidget {
         children: [
           Icon(icon, size: 56, color: appTheme.muted),
           SizedBox(height: appTheme.spacingLg),
-          Text(label, style: TextStyle(color: appTheme.fgMuted, fontSize: 14)),
+          Text(label, style: TextStyle(color: appTheme.fgMuted, fontSize: 16)),
           SizedBox(height: appTheme.spacingLg),
           SizedBox(
             height: 44,

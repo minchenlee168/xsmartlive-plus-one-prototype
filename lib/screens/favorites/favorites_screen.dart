@@ -10,7 +10,7 @@ class FavoritesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final favAsync = ref.watch(favoritesProvider);
+    final favAsync = ref.watch(favoritesNotifierProvider);
     final appTheme = context.appTheme;
 
     return Scaffold(
@@ -21,12 +21,7 @@ class FavoritesScreen extends ConsumerWidget {
             child: Text('載入失敗：$e',
                 style: TextStyle(color: appTheme.fgMuted))),
         data: (favorites) {
-          // 濾掉本地已取消收藏的項目（點愛心即時移除）。
-          final removed = ref.watch(removedFavoriteIdsProvider);
-          final visible = favorites
-              .where((f) => !removed.contains(f.product.id))
-              .toList();
-          if (visible.isEmpty) {
+          if (favorites.isEmpty) {
             return Column(
               children: [
                 _Header(count: 0, showCount: false),
@@ -51,11 +46,11 @@ class FavoritesScreen extends ConsumerWidget {
               ],
             );
           }
-          // 收藏卡改用共用「標準商品卡」ProductCard，與全站商品卡樣式一致；
-          // 右上疊一顆愛心作為「移除收藏」入口（點擊即時移除）。
+          // 收藏卡即共用「標準商品卡」ProductCard：右上內建愛心（點擊即取消收藏、
+          // 即時移除），已下架商品傳 unavailable 由卡片自己蓋「已下架」遮罩。
           return Column(
             children: [
-              _Header(count: visible.length, showCount: true),
+              _Header(count: favorites.length, showCount: true),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
@@ -70,39 +65,20 @@ class FavoritesScreen extends ConsumerWidget {
                         spacing: spacing,
                         runSpacing: spacing,
                         children: [
-                          for (final fav in visible)
+                          for (final fav in favorites)
                             SizedBox(
                               width: cardW,
-                              child: Stack(
-                                children: [
-                                  ProductCard(
-                                    variant: ProductCardVariant.standard,
-                                    product: fav.product,
-                                    // 下架品由遮罩表達不可購買，給正庫存避免又顯示「已售完」。
-                                    stock: kDelistedFavoriteIds
-                                            .contains(fav.product.id)
-                                        ? 99
-                                        : previewStockFor(fav.product),
-                                  ),
-                                  // 已下架：蓋遮罩、吸收點擊（不可加入購物車 / 進內頁）。
-                                  if (kDelistedFavoriteIds
-                                      .contains(fav.product.id))
-                                    const Positioned.fill(
-                                      child: _DelistedOverlay(),
-                                    ),
-                                  // 愛心置於最上層，下架商品仍可移除收藏。
-                                  Positioned(
-                                    top: appTheme.spacingSm,
-                                    right: appTheme.spacingSm,
-                                    child: _RemoveFavButton(
-                                      onTap: () => ref
-                                          .read(removedFavoriteIdsProvider
-                                              .notifier)
-                                          .update((s) =>
-                                              {...s, fav.product.id}),
-                                    ),
-                                  ),
-                                ],
+                              child: ProductCard(
+                                variant: ProductCardVariant.standard,
+                                product: fav.product,
+                                unavailable: kDelistedFavoriteIds
+                                    .contains(fav.product.id),
+                                // 下架品由 unavailable 表達不可購買，給正庫存
+                                // 避免又顯示「已售完」。
+                                stock: kDelistedFavoriteIds
+                                        .contains(fav.product.id)
+                                    ? 99
+                                    : previewStockFor(fav.product),
                               ),
                             ),
                         ],
@@ -114,64 +90,6 @@ class FavoritesScreen extends ConsumerWidget {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-/// 已下架遮罩：覆蓋整張卡、置中顯示「已下架」，並吸收點擊（不可購買 / 進內頁）。
-class _DelistedOverlay extends StatelessWidget {
-  const _DelistedOverlay();
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    return GestureDetector(
-      onTap: () {},
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: appTheme.bg.withValues(alpha: 0.74),
-          borderRadius: BorderRadius.circular(appTheme.cardRadius),
-        ),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: appTheme.fg,
-              borderRadius: BorderRadius.circular(appTheme.radiusSm),
-            ),
-            child: Text('已下架',
-                style: TextStyle(
-                  color: appTheme.bgElev,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                )),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// 收藏卡右上角的「移除收藏」愛心鈕（原型：佔位）。
-class _RemoveFavButton extends StatelessWidget {
-  const _RemoveFavButton({required this.onTap});
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.appTheme;
-    return Material(
-      color: appTheme.bgElev,
-      shape: const CircleBorder(),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: SizedBox(
-          width: 28,
-          height: 28,
-          child: Icon(Icons.favorite, color: appTheme.danger, size: 16),
-        ),
       ),
     );
   }

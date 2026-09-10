@@ -435,21 +435,45 @@ final comboProvider = FutureProvider.family<Combo?, int>(
 // Kept for search screen reset; no longer drives product filtering directly.
 final selectedCategoryProvider = StateProvider<int?>((ref) => null);
 
-final favoritesProvider =
-    FutureProvider<List<FavoriteProduct>>((ref) async {
-  try {
-    return await ref.read(productRepositoryProvider).fetchFavorites();
-  } catch (_) {
-    // Web 預覽（未登入 / 無法打真實 API）→ 回退範例收藏，讓「收藏 / 追蹤」
-    // 頁有內容可預覽；真機登入後走真實 API。
-    return _sampleFavorites;
+/// 全站收藏的單一狀態來源：初始化自 API/mock，之後由各處愛心即時 toggle。
+/// 原型純前端；TODO(API): toggle 改呼叫 POST/DELETE /favorites/{id}。
+class FavoritesNotifier extends AsyncNotifier<List<FavoriteProduct>> {
+  @override
+  Future<List<FavoriteProduct>> build() async {
+    try {
+      return await ref.read(productRepositoryProvider).fetchFavorites();
+    } catch (_) {
+      // Web 預覽（未登入 / 無法打真實 API）→ 回退範例收藏。
+      return _sampleFavorites;
+    }
   }
-});
 
-/// 本地端「已取消收藏」的商品 id（原型：點愛心即時從我的最愛移除，不改後端）。
-/// TODO(API): 改為呼叫 DELETE /favorites/{id} 並 invalidate favoritesProvider。
-final removedFavoriteIdsProvider =
-    StateProvider<Set<String>>((ref) => <String>{});
+  bool isFavorite(String id) =>
+      (state.valueOrNull ?? const []).any((f) => f.product.id == id);
+
+  /// 加入 / 移除收藏。加入時放到最前面，讓使用者一眼看到。
+  void toggle(Product product, {String streamer = '直播精選'}) {
+    final cur = state.valueOrNull ?? const <FavoriteProduct>[];
+    if (isFavorite(product.id)) {
+      state = AsyncData(
+          cur.where((f) => f.product.id != product.id).toList());
+    } else {
+      state = AsyncData([
+        FavoriteProduct(product: product, streamer: streamer),
+        ...cur,
+      ]);
+    }
+  }
+
+  void remove(String id) {
+    final cur = state.valueOrNull ?? const <FavoriteProduct>[];
+    state = AsyncData(cur.where((f) => f.product.id != id).toList());
+  }
+}
+
+final favoritesNotifierProvider =
+    AsyncNotifierProvider<FavoritesNotifier, List<FavoriteProduct>>(
+        FavoritesNotifier.new);
 
 const List<FavoriteProduct> _sampleFavorites = [
   FavoriteProduct(

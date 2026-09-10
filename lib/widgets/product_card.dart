@@ -54,6 +54,7 @@ class ProductCard extends ConsumerStatefulWidget {
     this.stock = 0,
     this.imageAspectRatio,
     this.onAddToCart,
+    this.unavailable = false,
   });
 
   final Product product;
@@ -63,6 +64,9 @@ class ProductCard extends ConsumerStatefulWidget {
 
   /// standard 變體使用的庫存數。
   final int stock;
+
+  /// true = 已下架：卡片蓋「已下架」遮罩、停用加入購物車 / 進內頁；愛心仍可點。
+  final bool unavailable;
 
   /// standard 變體選填：圖片長寬比（例如 1.0 = 方形，對照設計稿的網格）。
   /// null 時圖片用固定 1:1 方形（首頁 / 主題館橫向列）。
@@ -84,7 +88,6 @@ class _ProductCardState extends ConsumerState<ProductCard>
   // 精簡卡狀態
   final _addBtnKey = GlobalKey();
   late final AnimationController _pulseCtrl;
-  bool _favLocal = false;
   bool _adding = false;
 
   @override
@@ -116,11 +119,60 @@ class _ProductCardState extends ConsumerState<ProductCard>
   // 標準卡
   // ---------------------------------------------------------------------------
 
+  /// 收藏愛心（白底圓 + 實心/空心）；點擊 toggle 我的最愛。兩變體共用。
+  Widget _heartButton(AppThemeExtension appTheme) {
+    final favs = ref.watch(favoritesNotifierProvider).valueOrNull;
+    final isFav =
+        favs?.any((f) => f.product.id == widget.product.id) ?? false;
+    return GestureDetector(
+      onTap: () =>
+          ref.read(favoritesNotifierProvider.notifier).toggle(widget.product),
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: appTheme.bgElev.withValues(alpha: 0.92),
+          shape: BoxShape.circle,
+          boxShadow: appTheme.elevation1,
+        ),
+        alignment: Alignment.center,
+        child: Icon(
+          isFav ? Icons.favorite : Icons.favorite_border,
+          size: 16,
+          color: isFav ? appTheme.danger : appTheme.fgMuted,
+        ),
+      ),
+    );
+  }
+
+  /// 已下架遮罩：覆蓋圖片、置中「已下架」標。
+  Widget _delistedScrim(AppThemeExtension appTheme) {
+    return DecoratedBox(
+      decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.42)),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: appTheme.fg,
+            borderRadius: BorderRadius.circular(appTheme.radiusSm),
+          ),
+          child: Text('已下架',
+              style: TextStyle(
+                color: appTheme.bgElev,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              )),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStandard(BuildContext context) {
     final appTheme = context.appTheme;
     final accent = appTheme.brandPalette.tone500;
     final p = widget.product;
     final soldOut = widget.stock <= 0;
+    final blocked = widget.unavailable;
     // 任選組合商品：不顯示庫存與數量選擇（改由挑選彈窗決定），按鈕開挑選彈窗。
     final combo = comboForId(p.id);
     // 網格模式（imageAspectRatio 有值，如分類頁）採用較寬鬆、協調的比例；
@@ -166,31 +218,25 @@ class _ProductCardState extends ConsumerState<ProductCard>
         // 卡片依內容高度收合，避免在等比 grid 中被撐高留白。
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 圖片（prototype 佔位）；imageAspectRatio 指定時用等比方形。
-          if (widget.imageAspectRatio != null)
-            AspectRatio(
-              aspectRatio: widget.imageAspectRatio!,
-              child: Container(
-                width: double.infinity,
-                color: appTheme.bgSubtle,
-                alignment: Alignment.center,
-                child: Icon(Icons.image_outlined,
-                    size: 26, color: appTheme.fgMuted),
+          // 圖片（prototype 佔位；imageAspectRatio 指定時用該比例，否則 1:1 方形，
+          // 與精簡卡統一）+ 右上收藏愛心 +（若已下架）遮罩。
+          Stack(
+            children: [
+              AspectRatio(
+                aspectRatio: widget.imageAspectRatio ?? 1,
+                child: Container(
+                  width: double.infinity,
+                  color: appTheme.bgSubtle,
+                  alignment: Alignment.center,
+                  child: Icon(Icons.image_outlined,
+                      size: 26, color: appTheme.fgMuted),
+                ),
               ),
-            )
-          else
-            // 非網格（首頁 / 主題館）：圖片用 1:1 方形，與精簡卡（compact）
-            // 一致，讓全站商品卡圖片比例統一。不同寬度的卡片圖片皆等比例方形。
-            AspectRatio(
-              aspectRatio: 1,
-              child: Container(
-                width: double.infinity,
-                color: appTheme.bgSubtle,
-                alignment: Alignment.center,
-                child: Icon(Icons.image_outlined,
-                    size: 26, color: appTheme.fgMuted),
-              ),
-            ),
+              if (widget.unavailable)
+                Positioned.fill(child: _delistedScrim(appTheme)),
+              Positioned(top: 6, right: 6, child: _heartButton(appTheme)),
+            ],
+          ),
           Padding(
             padding: EdgeInsets.all(grid ? appTheme.spacingMd : 8),
             child: Column(
@@ -199,7 +245,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                 // 點名稱導向商品內頁。
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => context.push('/product/${p.id}'),
+                  onTap: blocked ? null : () => context.push('/product/${p.id}'),
                   // 固定保留兩行高度，讓一行 / 兩行名稱的卡片等高，
                   // 橫向列不會因短名稱在底部留下多餘空白。
                   child: SizedBox(
@@ -255,10 +301,14 @@ class _ProductCardState extends ConsumerState<ProductCard>
                 if (combo == null) ...[
                   SizedBox(height: grid ? appTheme.spacingSm : 4),
                   Text(
-                    soldOut ? '已售完' : '庫存 ${widget.stock}',
+                    blocked
+                        ? '已下架'
+                        : (soldOut ? '已售完' : '庫存 ${widget.stock}'),
                     style: TextStyle(
                       fontSize: metaSize,
-                      color: soldOut ? appTheme.danger : appTheme.fgMuted,
+                      color: (blocked || soldOut)
+                          ? appTheme.danger
+                          : appTheme.fgMuted,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -266,7 +316,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                   Row(
                     children: [
                       stepBtn(Icons.remove,
-                          enabled: !soldOut && _qty > 1,
+                          enabled: !blocked && !soldOut && _qty > 1,
                           onTap: () => setState(() => _qty--)),
                       Expanded(
                         child: Text(
@@ -276,7 +326,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                         ),
                       ),
                       stepBtn(Icons.add,
-                          enabled: !soldOut && _qty < widget.stock,
+                          enabled: !blocked && !soldOut && _qty < widget.stock,
                           onTap: () => setState(() => _qty++)),
                     ],
                   ),
@@ -286,7 +336,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                   width: double.infinity,
                   height: grid ? 36 : 32,
                   child: FilledButton(
-                    onPressed: soldOut
+                    onPressed: (blocked || soldOut)
                         ? null
                         : () {
                             // 任選組合 → 開挑選組合彈窗；有規格 → 選規格彈窗；
@@ -653,29 +703,7 @@ class _ProductCardState extends ConsumerState<ProductCard>
                         ),
                       ),
                     Positioned(
-                      top: 6,
-                      right: 6,
-                      child: GestureDetector(
-                        onTap: () =>
-                            setState(() => _favLocal = !_favLocal),
-                        child: Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
-                            shape: BoxShape.circle,
-                          ),
-                          alignment: Alignment.center,
-                          child: Icon(
-                            _favLocal
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            size: 16,
-                            color: _favLocal ? accent : appTheme.fgMuted,
-                          ),
-                        ),
-                      ),
-                    ),
+                      top: 6, right: 6, child: _heartButton(appTheme)),
                   ],
                 ),
               ),

@@ -743,10 +743,13 @@ class _OrderActionButtons extends StatelessWidget {
       children: [
         button(Icons.help_outline, '訂單提問',
             enabled: true, onTap: () => onSelected(_OrderAction.inquiry)),
-        const SizedBox(width: 8),
-        button(Icons.place_outlined, '更換地址',
-            enabled: canChangeAddress,
-            onTap: () => onSelected(_OrderAction.changeAddress)),
+        // 只有可更換地址（待付款 / 待出貨）時才顯示此按鈕，否則整顆隱藏。
+        if (canChangeAddress) ...[
+          const SizedBox(width: 8),
+          button(Icons.place_outlined, '更換地址',
+              enabled: true,
+              onTap: () => onSelected(_OrderAction.changeAddress)),
+        ],
         const SizedBox(width: 8),
         button(Icons.receipt_long_outlined, '訂購/付款資訊',
             enabled: true, onTap: () => onSelected(_OrderAction.payInfo)),

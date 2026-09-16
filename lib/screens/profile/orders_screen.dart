@@ -844,7 +844,7 @@ class _OrderDetailBody extends ConsumerWidget {
         color: appTheme.bg,
         borderRadius: BorderRadius.circular(8),
       ),
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(appTheme.spacingMd),
       child: detailAsync.when(
         data: (detail) {
           if (detail.items.isEmpty) {

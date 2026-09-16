@@ -112,7 +112,7 @@ const Set<int> kMultiFulfillmentOrderIds = {100006};
 /// 預設查詢區間即可看到。
 const List<Purchase> kSampleOrders = [
   // 待出貨 x5
-  Purchase(id: 100020, createdAt: '2026-08-30T20:14:00', itemCount: 2, amount: 1690, paymentMethod: '信用卡', shippingMethod: '超商取貨', status: 'paid'),
+  Purchase(id: 100020, createdAt: '2026-08-30T20:14:00', itemCount: 3, amount: 2450, paymentMethod: '信用卡', shippingMethod: '超商取貨', status: 'paid'),
   Purchase(id: 100019, createdAt: '2026-08-28T13:02:00', itemCount: 1, amount: 890, paymentMethod: 'LINE Pay', shippingMethod: '宅配', status: 'paid'),
   Purchase(id: 100018, createdAt: '2026-08-26T09:47:00', itemCount: 3, amount: 3280, paymentMethod: '信用卡', shippingMethod: '宅配', status: 'paid'),
   Purchase(id: 100017, createdAt: '2026-08-24T21:30:00', itemCount: 2, amount: 1180, paymentMethod: 'Apple Pay', shippingMethod: '超商取貨', status: 'paid'),
@@ -206,6 +206,45 @@ PurchaseDetail _sampleOrderDetail(int id) {
     (o) => o.id == id,
     orElse: () => kSampleOrders.first,
   );
+
+  // 示範：訂單 100020 明細內含多個商品 —— 三件不同商品各自一列 + 貨態。
+  if (order.id == 100020) {
+    return PurchaseDetail(
+      id: id,
+      items: [
+        PurchaseDetailItem(
+          id: id * 10 + 1,
+          productName: '柔霧持色唇釉 直播下標',
+          variantName: '#02 楓葉紅',
+          unitPrice: 650,
+          quantity: 1,
+          fulfillments: [
+            _sampleFulfillment(id, 1, 0, order.createdAt, 1), // 待出貨
+          ],
+        ),
+        PurchaseDetailItem(
+          id: id * 10 + 2,
+          productName: '水潤光唇釉 直播下標',
+          variantName: '#05 蜜桃粉',
+          unitPrice: 520,
+          quantity: 1,
+          fulfillments: [
+            _sampleFulfillment(id, 2, 0, order.createdAt, 1), // 待出貨
+          ],
+        ),
+        PurchaseDetailItem(
+          id: id * 10 + 3,
+          productName: '玫瑰保濕精華液 30ml',
+          variantName: '一般 / 標準',
+          unitPrice: 1280,
+          quantity: 1,
+          fulfillments: [
+            _sampleFulfillment(id, 3, 0, order.createdAt, 1), // 待出貨
+          ],
+        ),
+      ],
+    );
+  }
 
   // 示範：訂單 100006 拆成兩個包裹 —— 包裹 1 已送達、包裹 2 已出貨。
   if (order.id == 100006) {
